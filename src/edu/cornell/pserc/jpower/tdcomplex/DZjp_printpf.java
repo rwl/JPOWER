@@ -21,18 +21,12 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import java.util.Map;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
+public class DZjp_printpf {
 
-public class DZjp_loadcase {
+	public static void jp_printpf(DZjp_jpc results, int fd, DoubleMatrix1D jpopt) {
 
-	public static Map<String, DoubleMatrix2D> loadcase(String casefile) {
-		return null;
-	}
-
-	public static DZjp_jpc loadcase(DZjp_jpc casefile) {
-		return null;
 	}
 
 }

@@ -21,8 +21,6 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import java.util.Map;
-
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 public class DZjp_ext2int {
@@ -34,7 +32,7 @@ public class DZjp_ext2int {
 	 * @param branch
 	 * @return
 	 */
-	public static Map<String, DoubleMatrix2D> jp_ext2int(DoubleMatrix2D bus,
+	public static DZjp_jpc jp_ext2int(DoubleMatrix2D bus,
 			DoubleMatrix2D gen, DoubleMatrix2D branch) {
 		return jp_ext2int(bus, gen, branch, null);
 	}
@@ -47,7 +45,7 @@ public class DZjp_ext2int {
 	 * @param areas
 	 * @return
 	 */
-	public static Map<String, DoubleMatrix2D> jp_ext2int(DoubleMatrix2D bus,
+	public static DZjp_jpc jp_ext2int(DoubleMatrix2D bus,
 			DoubleMatrix2D gen, DoubleMatrix2D branch, DoubleMatrix2D areas) {
 		return null;
 	}
@@ -57,7 +55,7 @@ public class DZjp_ext2int {
 	 * @param jpc
 	 * @return
 	 */
-	public static Map<String, DoubleMatrix2D> jp_ext2int(Map<String, DoubleMatrix2D> jpc) {
+	public static DZjp_jpc jp_ext2int(DZjp_jpc jpc) {
 		return null;
 	}
 

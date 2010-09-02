@@ -21,13 +21,13 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 public class DZjp_dcpf {
 
-    public static DoubleMatrix1D jp_dcpf(DComplexMatrix2D B, DoubleMatrix1D Pbus,
-            DoubleMatrix1D Va0, int[] ref, int[] pv, int[] pq) {
+    public static DoubleMatrix1D jp_dcpf(DoubleMatrix2D B, DoubleMatrix1D Pbus,
+            DoubleMatrix1D Va0, int ref, int[] pv, int[] pq) {
 
         return null;
     }
