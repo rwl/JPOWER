@@ -20,23 +20,42 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-public class DZjp_jpc {
+public class DZjp_order {
 
-    public double baseMVA = 100;
-    public DoubleMatrix2D bus;
-    public DoubleMatrix2D gen;
-    public DoubleMatrix2D branch;
-    public DoubleMatrix2D areas;
-    public DoubleMatrix2D gencost;
-    public DoubleMatrix2D A;
-    public DoubleMatrix2D N;
+    class Case {
+        DoubleMatrix2D areas;
+        DoubleMatrix2D bus;
+        DoubleMatrix2D branch;
+        DoubleMatrix2D gen;
+        DoubleMatrix2D gencost;
+        DoubleMatrix2D A;
+        DoubleMatrix2D N;
+    }
 
-    public String version = "2";
-    public double et;	// elapsed time in seconds
-    public boolean success;
+    class Status {
+        public int[] on;
+        public int[] off;
+    }
 
-    public DZjp_order order;
+    class BusGen {
+        DoubleMatrix1D e2i;
+        DoubleMatrix1D i2e;
+        Status status = new Status();
+    }
+
+    class BranchAreas {
+        Status status = new Status();
+    }
+
+    public String state;		// 'i' or 'e'
+    public Case internal = new Case();
+    public Case external = new Case();
+    public BusGen bus = new BusGen();
+    public BusGen gen = new BusGen();
+    public BranchAreas branch = new BranchAreas();
+    public BranchAreas areas = new BranchAreas();
 
 }
