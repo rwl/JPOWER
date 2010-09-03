@@ -173,42 +173,30 @@ public class DZjp_ext2int extends DZjp_idx {
             }
 
             /* check that all buses have a valid BUS_TYPE */
-            DoubleMatrix1D bus_type = jpc.bus.viewColumn(BUS_TYPE);
-            IntMatrix1D bt = IntFactory1D.dense.make(nb);
-            for (int i = 0; i < nb; i++) {
-                int t = (int) bus_type.get(i);
-                bt.setQuick(i, t);
-                if (t != PQ || t != PV || t != REF || t != NONE)
+            int[] bt = idx(jpc.bus.viewColumn(BUS_I));
+            for (int i = 0; i < nb; i++)
+                if (bt[i] != PQ || bt[i] != PV || bt[i] != REF || bt[i] != NONE)
+                    System.out.printf("ext2int: bus %d has an invalid BUS_TYPE", i);
                     // TODO: Throw invalid bus type exception.
-                    System.out.println("ext2int: bus " + i + " has an invalid BUS_TYPE");
-            }
 
             /* determine which buses, branches, gens are connected & in-service */
-            DoubleMatrix1D bus_i = jpc.bus.viewColumn(BUS_I);
-            IntMatrix1D bi = IntFactory1D.dense.make(nb);
-            int[] b1 = new int[nb];
-            int[] rb = new int[nb];
-            for (int i = 0; i < nb; i++) {
-                bi.setQuick(i, (int) bus_i.getQuick(i));
-                b1[i] = 1; rb[i] = i; }
-//            int max_i = bi.aggregate(IntFunctions.max, IntFunctions.identity);
-            int[] max_i = bi.getMaxLocation();
-            SparseRCIntMatrix2D n2i = new SparseRCIntMatrix2D(max_i[0], 1,
-                    bi.toArray(), b1, rb, false, false, false);
+            int[] bi = idx(jpc.bus.viewColumn(BUS_I));
+            SparseRCIntMatrix2D n2i = new SparseRCIntMatrix2D(max(bi), 1,
+                  bi, ones(nb), rg(nb), false, false, false);
 
             /* bus status */
-            IntMatrix1D bs = bt.copy();
+            IntMatrix1D bs = IntFactory1D.dense.make(bt);
             bs.assign(IntFunctions.compare(NONE));
-            IntArrayList on = new IntArrayList();  // connected
-            bs.getNonZeros(on, null);
-            o.bus.status.on = on.elements();
-            bs = bt.copy();
+            bs.getNonZeros(o.bus.status.on, null); // connected
+            bs = IntFactory1D.dense.make(bt);
             bs.assign(IntFunctions.equals(NONE));
-            IntArrayList off = new IntArrayList(); // isolated
-            bs.getPositiveValues(off, null);
-            o.bus.status.off = off.elements();
+            bs.getPositiveValues(o.bus.status.off, null); // isolated
 
             /* gen status */
+            int[] gbus = idx(jpc.gen.viewColumn(GEN_BUS));
+            bs.viewSelection(n2i.viewSelection(gbus, null).viewColumn(0).toArray());
+
+            DoubleMatrix1D gs = jpc.gen.viewColumn(GEN_STATUS);
         }
 
         return null;

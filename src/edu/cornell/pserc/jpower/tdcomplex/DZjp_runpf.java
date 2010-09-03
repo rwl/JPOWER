@@ -215,13 +215,13 @@ public class DZjp_runpf extends DZjp_idx {
         long t0 = System.currentTimeMillis();
         if (verbose > 0) {
             Map<String, String> v = DZjp_jpver.jp_jpver("all");
-            System.out.println("JPOWER Version " + v.get("Version") + " " + v.get("Date"));
+            System.out.printf("\nJPOWER Version %s, %s", v.get("Version"), v.get("Date"));
         }
 
         boolean success = false;
         if (dc) {                                 // DC formulation
             if (verbose > 0)
-                System.out.println(" -- DC Power Flow");
+                System.out.printf(" -- DC Power Flow\n");
 
             /* initial state */
             DoubleMatrix1D Va0 = bus.viewColumn(VA).copy();
@@ -276,15 +276,15 @@ public class DZjp_runpf extends DZjp_idx {
         DZjp_jpc results = DZjp_int2ext.jp_int2ext(jpc);
 
         // zero out result fields of out-of-service gens & branches
-        if (results.order.gen.status.off.length > 0)
-        	results.gen.viewSelection(results.order.gen.status.off,
-        			new int[] {PG, QG}).assign(0);
-        if (results.order.branch.status.off.length > 0)
-        	results.branch.viewSelection(results.order.branch.status.off,
-        			new int[] {PF, QF, PT, QT}).assign(0);
+        if (results.order.gen.status.off.size() > 0)
+            results.gen.viewSelection(results.order.gen.status.off.elements(),
+                    new int[] {PG, QG}).assign(0);
+        if (results.order.branch.status.off.size() > 0)
+            results.branch.viewSelection(results.order.branch.status.off.elements(),
+                    new int[] {PF, QF, PT, QT}).assign(0);
 
         if (fname != "") {
-        	// TODO: printpf to file
+            // TODO: printpf to file
         }
         DZjp_printpf.jp_printpf(results, 1, jpopt);
 

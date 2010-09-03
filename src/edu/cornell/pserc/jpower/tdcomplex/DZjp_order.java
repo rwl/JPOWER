@@ -20,6 +20,7 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
+import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
@@ -36,8 +37,8 @@ public class DZjp_order {
     }
 
     class Status {
-        public int[] on;
-        public int[] off;
+        public IntArrayList on = new IntArrayList();
+        public IntArrayList off = new IntArrayList();
     }
 
     class BusGen {
