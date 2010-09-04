@@ -172,9 +172,6 @@ public class DZjp_runpf extends DZjp_idx {
     public static Object[] jp_runpf(DZjp_jpc casedata,
             DoubleMatrix1D jpopt, String fname, String solvedcase) {
 
-        DoubleFunctions func = DoubleFunctions.functions;
-        DComplexFunctions cfunc = DComplexFunctions.functions;
-
         /* options */
         int verbose = (int) jpopt.get(31);
         boolean qlim = jpopt.get(6) != 0.0;     /* enforce Q limits on gens? */
@@ -225,7 +222,7 @@ public class DZjp_runpf extends DZjp_idx {
 
             /* initial state */
             DoubleMatrix1D Va0 = bus.viewColumn(VA).copy();
-            Va0.assign(func.chain(func.mult(Math.PI), func.div(180)));
+            Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
             /* build B matrices and phase shift injections */
             List<AbstractMatrix> Bdc = DZjp_makeBdc.jp_makeBdc(baseMVA, bus, branch);
@@ -237,8 +234,8 @@ public class DZjp_runpf extends DZjp_idx {
             /* compute complex bus power injections (generation - load) */
             /* adjusted for phase shifters and real shunts */
             DoubleMatrix1D Pbus = DZjp_makeSbus.jp_makeSbus(baseMVA, bus, gen).getRealPart();
-            Pbus.assign(Pbusinj.getRealPart(), func.minus);
-            Pbus.assign(bus.viewColumn(GS), func.chain(func.div(baseMVA), func.minus));
+            Pbus.assign(Pbusinj.getRealPart(), dfunc.minus);
+            Pbus.assign(bus.viewColumn(GS), dfunc.chain(dfunc.div(baseMVA), dfunc.minus));
 
             /* "run" the power flow */
             DoubleMatrix1D Va = DZjp_dcpf.jp_dcpf(B, Pbus, Va0, ref, pv, pq);
@@ -247,12 +244,12 @@ public class DZjp_runpf extends DZjp_idx {
             branch.viewColumn(QF).assign(0);
             branch.viewColumn(QT).assign(0);
             branch.viewColumn(PF).assign(
-                    Bf.zMult(Va, null).assign(Pfinj, func.plus).assign(func.mult(baseMVA)));
+                    Bf.zMult(Va, null).assign(Pfinj, dfunc.plus).assign(dfunc.mult(baseMVA)));
             branch.viewColumn(PT).assign(
-                    branch.viewColumn(PT).copy().assign(func.neg));
+                    branch.viewColumn(PT).copy().assign(dfunc.neg));
             bus.viewColumn(VM).assign(1);
             bus.viewColumn(VA).assign(Va);
-            bus.viewColumn(VA).assign(func.chain(func.mult(180), func.div(Math.PI)));
+            bus.viewColumn(VA).assign(dfunc.chain(dfunc.mult(180), dfunc.div(Math.PI)));
             // update Pg for swing generator (note: other gens at ref bus are accounted for in Pbus)
             //      Pg = Pinj + Pload + Gs
             //      newPg = oldPg + newPinj - oldPinj

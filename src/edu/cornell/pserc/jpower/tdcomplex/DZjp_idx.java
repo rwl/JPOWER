@@ -21,7 +21,13 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
+import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tint.IntFactory1D;
+import cern.colt.matrix.tint.IntMatrix1D;
+import cern.jet.math.tdcomplex.DComplexFunctions;
+import cern.jet.math.tdouble.DoubleFunctions;
+import cern.jet.math.tint.IntFunctions;
 
 public class DZjp_idx {
 
@@ -139,13 +145,18 @@ public class DZjp_idx {
                                                 //	  starting with highest order, where cost is
                                                 //	  f(p) = cn*p^2 + ... + c1*p + c0
 
+    /* aliases */
+    protected static final DoubleFunctions dfunc = DoubleFunctions.functions;
+    protected static final IntFunctions ifunc = IntFunctions.intFunctions;
+    protected static final DComplexFunctions cfunc = DComplexFunctions.functions;
+
     /**
      *
      * @param stop
      * @return
      */
-    protected static int[] rg(int stop) {
-        return rg(0, stop);
+    protected static int[] irange(int stop) {
+        return irange(0, stop);
     }
 
     /**
@@ -154,8 +165,8 @@ public class DZjp_idx {
      * @param stop
      * @return
      */
-    protected static int[] rg(int start, int stop) {
-        return rg(start, stop, 1);
+    protected static int[] irange(int start, int stop) {
+        return irange(start, stop, 1);
     }
 
     /**
@@ -165,8 +176,44 @@ public class DZjp_idx {
      * @param step
      * @return
      */
-    protected static int[] rg(int start, int stop, int step) {
+    protected static int[] irange(int start, int stop, int step) {
         int[] r = new int[stop - start];
+        int v = start;
+        for (int i = 0; i < r.length; i++) {
+            r[i] = v;
+            v += step;
+        }
+        return r;
+    }
+
+    /**
+     *
+     * @param stop
+     * @return
+     */
+    protected static double[] drange(int stop) {
+        return drange(0, stop);
+    }
+
+    /**
+     *
+     * @param start
+     * @param stop
+     * @return
+     */
+    protected static double[] drange(int start, int stop) {
+        return drange(start, stop, 1);
+    }
+
+    /**
+     *
+     * @param start
+     * @param stop
+     * @param step
+     * @return
+     */
+    protected static double[] drange(int start, int stop, int step) {
+        double[] r = new double[stop - start];
         int v = start;
         for (int i = 0; i < r.length; i++) {
             r[i] = v;
@@ -204,12 +251,51 @@ public class DZjp_idx {
      * @param d
      * @return
      */
-    protected static int[] idx(DoubleMatrix1D d) {
+    protected static int[] inta(DoubleMatrix1D d) {
         int[] ix = new int[(int) d.size()];
         for (int i = 0; i < ix.length; i++)
             ix[i] = (int) d.getQuick(i);
         return ix;
     }
+
+    /**
+     *
+     * @param d
+     * @return
+     */
+    protected static IntMatrix1D intm(DoubleMatrix1D d) {
+        int n = (int) d.size();
+        IntMatrix1D im = IntFactory1D.dense.make(n);
+        for (int i = 0; i < n; i++)
+            im.set(i, (int) d.get(i));
+        return im;
+    }
+
+    /**
+     *
+     * @param d
+     * @return
+     */
+    protected static DoubleMatrix1D dbla(int[] ix) {
+        DoubleMatrix1D dx = DoubleFactory1D.dense.make(ix.length);
+        for (int i = 0; i < ix.length; i++)
+            dx.setQuick(i, ix[i]);
+        return dx;
+    }
+
+    /**
+     *
+     * @param d
+     * @return
+     */
+    protected static DoubleMatrix1D dblm(IntMatrix1D ix) {
+        int n = (int) ix.size();
+        DoubleMatrix1D dm = DoubleFactory1D.dense.make(n);
+        for (int i = 0; i < n; i++)
+            dm.set(i, ix.get(i));
+        return dm;
+    }
+
 
     /**
      *
