@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 1996-2010 by Power System Engineering Research Center (PSERC)
  * Copyright (C) 2010 Richard Lincoln
  *
  * This program is free software; you can redistribute it and/or
@@ -20,24 +21,12 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.AbstractMatrix;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
-public class DZjp_jpc {
+public class DZjp_get_reorder {
 
-    public double baseMVA = 100;
-    public DoubleMatrix2D bus;
-    public DoubleMatrix2D gen;
-    public DoubleMatrix2D branch;
-    public DoubleMatrix2D areas;
-    public DoubleMatrix2D gencost;
-    public DoubleMatrix2D A;
-    public DoubleMatrix2D N;
-    public String userfcn;
-
-    public String version = "2";
-    public double et;	// elapsed time in seconds
-    public boolean success;
-
-    public DZjp_order order;
-
+    public static DoubleMatrix1D jp_get_reorder(AbstractMatrix A, int[] idx, int dim) {
+        return null;
+    }
 }

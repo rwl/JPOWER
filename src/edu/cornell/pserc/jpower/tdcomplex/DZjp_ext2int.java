@@ -21,17 +21,16 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import cern.colt.list.tint.IntArrayList;
+import java.lang.reflect.Field;
+
+import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleSorting;
 import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.matrix.tint.IntFactory2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
 
 /**
  * Converts external to internal indexing.
@@ -114,12 +113,13 @@ public class DZjp_ext2int extends DZjp_idx {
      * @param branch
      * @return
      */
-    public static DZjp_jpc jp_ext2int(DoubleMatrix2D bus, DoubleMatrix2D gen,
+    public static DoubleMatrix2D[] jp_ext2int(DoubleMatrix2D bus, DoubleMatrix2D gen,
             DoubleMatrix2D branch) {
         return jp_ext2int(bus, gen, branch, null);
     }
 
     /**
+     * old form
      *
      * @param bus
      * @param gen
@@ -127,9 +127,22 @@ public class DZjp_ext2int extends DZjp_idx {
      * @param areas
      * @return
      */
-    public static DZjp_jpc jp_ext2int(DoubleMatrix2D bus,
+    public static DoubleMatrix2D[] jp_ext2int(DoubleMatrix2D bus,
             DoubleMatrix2D gen, DoubleMatrix2D branch, DoubleMatrix2D areas) {
-        return null;
+
+        int[] i2e = inta(bus.viewColumn(BUS_I));
+        DoubleMatrix1D e2i = DoubleFactory1D.sparse.make((int) max(i2e));
+        e2i.viewSelection(i2e).assign(drange(bus.rows()));
+
+        bus.viewColumn(BUS_I).assign( e2i.viewSelection(inta(bus.viewColumn(BUS_I))) );
+        gen.viewColumn(GEN_BUS).assign( e2i.viewSelection(inta(gen.viewColumn(GEN_BUS))) );
+        branch.viewColumn(F_BUS).assign( e2i.viewSelection(inta(branch.viewColumn(F_BUS))) );
+        branch.viewColumn(T_BUS).assign( e2i.viewSelection(inta(branch.viewColumn(T_BUS))) );
+
+        if (areas != null && areas.size() != 0)
+            areas.viewColumn(PRICE_REF_BUS).assign( e2i.viewSelection(inta(areas.viewColumn(PRICE_REF_BUS))) );
+
+        return new DoubleMatrix2D[] {bus, gen, branch, areas};
     }
 
     /**
@@ -235,7 +248,7 @@ public class DZjp_ext2int extends DZjp_idx {
 
             /* apply consecutive bus numbering */
             o.bus.i2e = jpc.bus.viewColumn(BUS_I);
-            o.bus.e2i = DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(dfunc.min, dfunc.identity));
+            o.bus.e2i = DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(dfunc.max, dfunc.identity));
             o.bus.e2i.viewSelection(inta(o.bus.i2e)).assign(DoubleFactory1D.dense.make(drange(nb)));
             jpc.bus.viewColumn(BUS_I).assign( o.bus.e2i.viewSelection(inta(jpc.bus.viewColumn(BUS_I))) );
             jpc.gen.viewColumn(GEN_BUS).assign( o.bus.e2i.viewSelection(inta(jpc.gen.viewColumn(GEN_BUS))) );
@@ -248,6 +261,159 @@ public class DZjp_ext2int extends DZjp_idx {
             o.gen.e2i = dbla(DoubleSorting.quickSort.sortIndex(jpc.gen.viewColumn(GEN_BUS)));
             o.gen.i2e = dbla(DoubleSorting.quickSort.sortIndex(o.gen.e2i));
             jpc.gen = jpc.gen.viewSelection(inta(o.gen.e2i), null).copy();
+
+            if (o.internal != null)
+                o.internal = null;
+            o.state = "i";
+            jpc.order = o;
+
+            /* update gencost, A and N */
+            if (jpc.gencost != null) {
+                String[] ordering;
+                if (jpc.gencost.rows() == 2*ng0) {
+                    ordering = new String[] {"gen", "gen"}; // Pg cost only
+                } else {
+                    ordering = new String[] {"gen"}; // include Qg cost
+                }
+                jpc = jp_ext2int(jpc, "gencost", ordering);
+            }
+            if (jpc.A != null || jpc.N != null) {
+                String[] ordering;
+                if (dc) {
+                    ordering = new String[] {"bus", "gen"};
+                } else {
+                    ordering = new String[] {"bus", "bus", "gen", "gen"};
+                }
+                if (jpc.A != null)
+                    jpc = jp_ext2int(jpc, "A", ordering, 2);
+                if (jpc.N != null)
+                    jpc = jp_ext2int(jpc, "N", ordering, 2);
+
+                /* execute userfcn callbacks for 'ext2int' stage */
+                if (jpc.userfcn != null)
+                    jpc = DZjp_run_userfcn.jp_run_userfcn(jpc.userfcn, "ext2int", jpc);
+            }
+
+            DZjp_jpc i2e = jpc;
+        } else {
+//            ordering = branch; // rename argument
+        }
+
+        return null;
+    }
+
+
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, String field, String[] ordering) {
+        int dim = 1;
+        return jp_ext2int(jpc, field, ordering, dim);
+    }
+
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, String field, String[] ordering, int dim) {
+        return jp_ext2int(jpc, new String[] {field}, ordering, dim);
+    }
+
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, String[] field, String[] ordering) {
+        int dim = 1;
+        return jp_ext2int(jpc, field, ordering, dim);
+    }
+
+    /**
+     *
+     * @param jpc
+     * @param field
+     * @param ordering
+     * @param dim
+     * @return
+     */
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, String[] field, String[] ordering, int dim) {
+        for (String f : field) {
+            try {
+                Field fld = jpc.getClass().getField(f);
+                fld.set(jpc.order.external, fld.get(jpc));
+                fld.set(jpc, jp_ext2int(jpc, (AbstractMatrix) fld.get(jpc), ordering, dim));
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        DZjp_jpc i2e = jpc;
+        return jpc;
+    }
+
+
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, AbstractMatrix val, String ordering) {
+        int dim = 1;
+        return jp_ext2int(jpc, val, new String[] {ordering}, dim);
+    }
+
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, AbstractMatrix val, String ordering, int dim) {
+        return jp_ext2int(jpc, val, new String[] {ordering}, dim);
+    }
+
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, AbstractMatrix val, String[] ordering) {
+        int dim = 1;
+        return jp_ext2int(jpc, val, ordering, dim);
+    }
+
+    /**
+     *
+     * @param jpc
+     * @param val
+     * @param ordering
+     * @param dim
+     * @return
+     */
+    public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, AbstractMatrix val, String[] ordering, int dim) {
+        DZjp_order o = jpc.order;
+
+        if (ordering.length == 1) {		// single set
+            int[] idx;
+            if (ordering.equals("gen")) {
+                int[] e2i = inta(o.gen.e2i);
+                idx = IntFactory1D.dense.make(o.gen.status.on.elements()).viewSelection(e2i).toArray();
+            } else if (ordering.equals("bus")) {
+                idx = o.bus.status.on.elements();
+            } else {
+                idx = o.branch.status.on.elements();	// TODO: enum
+            }
+            DoubleMatrix1D i2e = DZjp_get_reorder.jp_get_reorder(val, idx, dim);
+        } else {
+            int b = 0;		// base
+            for (String odr : ordering) {
+                try {
+                    Field fld = o.external.getClass().getField(odr);
+                    DoubleMatrix2D f = (DoubleMatrix2D) fld.get(o.external);
+                    int n = f.rows();
+                    DoubleMatrix1D v = DZjp_get_reorder.jp_get_reorder(val, irange(b, b+n), dim);
+
+                    b += n;
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+//            int n;
+//            if (dim == 1) {
+//                n = val.rows();
+//            } else if (dim == 2) {
+//                n = val.columns();
+//            } else if (dim == 3) {
+//                n = val.slices();
+//            }
+//            if (n > b) {	// the rest
+//                DoubleMatrix1D v = DZjp_get_reorder.jp_get_reorder(val, irange(b, b+n), dim);
+//
+//            }
         }
 
         return null;
