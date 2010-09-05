@@ -21,6 +21,8 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
+import java.util.concurrent.Future;
+
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
@@ -28,114 +30,115 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class DZjp_idx {
 
     /* define bus types */
-    public static final int PQ = 1;
-    public static final int PV = 2;
-    public static final int REF = 3;
-    public static final int NONE = 4;
+    protected static final int PQ = 1;
+    protected static final int PV = 2;
+    protected static final int REF = 3;
+    protected static final int NONE = 4;
 
     /* define bus indices */
-    public static final int BUS_I		= 1;	// bus number (1 to 29997)
-    public static final int BUS_TYPE	= 2;	// bus type (1 - PQ bus, 2 - PV bus, 3 - reference bus, 4 - isolated bus)
-    public static final int PD			= 3;	// Pd, real power demand (MW)
-    public static final int QD			= 4;	// Qd, reactive power demand (MVAr)
-    public static final int GS			= 5;	// Gs, shunt conductance (MW at V = 1.0 p.u.)
-    public static final int BS			= 6;	// Bs, shunt susceptance (MVAr at V = 1.0 p.u.)
-    public static final int BUS_AREA	= 7;	// area number, 1-100
-    public static final int VM			= 8;	// Vm, voltage magnitude (p.u.)
-    public static final int VA			= 9;	// Va, voltage angle (degrees)
-    public static final int BASE_KV		= 10;	// baseKV, base voltage (kV)
-    public static final int ZONE		= 11;	// zone, loss zone (1-999)
-    public static final int VMAX		= 12;	// maxVm, maximum voltage magnitude (p.u.)	  (not in PTI format)
-    public static final int VMIN		= 13;	// minVm, minimum voltage magnitude (p.u.)	  (not in PTI format)
+    protected static final int BUS_I		= 1;	// bus number (1 to 29997)
+    protected static final int BUS_TYPE	= 2;	// bus type (1 - PQ bus, 2 - PV bus, 3 - reference bus, 4 - isolated bus)
+    protected static final int PD			= 3;	// Pd, real power demand (MW)
+    protected static final int QD			= 4;	// Qd, reactive power demand (MVAr)
+    protected static final int GS			= 5;	// Gs, shunt conductance (MW at V = 1.0 p.u.)
+    protected static final int BS			= 6;	// Bs, shunt susceptance (MVAr at V = 1.0 p.u.)
+    protected static final int BUS_AREA	= 7;	// area number, 1-100
+    protected static final int VM			= 8;	// Vm, voltage magnitude (p.u.)
+    protected static final int VA			= 9;	// Va, voltage angle (degrees)
+    protected static final int BASE_KV		= 10;	// baseKV, base voltage (kV)
+    protected static final int ZONE		= 11;	// zone, loss zone (1-999)
+    protected static final int VMAX		= 12;	// maxVm, maximum voltage magnitude (p.u.)	  (not in PTI format)
+    protected static final int VMIN		= 13;	// minVm, minimum voltage magnitude (p.u.)	  (not in PTI format)
 
     // included in opf solution, not necessarily in input
     // assume objective function has units, u
-    public static final int LAM_P		= 14;	// Lagrange multiplier on real power mismatch (u/MW)
-    public static final int LAM_Q		= 15;	// Lagrange multiplier on reactive power mismatch (u/MVAr)
-    public static final int MU_VMAX		= 16;	// Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)
-    public static final int MU_VMIN		= 17;	// Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)
+    protected static final int LAM_P		= 14;	// Lagrange multiplier on real power mismatch (u/MW)
+    protected static final int LAM_Q		= 15;	// Lagrange multiplier on reactive power mismatch (u/MVAr)
+    protected static final int MU_VMAX		= 16;	// Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)
+    protected static final int MU_VMIN		= 17;	// Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)
 
 
     /* define gen indices */
-    public static final int GEN_BUS		= 1;	// bus number
-    public static final int PG			= 2;	// Pg, real power output (MW)
-    public static final int QG			= 3;	// Qg, reactive power output (MVAr)
-    public static final int QMAX		= 4;	// Qmax, maximum reactive power output at Pmin (MVAr)
-    public static final int QMIN		= 5;	// Qmin, minimum reactive power output at Pmin (MVAr)
-    public static final int VG			= 6;	// Vg, voltage magnitude setpopublic static final int (p.u.)
-    public static final int MBASE		= 7;	// mBase, total MVA base of this machine, defaults to baseMVA
-    public static final int GEN_STATUS	= 8;	// status, 1 - machine in service, 0 - machine out of service
-    public static final int PMAX		= 9;	// Pmax, maximum real power output (MW)
-    public static final int PMIN		= 10;	// Pmin, minimum real power output (MW)
-    public static final int PC1			= 11;	// Pc1, lower real power output of PQ capability curve (MW)
-    public static final int PC2			= 12;	// Pc2, upper real power output of PQ capability curve (MW)
-    public static final int QC1MIN		= 13;	// Qc1min, minimum reactive power output at Pc1 (MVAr)
-    public static final int QC1MAX		= 14;	// Qc1max, maximum reactive power output at Pc1 (MVAr)
-    public static final int QC2MIN		= 15;	// Qc2min, minimum reactive power output at Pc2 (MVAr)
-    public static final int QC2MAX		= 16;	// Qc2max, maximum reactive power output at Pc2 (MVAr)
-    public static final int RAMP_AGC	= 17;	// ramp rate for load following/AGC (MW/min)
-    public static final int RAMP_10		= 18;	// ramp rate for 10 minute reserves (MW)
-    public static final int RAMP_30		= 19;	// ramp rate for 30 minute reserves (MW)
-    public static final int RAMP_Q		= 20;	// ramp rate for reactive power (2 sec timescale) (MVAr/min)
-    public static final int APF			= 21;	// area participation factor
+    protected static final int GEN_BUS		= 1;	// bus number
+    protected static final int PG			= 2;	// Pg, real power output (MW)
+    protected static final int QG			= 3;	// Qg, reactive power output (MVAr)
+    protected static final int QMAX		= 4;	// Qmax, maximum reactive power output at Pmin (MVAr)
+    protected static final int QMIN		= 5;	// Qmin, minimum reactive power output at Pmin (MVAr)
+    protected static final int VG			= 6;	// Vg, voltage magnitude setpoprotected static final int (p.u.)
+    protected static final int MBASE		= 7;	// mBase, total MVA base of this machine, defaults to baseMVA
+    protected static final int GEN_STATUS	= 8;	// status, 1 - machine in service, 0 - machine out of service
+    protected static final int PMAX		= 9;	// Pmax, maximum real power output (MW)
+    protected static final int PMIN		= 10;	// Pmin, minimum real power output (MW)
+    protected static final int PC1			= 11;	// Pc1, lower real power output of PQ capability curve (MW)
+    protected static final int PC2			= 12;	// Pc2, upper real power output of PQ capability curve (MW)
+    protected static final int QC1MIN		= 13;	// Qc1min, minimum reactive power output at Pc1 (MVAr)
+    protected static final int QC1MAX		= 14;	// Qc1max, maximum reactive power output at Pc1 (MVAr)
+    protected static final int QC2MIN		= 15;	// Qc2min, minimum reactive power output at Pc2 (MVAr)
+    protected static final int QC2MAX		= 16;	// Qc2max, maximum reactive power output at Pc2 (MVAr)
+    protected static final int RAMP_AGC	= 17;	// ramp rate for load following/AGC (MW/min)
+    protected static final int RAMP_10		= 18;	// ramp rate for 10 minute reserves (MW)
+    protected static final int RAMP_30		= 19;	// ramp rate for 30 minute reserves (MW)
+    protected static final int RAMP_Q		= 20;	// ramp rate for reactive power (2 sec timescale) (MVAr/min)
+    protected static final int APF			= 21;	// area participation factor
 
     // included in opf solution, not necessarily in input
     // assume objective function has units, u
-    public static final int MU_PMAX		= 22;	// Kuhn-Tucker multiplier on upper Pg limit (u/MW)
-    public static final int MU_PMIN		= 23;	// Kuhn-Tucker multiplier on lower Pg limit (u/MW)
-    public static final int MU_QMAX		= 24;	// Kuhn-Tucker multiplier on upper Qg limit (u/MVAr)
-    public static final int MU_QMIN		= 25;	// Kuhn-Tucker multiplier on lower Qg limit (u/MVAr)
+    protected static final int MU_PMAX		= 22;	// Kuhn-Tucker multiplier on upper Pg limit (u/MW)
+    protected static final int MU_PMIN		= 23;	// Kuhn-Tucker multiplier on lower Pg limit (u/MW)
+    protected static final int MU_QMAX		= 24;	// Kuhn-Tucker multiplier on upper Qg limit (u/MVAr)
+    protected static final int MU_QMIN		= 25;	// Kuhn-Tucker multiplier on lower Qg limit (u/MVAr)
 
 
     /* define branch indices */
-    public static final int F_BUS		= 1;	// f, from bus number
-    public static final int T_BUS		= 2;	// t, to bus number
-    public static final int BR_R		= 3;	// r, resistance (p.u.)
-    public static final int BR_X		= 4;	// x, reactance (p.u.)
-    public static final int BR_B		= 5;	// b, total line charging susceptance (p.u.)
-    public static final int RATE_A		= 6;	// rateA, MVA rating A (long term rating)
-    public static final int RATE_B		= 7;	// rateB, MVA rating B (short term rating)
-    public static final int RATE_C		= 8;	// rateC, MVA rating C (emergency rating)
-    public static final int TAP			= 9;	// ratio, transformer off nominal turns ratio
-    public static final int SHIFT		= 10;	// angle, transformer phase shift angle (degrees)
-    public static final int BR_STATUS	= 11;	// initial branch status, 1 - in service, 0 - out of service
-    public static final int ANGMIN		= 12;	// minimum angle difference, angle(Vf) - angle(Vt) (degrees)
-    public static final int ANGMAX		= 13;	// maximum angle difference, angle(Vf) - angle(Vt) (degrees)
+    protected static final int F_BUS		= 1;	// f, from bus number
+    protected static final int T_BUS		= 2;	// t, to bus number
+    protected static final int BR_R		= 3;	// r, resistance (p.u.)
+    protected static final int BR_X		= 4;	// x, reactance (p.u.)
+    protected static final int BR_B		= 5;	// b, total line charging susceptance (p.u.)
+    protected static final int RATE_A		= 6;	// rateA, MVA rating A (long term rating)
+    protected static final int RATE_B		= 7;	// rateB, MVA rating B (short term rating)
+    protected static final int RATE_C		= 8;	// rateC, MVA rating C (emergency rating)
+    protected static final int TAP			= 9;	// ratio, transformer off nominal turns ratio
+    protected static final int SHIFT		= 10;	// angle, transformer phase shift angle (degrees)
+    protected static final int BR_STATUS	= 11;	// initial branch status, 1 - in service, 0 - out of service
+    protected static final int ANGMIN		= 12;	// minimum angle difference, angle(Vf) - angle(Vt) (degrees)
+    protected static final int ANGMAX		= 13;	// maximum angle difference, angle(Vf) - angle(Vt) (degrees)
 
     // included in power flow solution, not necessarily in input
-    public static final int PF			= 14;	// real power injected at "from" bus end (MW)	   (not in PTI format)
-    public static final int QF			= 15;	// reactive power injected at "from" bus end (MVAr) (not in PTI format)
-    public static final int PT			= 16;	// real power injected at "to" bus end (MW)		 (not in PTI format)
-    public static final int QT			= 17;	// reactive power injected at "to" bus end (MVAr)   (not in PTI format)
+    protected static final int PF			= 14;	// real power injected at "from" bus end (MW)	   (not in PTI format)
+    protected static final int QF			= 15;	// reactive power injected at "from" bus end (MVAr) (not in PTI format)
+    protected static final int PT			= 16;	// real power injected at "to" bus end (MW)		 (not in PTI format)
+    protected static final int QT			= 17;	// reactive power injected at "to" bus end (MVAr)   (not in PTI format)
 
     // included in opf solution, not necessarily in input
     // assume objective function has units, u
-    public static final int MU_SF		= 18;	// Kuhn-Tucker multiplier on MVA limit at "from" bus (u/MVA)
-    public static final int MU_ST		= 19;	// Kuhn-Tucker multiplier on MVA limit at "to" bus (u/MVA)
-    public static final int MU_ANGMIN	= 20;	// Kuhn-Tucker multiplier lower angle difference limit (u/degree)
-    public static final int MU_ANGMAX	= 21;	// Kuhn-Tucker multiplier upper angle difference limit (u/degree)
+    protected static final int MU_SF		= 18;	// Kuhn-Tucker multiplier on MVA limit at "from" bus (u/MVA)
+    protected static final int MU_ST		= 19;	// Kuhn-Tucker multiplier on MVA limit at "to" bus (u/MVA)
+    protected static final int MU_ANGMIN	= 20;	// Kuhn-Tucker multiplier lower angle difference limit (u/degree)
+    protected static final int MU_ANGMAX	= 21;	// Kuhn-Tucker multiplier upper angle difference limit (u/degree)
 
 
     /* define area indices */
-    public static final int AREA_I		= 1;	// area number
-    public static final int PRICE_REF_BUS = 2;	// price reference bus for this area
+    protected static final int AREA_I		= 1;	// area number
+    protected static final int PRICE_REF_BUS = 2;	// price reference bus for this area
 
 
     /* define cost models */
-    public static final int PW_LINEAR	= 1;
-    public static final int POLYNOMIAL	= 2;
+    protected static final int PW_LINEAR	= 1;
+    protected static final int POLYNOMIAL	= 2;
 
     // define cost indices
-    public static final int MODEL		= 1;	// cost model, 1 = piecewise linear, 2 = polynomial
-    public static final int STARTUP		= 2;	// startup cost in US dollars
-    public static final int SHUTDOWN	= 3;	// shutdown cost in US dollars
-    public static final int NCOST		= 4;	// number breakpoints in piecewise linear cost function,
+    protected static final int MODEL		= 1;	// cost model, 1 = piecewise linear, 2 = polynomial
+    protected static final int STARTUP		= 2;	// startup cost in US dollars
+    protected static final int SHUTDOWN	= 3;	// shutdown cost in US dollars
+    protected static final int NCOST		= 4;	// number breakpoints in piecewise linear cost function,
                                                 // or number of coefficients in polynomial cost function
-    public static final int COST		= 5;	// parameters defining total cost function begin in this col
+    protected static final int COST		= 5;	// parameters defining total cost function begin in this col
                                                 // (MODEL = 1) : p0, f0, p1, f1, ..., pn, fn
                                                 //	  where p0 < p1 < ... < pn and the cost f(p) is defined
                                                 //	  by the coordinates (p0,f0), (p1,f1), ..., (pn,fn) of
@@ -227,23 +230,63 @@ public class DZjp_idx {
      * @param n
      * @return
      */
-    protected static int[] zeros(int n) {
-        int[] z = new int[n];
-        for (int i : z)
-            z[i] = 0;
-        return z;
+    protected static int[] zeros(int size) {
+        final int[] values = new int[size];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            values[i] = 0;
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                values[i] = 0;
+            }
+        }
+        return values;
     }
 
     /**
      *
-     * @param n array length
+     * @param size array length
      * @return an integer array with all elements = 1.
      */
-    protected static int[] ones(int n) {
-        int[] one = new int[n];
-        for (int i : one)
-            one[i] = 1;
-        return one;
+    protected static int[] ones(int size) {
+        final int[] values = new int[size];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            values[i] = 1;
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                values[i] = 1;
+            }
+        }
+        return values;
     }
 
     /**
@@ -251,11 +294,32 @@ public class DZjp_idx {
      * @param d
      * @return
      */
-    protected static int[] inta(DoubleMatrix1D d) {
-        int[] ix = new int[(int) d.size()];
-        for (int i = 0; i < ix.length; i++)
-            ix[i] = (int) d.getQuick(i);
-        return ix;
+    protected static int[] inta(final DoubleMatrix1D d) {
+        int size = (int) d.size();
+        final int[] values = new int[size];
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            values[i] = (int) d.getQuick(i);
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                values[i] = (int) d.getQuick(i);
+            }
+        }
+        return values;
     }
 
     /**
@@ -263,12 +327,32 @@ public class DZjp_idx {
      * @param d
      * @return
      */
-    protected static IntMatrix1D intm(DoubleMatrix1D d) {
-        int n = (int) d.size();
-        IntMatrix1D im = IntFactory1D.dense.make(n);
-        for (int i = 0; i < n; i++)
-            im.set(i, (int) d.get(i));
-        return im;
+    protected static IntMatrix1D intm(final DoubleMatrix1D d) {
+        int size = (int) d.size();
+        final IntMatrix1D values = IntFactory1D.dense.make(size);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            values.setQuick(i, (int) d.getQuick(i));
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                values.setQuick(i, (int) d.getQuick(i));
+            }
+        }
+        return values;
     }
 
     /**
@@ -276,11 +360,32 @@ public class DZjp_idx {
      * @param d
      * @return
      */
-    protected static DoubleMatrix1D dbla(int[] ix) {
-        DoubleMatrix1D dx = DoubleFactory1D.dense.make(ix.length);
-        for (int i = 0; i < ix.length; i++)
-            dx.setQuick(i, ix[i]);
-        return dx;
+    protected static DoubleMatrix1D dbla(final int[] ix) {
+        int size = ix.length;
+        final DoubleMatrix1D values = DoubleFactory1D.dense.make(size);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            values.setQuick(i, ix[i]);
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                values.setQuick(i, ix[i]);
+            }
+        }
+        return values;
     }
 
     /**
@@ -288,12 +393,32 @@ public class DZjp_idx {
      * @param d
      * @return
      */
-    protected static DoubleMatrix1D dblm(IntMatrix1D ix) {
-        int n = (int) ix.size();
-        DoubleMatrix1D dm = DoubleFactory1D.dense.make(n);
-        for (int i = 0; i < n; i++)
-            dm.set(i, ix.get(i));
-        return dm;
+    protected static DoubleMatrix1D dblm(final IntMatrix1D ix) {
+        int size = (int) ix.size();
+        final DoubleMatrix1D values = DoubleFactory1D.dense.make(size);
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+            nthreads = Math.min(nthreads, size);
+            Future<?>[] futures = new Future[nthreads];
+            int k = size / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        for (int i = firstIdx; i < lastIdx; i++) {
+                            values.setQuick(i, ix.getQuick(i));
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            for (int i = 0; i < size; i++) {
+                values.setQuick(i, ix.getQuick(i));
+            }
+        }
+        return values;
     }
 
 
