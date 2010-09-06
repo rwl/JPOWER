@@ -23,6 +23,7 @@ package edu.cornell.pserc.jpower.tdcomplex;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tint.IntMatrix1D;
 
 public class DZjp_order {
 
@@ -42,8 +43,8 @@ public class DZjp_order {
     }
 
     class BusGen {
-        DoubleMatrix1D e2i;
-        DoubleMatrix1D i2e;
+        IntMatrix1D e2i;
+        IntMatrix1D i2e;
         Status status = new Status();
     }
 

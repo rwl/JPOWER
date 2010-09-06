@@ -30,6 +30,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleSorting;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
 
 /**
@@ -247,20 +248,20 @@ public class DZjp_ext2int extends DZjp_idx {
             nb = jpc.bus.rows();
 
             /* apply consecutive bus numbering */
-            o.bus.i2e = jpc.bus.viewColumn(BUS_I);
-            o.bus.e2i = DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(dfunc.max, dfunc.identity));
-            o.bus.e2i.viewSelection(inta(o.bus.i2e)).assign(DoubleFactory1D.dense.make(drange(nb)));
-            jpc.bus.viewColumn(BUS_I).assign( o.bus.e2i.viewSelection(inta(jpc.bus.viewColumn(BUS_I))) );
-            jpc.gen.viewColumn(GEN_BUS).assign( o.bus.e2i.viewSelection(inta(jpc.gen.viewColumn(GEN_BUS))) );
-            jpc.branch.viewColumn(F_BUS).assign( o.bus.e2i.viewSelection( inta(jpc.branch.viewColumn(F_BUS))) );
-            jpc.branch.viewColumn(T_BUS).assign( o.bus.e2i.viewSelection( inta(jpc.branch.viewColumn(T_BUS))) );
+            o.bus.i2e = intm(jpc.bus.viewColumn(BUS_I));
+            o.bus.e2i = intm(DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(ifunc.max, ifunc.identity)));
+            o.bus.e2i.viewSelection(o.bus.i2e.toArray()).assign(IntFactory1D.dense.make(irange(nb)));
+            jpc.bus.viewColumn(BUS_I).assign( dblm(o.bus.e2i.viewSelection(inta(jpc.bus.viewColumn(BUS_I)))) );
+            jpc.gen.viewColumn(GEN_BUS).assign( dblm(o.bus.e2i.viewSelection(inta(jpc.gen.viewColumn(GEN_BUS)))) );
+            jpc.branch.viewColumn(F_BUS).assign( dblm(o.bus.e2i.viewSelection( inta(jpc.branch.viewColumn(F_BUS)))) );
+            jpc.branch.viewColumn(T_BUS).assign( dblm(o.bus.e2i.viewSelection( inta(jpc.branch.viewColumn(T_BUS)))) );
             if (jpc.areas != null)
-                jpc.areas.viewColumn(PRICE_REF_BUS).assign( o.bus.e2i.viewSelection( inta(jpc.areas.viewColumn(PRICE_REF_BUS))) );
+                jpc.areas.viewColumn(PRICE_REF_BUS).assign( dblm(o.bus.e2i.viewSelection( inta(jpc.areas.viewColumn(PRICE_REF_BUS)))) );
 
             /* reorder gens in order of increasing bus number */
-            o.gen.e2i = dbla(DoubleSorting.quickSort.sortIndex(jpc.gen.viewColumn(GEN_BUS)));
-            o.gen.i2e = dbla(DoubleSorting.quickSort.sortIndex(o.gen.e2i));
-            jpc.gen = jpc.gen.viewSelection(inta(o.gen.e2i), null).copy();
+            o.gen.e2i = IntFactory1D.dense.make(DoubleSorting.quickSort.sortIndex(jpc.gen.viewColumn(GEN_BUS)));
+            o.gen.i2e = IntFactory1D.dense.make(IntSorting.quickSort.sortIndex(o.gen.e2i));
+            jpc.gen = jpc.gen.viewSelection(o.gen.e2i.toArray(), null).copy();
 
             if (o.internal != null)
                 o.internal = null;
@@ -374,7 +375,7 @@ public class DZjp_ext2int extends DZjp_idx {
         if (ordering.length == 1) {		// single set
             int[] idx;
             if (ordering.equals("gen")) {
-                int[] e2i = inta(o.gen.e2i);
+                int[] e2i = o.gen.e2i.toArray();
                 idx = IntFactory1D.dense.make(o.gen.status.on.elements()).viewSelection(e2i).toArray();
             } else if (ordering.equals("bus")) {
                 idx = o.bus.status.on.elements();

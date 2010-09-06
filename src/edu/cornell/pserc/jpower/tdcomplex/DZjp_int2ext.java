@@ -21,10 +21,93 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-public class DZjp_int2ext {
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-	public static DZjp_jpc jp_int2ext(DZjp_jpc jpc) {
-		return null;
-	}
+/**
+ * Converts internal to external bus numbering.
+ *
+ * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
+public class DZjp_int2ext extends DZjp_idx {
+
+    public static DoubleMatrix2D[] jp_int2ext(DoubleMatrix2D bus, DoubleMatrix2D gen,
+            DoubleMatrix2D branch) {
+        return jp_int2ext(bus, gen, branch, null);
+    }
+
+    /**
+     *
+     * @param bus
+     * @param gen
+     * @param branch
+     * @param areas
+     * @return
+     */
+    public static DoubleMatrix2D[] jp_int2ext(DoubleMatrix2D bus,
+            DoubleMatrix2D gen, DoubleMatrix2D branch, DoubleMatrix2D areas) {
+        return null;
+    }
+
+
+    /**
+     * If the input is a single JPOWER case object, then it restores all
+     * buses, generators and branches that were removed because of being
+     * isolated or off-line, and reverts to the original generator ordering
+     * and original bus numbering. This requires that the 'order' field
+     * created by EXT2INT be in place.
+     *
+     * @param jpc
+     * @return
+     */
+    public static DZjp_jpc jp_int2ext(DZjp_jpc jpc) {
+
+        if (jpc.order == null)
+            System.err.println("int2ext: jpc does not have the 'order' set, as required for conversion back to external numbering.");
+            // TODO: throw missing null order exception
+        DZjp_order o = jpc.order;
+
+        if (o.state == "i") {
+            /* execute userfcn callbacks for 'int2ext' stage */
+            if (jpc.userfcn != null)
+                jpc = DZjp_run_userfcn.jp_run_userfcn(jpc.userfcn, "int2ext", jpc);
+
+            /* save data matrices with internal ordering & restore originals */
+            o.internal.bus    = jpc.bus.copy();
+            o.internal.branch = jpc.branch.copy();
+            o.internal.gen    = jpc.gen.copy();
+            jpc.bus    = o.external.bus.copy();
+            jpc.branch = o.external.branch.copy();
+            jpc.gen    = o.external.gen.copy();
+            if (jpc.gencost != null) {
+                o.internal.gencost = jpc.gencost.copy();
+                jpc.gencost = o.external.gencost.copy();
+            }
+            if (jpc.areas != null) {
+                o.internal.areas = jpc.areas.copy();
+                jpc.areas = o.external.areas.copy();
+            }
+            if (jpc.A != null) {
+                o.internal.A = jpc.A.copy();
+                jpc.A = o.external.A.copy();
+            }
+            if (jpc.N != null) {
+                o.internal.N = jpc.N.copy();
+                jpc.N = o.external.N.copy();
+            }
+
+            /* update data (in bus, branch and gen only) */
+            jpc.bus.viewSelection(o.bus.status.on.elements(), null).assign(o.internal.bus);
+            jpc.branch.viewSelection(o.branch.status.on.elements(), null).assign(o.internal.branch);
+            jpc.gen.viewSelection(o.gen.status.on.elements(), null).assign(o.internal.gen.viewSelection(o.gen.i2e.toArray(), null));
+            if (jpc.areas != null)
+                jpc.areas.viewSelection(o.areas.status.on.elements(), null).assign(o.internal.areas);
+
+            /* revert to original bus numbers */
+        }
+
+        return null;
+    }
 
 }
