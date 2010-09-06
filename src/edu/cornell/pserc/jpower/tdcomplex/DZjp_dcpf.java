@@ -34,33 +34,33 @@ import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
  */
 public class DZjp_dcpf extends DZjp_idx {
 
-    /**
-     * Solves for the bus voltage angles at all but the reference bus.
-.	 *
-     * @param B the full system B matrix
-     * @param Pbus the vector of bus real power injections
-     * @param Va0 the initial vector of bus voltage angles (in radians)
-     * @param ref the swing bus index
-     * @param pv PV bus indicies
-     * @param pq PQ bus indices
-     * @return a vector of bus voltage angles in radians
-     */
-    @SuppressWarnings("static-access")
-    public static DoubleMatrix1D jp_dcpf(DoubleMatrix2D B, DoubleMatrix1D Pbus,
-            DoubleMatrix1D Va0, int ref, int[] pv, int[] pq) {
+	/**
+	 * Solves for the bus voltage angles at all but the reference bus.
+	 *
+	 * @param B the full system B matrix
+	 * @param Pbus the vector of bus real power injections
+	 * @param Va0 the initial vector of bus voltage angles (in radians)
+	 * @param ref the swing bus index
+	 * @param pv PV bus indicies
+	 * @param pq PQ bus indices
+	 * @return a vector of bus voltage angles in radians
+	 */
+	@SuppressWarnings("static-access")
+	public static DoubleMatrix1D jp_dcpf(DoubleMatrix2D B, DoubleMatrix1D Pbus,
+			DoubleMatrix1D Va0, int ref, int[] pv, int[] pq) {
 
-        /* initialize result vector */
-        DoubleMatrix1D Va = Va0.copy();
+		/* initialize result vector */
+		DoubleMatrix1D Va = Va0.copy();
 
-        /* update angles for non-reference buses */
-        int[] pvpq = cat(pv, pq);
-        DoubleMatrix2D A = B.viewSelection(pvpq, pvpq);
-        DoubleMatrix1D b = B.viewColumn(ref).viewSelection(pvpq).copy();
-        b.assign(dfunc.mult(Va.get(ref)));
-        b.assign(Pbus.viewSelection(pvpq), dfunc.swapArgs(dfunc.minus));
-        Va.viewSelection(pvpq).assign(SparseDoubleAlgebra.DEFAULT.solve(A, b));
+		/* update angles for non-reference buses */
+		int[] pvpq = cat(pv, pq);
+		DoubleMatrix2D A = B.viewSelection(pvpq, pvpq);
+		DoubleMatrix1D b = B.viewColumn(ref).viewSelection(pvpq).copy();
+		b.assign(dfunc.mult(Va.get(ref)));
+		b.assign(Pbus.viewSelection(pvpq), dfunc.swapArgs(dfunc.minus));
+		Va.viewSelection(pvpq).assign(SparseDoubleAlgebra.DEFAULT.solve(A, b));
 
-        return Va;
-    }
+		return Va;
+	}
 
 }

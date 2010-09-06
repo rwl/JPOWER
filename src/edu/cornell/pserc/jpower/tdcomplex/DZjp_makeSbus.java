@@ -37,45 +37,45 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
  */
 public class DZjp_makeSbus extends DZjp_idx {
 
-    /**
-     * Returns the vector of complex bus
-     * power injections, that is, generation minus load. Power is expressed
-     * in per unit.
-     *
-     * @see makeYbus
-     * @param baseMVA system base MVA
-     * @param bus bus data
-     * @param gen generator data
-     * @return vector of complex bus power injections
-     */
-    @SuppressWarnings("static-access")
-    public static DComplexMatrix1D jp_makeSbus(double baseMVA, DZjp_bus bus, DZjp_gen gen) {
+	/**
+	 * Returns the vector of complex bus
+	 * power injections, that is, generation minus load. Power is expressed
+	 * in per unit.
+	 *
+	 * @see makeYbus
+	 * @param baseMVA system base MVA
+	 * @param bus bus data
+	 * @param gen generator data
+	 * @return vector of complex bus power injections
+	 */
+	@SuppressWarnings("static-access")
+	public static DComplexMatrix1D jp_makeSbus(double baseMVA, DZjp_bus bus, DZjp_gen gen) {
 
-        /* generator info */
-        IntArrayList on = new IntArrayList();		// which generators are on?
-        gen.gen_status.assign(ifunc.equals(1)).getNonZeros(on, null);
-        int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
+		/* generator info */
+		IntArrayList on = new IntArrayList();		// which generators are on?
+		gen.gen_status.assign(ifunc.equals(1)).getNonZeros(on, null);
+		int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
 
-        /* form net complex bus power injection vector */
-        int nb = bus.size();
-        int ngon = on.size();
-        // connection matrix, element i, j is 1 if gen on(j) at bus i is ON
-        SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
-                gbus, irange(ngon), 1, 0, false);
+		/* form net complex bus power injection vector */
+		int nb = bus.size();
+		int ngon = on.size();
+		// connection matrix, element i, j is 1 if gen on(j) at bus i is ON
+		SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
+				gbus, irange(ngon), 1, 0, false);
 
-        DComplexMatrix1D Sg = DComplexFactory1D.dense.make(nb);
-        Sg.assignReal(gen.Pg.viewSelection(on.elements()));
-        Sg.assignImaginary(gen.Qg.viewSelection(on.elements()));
+		DComplexMatrix1D Sg = DComplexFactory1D.dense.make(nb);
+		Sg.assignReal(gen.Pg.viewSelection(on.elements()));
+		Sg.assignImaginary(gen.Qg.viewSelection(on.elements()));
 
-        DComplexMatrix1D Sd = DComplexFactory1D.dense.make(nb);
-        Sd.assignReal(bus.Pd);
-        Sd.assignImaginary(bus.Qd);
+		DComplexMatrix1D Sd = DComplexFactory1D.dense.make(nb);
+		Sd.assignReal(bus.Pd);
+		Sd.assignImaginary(bus.Qd);
 
-        // power injected by generators plus power injected by loads ...
-        DComplexMatrix1D Sbus = Cg.zMult(Sg.assign(Sd, cfunc.minus), null);
-        Sbus.assign(cfunc.div(baseMVA));	// converted to p.u.
+		// power injected by generators plus power injected by loads ...
+		DComplexMatrix1D Sbus = Cg.zMult(Sg.assign(Sd, cfunc.minus), null);
+		Sbus.assign(cfunc.div(baseMVA));	// converted to p.u.
 
-        return Sbus;
-    }
+		return Sbus;
+	}
 
 }

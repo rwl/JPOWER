@@ -34,13 +34,13 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 public class DZjp_idx {
 
-    /* define bus types */
-    protected static final int PQ = 1;
-    protected static final int PV = 2;
-    protected static final int REF = 3;
-    protected static final int NONE = 4;
+	/* define bus types */
+	protected static final int PQ = 1;
+	protected static final int PV = 2;
+	protected static final int REF = 3;
+	protected static final int NONE = 4;
 
-    /* define bus indices */
+	/* define bus indices */
 //    protected static final int BUS_I		= 1;	// bus number (1 to 29997)
 //    protected static final int BUS_TYPE	= 2;	// bus type (1 - PQ bus, 2 - PV bus, 3 - reference bus, 4 - isolated bus)
 //    protected static final int PD			= 3;	// Pd, real power demand (MW)
@@ -55,15 +55,15 @@ public class DZjp_idx {
 //    protected static final int VMAX		= 12;	// maxVm, maximum voltage magnitude (p.u.)	  (not in PTI format)
 //    protected static final int VMIN		= 13;	// minVm, minimum voltage magnitude (p.u.)	  (not in PTI format)
 
-    // included in opf solution, not necessarily in input
-    // assume objective function has units, u
+	// included in opf solution, not necessarily in input
+	// assume objective function has units, u
 //    protected static final int LAM_P		= 14;	// Lagrange multiplier on real power mismatch (u/MW)
 //    protected static final int LAM_Q		= 15;	// Lagrange multiplier on reactive power mismatch (u/MVAr)
 //    protected static final int MU_VMAX		= 16;	// Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)
 //    protected static final int MU_VMIN		= 17;	// Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)
 
 
-    /* define gen indices */
+	/* define gen indices */
 //    protected static final int GEN_BUS		= 1;	// bus number
 //    protected static final int PG			= 2;	// Pg, real power output (MW)
 //    protected static final int QG			= 3;	// Qg, reactive power output (MVAr)
@@ -94,7 +94,7 @@ public class DZjp_idx {
 //    protected static final int MU_QMIN		= 25;	// Kuhn-Tucker multiplier on lower Qg limit (u/MVAr)
 
 
-    /* define branch indices */
+	/* define branch indices */
 //    protected static final int F_BUS		= 1;	// f, from bus number
 //    protected static final int T_BUS		= 2;	// t, to bus number
 //    protected static final int BR_R		= 3;	// r, resistance (p.u.)
@@ -128,11 +128,11 @@ public class DZjp_idx {
 //    protected static final int PRICE_REF_BUS = 2;	// price reference bus for this area
 
 
-    /* define cost models */
-    protected static final int PW_LINEAR	= 1;
-    protected static final int POLYNOMIAL	= 2;
+	/* define cost models */
+	protected static final int PW_LINEAR	= 1;
+	protected static final int POLYNOMIAL	= 2;
 
-    // define cost indices
+	// define cost indices
 //    protected static final int MODEL		= 1;	// cost model, 1 = piecewise linear, 2 = polynomial
 //    protected static final int STARTUP		= 2;	// startup cost in US dollars
 //    protected static final int SHUTDOWN	= 3;	// shutdown cost in US dollars
@@ -148,304 +148,304 @@ public class DZjp_idx {
 //                                                //	  starting with highest order, where cost is
 //                                                //	  f(p) = cn*p^2 + ... + c1*p + c0
 
-    /* aliases */
-    protected static final DoubleFunctions dfunc = DoubleFunctions.functions;
-    protected static final IntFunctions ifunc = IntFunctions.intFunctions;
-    protected static final DComplexFunctions cfunc = DComplexFunctions.functions;
+	/* aliases */
+	protected static final DoubleFunctions dfunc = DoubleFunctions.functions;
+	protected static final IntFunctions ifunc = IntFunctions.intFunctions;
+	protected static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-    /**
-     *
-     * @param stop
-     * @return
-     */
-    protected static int[] irange(int stop) {
-        return irange(0, stop);
-    }
+	/**
+	 *
+	 * @param stop
+	 * @return
+	 */
+	protected static int[] irange(int stop) {
+		return irange(0, stop);
+	}
 
-    /**
-     *
-     * @param start
-     * @param stop
-     * @return
-     */
-    protected static int[] irange(int start, int stop) {
-        return irange(start, stop, 1);
-    }
+	/**
+	 *
+	 * @param start
+	 * @param stop
+	 * @return
+	 */
+	protected static int[] irange(int start, int stop) {
+		return irange(start, stop, 1);
+	}
 
-    /**
-     *
-     * @param start
-     * @param stop
-     * @param step
-     * @return
-     */
-    protected static int[] irange(int start, int stop, int step) {
-        int[] r = new int[stop - start];
-        int v = start;
-        for (int i = 0; i < r.length; i++) {
-            r[i] = v;
-            v += step;
-        }
-        return r;
-    }
+	/**
+	 *
+	 * @param start
+	 * @param stop
+	 * @param step
+	 * @return
+	 */
+	protected static int[] irange(int start, int stop, int step) {
+		int[] r = new int[stop - start];
+		int v = start;
+		for (int i = 0; i < r.length; i++) {
+			r[i] = v;
+			v += step;
+		}
+		return r;
+	}
 
-    /**
-     *
-     * @param stop
-     * @return
-     */
-    protected static double[] drange(int stop) {
-        return drange(0, stop);
-    }
+	/**
+	 *
+	 * @param stop
+	 * @return
+	 */
+	protected static double[] drange(int stop) {
+		return drange(0, stop);
+	}
 
-    /**
-     *
-     * @param start
-     * @param stop
-     * @return
-     */
-    protected static double[] drange(int start, int stop) {
-        return drange(start, stop, 1);
-    }
+	/**
+	 *
+	 * @param start
+	 * @param stop
+	 * @return
+	 */
+	protected static double[] drange(int start, int stop) {
+		return drange(start, stop, 1);
+	}
 
-    /**
-     *
-     * @param start
-     * @param stop
-     * @param step
-     * @return
-     */
-    protected static double[] drange(int start, int stop, int step) {
-        double[] r = new double[stop - start];
-        int v = start;
-        for (int i = 0; i < r.length; i++) {
-            r[i] = v;
-            v += step;
-        }
-        return r;
-    }
+	/**
+	 *
+	 * @param start
+	 * @param stop
+	 * @param step
+	 * @return
+	 */
+	protected static double[] drange(int start, int stop, int step) {
+		double[] r = new double[stop - start];
+		int v = start;
+		for (int i = 0; i < r.length; i++) {
+			r[i] = v;
+			v += step;
+		}
+		return r;
+	}
 
-    /**
-     *
-     * @param n
-     * @return
-     */
-    protected static int[] zeros(int size) {
-        final int[] values = new int[size];
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, size);
-            Future<?>[] futures = new Future[nthreads];
-            int k = size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        for (int i = firstIdx; i < lastIdx; i++) {
-                            values[i] = 0;
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            for (int i = 0; i < size; i++) {
-                values[i] = 0;
-            }
-        }
-        return values;
-    }
+	/**
+	 *
+	 * @param n
+	 * @return
+	 */
+	protected static int[] zeros(int size) {
+		final int[] values = new int[size];
+		int nthreads = ConcurrencyUtils.getNumberOfThreads();
+		if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+			nthreads = Math.min(nthreads, size);
+			Future<?>[] futures = new Future[nthreads];
+			int k = size / nthreads;
+			for (int j = 0; j < nthreads; j++) {
+				final int firstIdx = j * k;
+				final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
+					public void run() {
+						for (int i = firstIdx; i < lastIdx; i++) {
+							values[i] = 0;
+						}
+					}
+				});
+			}
+			ConcurrencyUtils.waitForCompletion(futures);
+		} else {
+			for (int i = 0; i < size; i++) {
+				values[i] = 0;
+			}
+		}
+		return values;
+	}
 
-    /**
-     *
-     * @param size array length
-     * @return an integer array with all elements = 1.
-     */
-    protected static int[] ones(int size) {
-        final int[] values = new int[size];
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, size);
-            Future<?>[] futures = new Future[nthreads];
-            int k = size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        for (int i = firstIdx; i < lastIdx; i++) {
-                            values[i] = 1;
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            for (int i = 0; i < size; i++) {
-                values[i] = 1;
-            }
-        }
-        return values;
-    }
+	/**
+	 *
+	 * @param size array length
+	 * @return an integer array with all elements = 1.
+	 */
+	protected static int[] ones(int size) {
+		final int[] values = new int[size];
+		int nthreads = ConcurrencyUtils.getNumberOfThreads();
+		if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+			nthreads = Math.min(nthreads, size);
+			Future<?>[] futures = new Future[nthreads];
+			int k = size / nthreads;
+			for (int j = 0; j < nthreads; j++) {
+				final int firstIdx = j * k;
+				final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
+					public void run() {
+						for (int i = firstIdx; i < lastIdx; i++) {
+							values[i] = 1;
+						}
+					}
+				});
+			}
+			ConcurrencyUtils.waitForCompletion(futures);
+		} else {
+			for (int i = 0; i < size; i++) {
+				values[i] = 1;
+			}
+		}
+		return values;
+	}
 
-    /**
-     *
-     * @param d
-     * @return
-     */
-    protected static int[] inta(final DoubleMatrix1D d) {
-        int size = (int) d.size();
-        final int[] values = new int[size];
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, size);
-            Future<?>[] futures = new Future[nthreads];
-            int k = size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        for (int i = firstIdx; i < lastIdx; i++) {
-                            values[i] = (int) d.getQuick(i);
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            for (int i = 0; i < size; i++) {
-                values[i] = (int) d.getQuick(i);
-            }
-        }
-        return values;
-    }
+	/**
+	 *
+	 * @param d
+	 * @return
+	 */
+	protected static int[] inta(final DoubleMatrix1D d) {
+		int size = (int) d.size();
+		final int[] values = new int[size];
+		int nthreads = ConcurrencyUtils.getNumberOfThreads();
+		if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+			nthreads = Math.min(nthreads, size);
+			Future<?>[] futures = new Future[nthreads];
+			int k = size / nthreads;
+			for (int j = 0; j < nthreads; j++) {
+				final int firstIdx = j * k;
+				final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
+					public void run() {
+						for (int i = firstIdx; i < lastIdx; i++) {
+							values[i] = (int) d.getQuick(i);
+						}
+					}
+				});
+			}
+			ConcurrencyUtils.waitForCompletion(futures);
+		} else {
+			for (int i = 0; i < size; i++) {
+				values[i] = (int) d.getQuick(i);
+			}
+		}
+		return values;
+	}
 
-    /**
-     *
-     * @param d
-     * @return
-     */
-    protected static IntMatrix1D intm(final DoubleMatrix1D d) {
-        int size = (int) d.size();
-        final IntMatrix1D values = IntFactory1D.dense.make(size);
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, size);
-            Future<?>[] futures = new Future[nthreads];
-            int k = size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        for (int i = firstIdx; i < lastIdx; i++) {
-                            values.setQuick(i, (int) d.getQuick(i));
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            for (int i = 0; i < size; i++) {
-                values.setQuick(i, (int) d.getQuick(i));
-            }
-        }
-        return values;
-    }
+	/**
+	 *
+	 * @param d
+	 * @return
+	 */
+	protected static IntMatrix1D intm(final DoubleMatrix1D d) {
+		int size = (int) d.size();
+		final IntMatrix1D values = IntFactory1D.dense.make(size);
+		int nthreads = ConcurrencyUtils.getNumberOfThreads();
+		if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+			nthreads = Math.min(nthreads, size);
+			Future<?>[] futures = new Future[nthreads];
+			int k = size / nthreads;
+			for (int j = 0; j < nthreads; j++) {
+				final int firstIdx = j * k;
+				final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
+					public void run() {
+						for (int i = firstIdx; i < lastIdx; i++) {
+							values.setQuick(i, (int) d.getQuick(i));
+						}
+					}
+				});
+			}
+			ConcurrencyUtils.waitForCompletion(futures);
+		} else {
+			for (int i = 0; i < size; i++) {
+				values.setQuick(i, (int) d.getQuick(i));
+			}
+		}
+		return values;
+	}
 
-    /**
-     *
-     * @param d
-     * @return
-     */
-    protected static DoubleMatrix1D dbla(final int[] ix) {
-        int size = ix.length;
-        final DoubleMatrix1D values = DoubleFactory1D.dense.make(size);
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, size);
-            Future<?>[] futures = new Future[nthreads];
-            int k = size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        for (int i = firstIdx; i < lastIdx; i++) {
-                            values.setQuick(i, ix[i]);
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            for (int i = 0; i < size; i++) {
-                values.setQuick(i, ix[i]);
-            }
-        }
-        return values;
-    }
+	/**
+	 *
+	 * @param d
+	 * @return
+	 */
+	protected static DoubleMatrix1D dbla(final int[] ix) {
+		int size = ix.length;
+		final DoubleMatrix1D values = DoubleFactory1D.dense.make(size);
+		int nthreads = ConcurrencyUtils.getNumberOfThreads();
+		if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+			nthreads = Math.min(nthreads, size);
+			Future<?>[] futures = new Future[nthreads];
+			int k = size / nthreads;
+			for (int j = 0; j < nthreads; j++) {
+				final int firstIdx = j * k;
+				final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
+					public void run() {
+						for (int i = firstIdx; i < lastIdx; i++) {
+							values.setQuick(i, ix[i]);
+						}
+					}
+				});
+			}
+			ConcurrencyUtils.waitForCompletion(futures);
+		} else {
+			for (int i = 0; i < size; i++) {
+				values.setQuick(i, ix[i]);
+			}
+		}
+		return values;
+	}
 
-    /**
-     *
-     * @param d
-     * @return
-     */
-    protected static DoubleMatrix1D dblm(final IntMatrix1D ix) {
-        int size = (int) ix.size();
-        final DoubleMatrix1D values = DoubleFactory1D.dense.make(size);
-        int nthreads = ConcurrencyUtils.getNumberOfThreads();
-        if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
-            nthreads = Math.min(nthreads, size);
-            Future<?>[] futures = new Future[nthreads];
-            int k = size / nthreads;
-            for (int j = 0; j < nthreads; j++) {
-                final int firstIdx = j * k;
-                final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
-                futures[j] = ConcurrencyUtils.submit(new Runnable() {
-                    public void run() {
-                        for (int i = firstIdx; i < lastIdx; i++) {
-                            values.setQuick(i, ix.getQuick(i));
-                        }
-                    }
-                });
-            }
-            ConcurrencyUtils.waitForCompletion(futures);
-        } else {
-            for (int i = 0; i < size; i++) {
-                values.setQuick(i, ix.getQuick(i));
-            }
-        }
-        return values;
-    }
+	/**
+	 *
+	 * @param d
+	 * @return
+	 */
+	protected static DoubleMatrix1D dblm(final IntMatrix1D ix) {
+		int size = (int) ix.size();
+		final DoubleMatrix1D values = DoubleFactory1D.dense.make(size);
+		int nthreads = ConcurrencyUtils.getNumberOfThreads();
+		if ((nthreads > 1) && (size >= ConcurrencyUtils.getThreadsBeginN_1D())) {
+			nthreads = Math.min(nthreads, size);
+			Future<?>[] futures = new Future[nthreads];
+			int k = size / nthreads;
+			for (int j = 0; j < nthreads; j++) {
+				final int firstIdx = j * k;
+				final int lastIdx = (j == nthreads - 1) ? size : firstIdx + k;
+				futures[j] = ConcurrencyUtils.submit(new Runnable() {
+					public void run() {
+						for (int i = firstIdx; i < lastIdx; i++) {
+							values.setQuick(i, ix.getQuick(i));
+						}
+					}
+				});
+			}
+			ConcurrencyUtils.waitForCompletion(futures);
+		} else {
+			for (int i = 0; i < size; i++) {
+				values.setQuick(i, ix.getQuick(i));
+			}
+		}
+		return values;
+	}
 
 
-    /**
-     *
-     * @param t
-     * @return
-     */
-    protected static int max(int[] t) {
-        int maximum = t[0];
-        for (int i=1; i < t.length; i++)
-            if (t[i] > maximum)
-                maximum = t[i];
-        return maximum;
-    }
+	/**
+	 *
+	 * @param t
+	 * @return
+	 */
+	protected static int max(int[] t) {
+		int maximum = t[0];
+		for (int i=1; i < t.length; i++)
+			if (t[i] > maximum)
+				maximum = t[i];
+		return maximum;
+	}
 
-    /**
-     *
-     * @param a
-     * @param b
-     * @return
-     */
-    protected static int[] cat(int[] a, int[] b) {
-        int[] c = new int[a.length + b.length];
-        System.arraycopy(a, 0, c, 0, a.length);
-        System.arraycopy(b, 0, c, a.length, b.length);
-        return c;
-    }
+	/**
+	 *
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	protected static int[] cat(int[] a, int[] b) {
+		int[] c = new int[a.length + b.length];
+		System.arraycopy(a, 0, c, 0, a.length);
+		System.arraycopy(b, 0, c, a.length, b.length);
+		return c;
+	}
 
 }

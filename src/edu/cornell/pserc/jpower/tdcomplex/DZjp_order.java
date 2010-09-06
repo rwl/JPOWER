@@ -31,37 +31,37 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gencost;
 
 public class DZjp_order {
 
-    class Case {
-        DZjp_areas areas;
-        DZjp_bus bus;
-        DZjp_branch branch;
-        DZjp_gen gen;
-        DZjp_gencost gencost;
-        DoubleMatrix2D A;
-        DoubleMatrix2D N;
-    }
+	class Case {
+		DZjp_areas areas;
+		DZjp_bus bus;
+		DZjp_branch branch;
+		DZjp_gen gen;
+		DZjp_gencost gencost;
+		DoubleMatrix2D A;
+		DoubleMatrix2D N;
+	}
 
-    class Status {
-        public IntArrayList on = new IntArrayList();
-        public IntArrayList off = new IntArrayList();
-    }
+	class Status {
+		public IntArrayList on = new IntArrayList();
+		public IntArrayList off = new IntArrayList();
+	}
 
-    class BusGen {
-        IntMatrix1D e2i;
-        IntMatrix1D i2e;
-        Status status = new Status();
-    }
+	class BusGen {
+		IntMatrix1D e2i;
+		IntMatrix1D i2e;
+		Status status = new Status();
+	}
 
-    class BranchAreas {
-        Status status = new Status();
-    }
+	class BranchAreas {
+		Status status = new Status();
+	}
 
-    public String state;		// 'i' or 'e'
-    public Case internal = new Case();
-    public Case external = new Case();
-    public BusGen bus = new BusGen();
-    public BusGen gen = new BusGen();
-    public BranchAreas branch = new BranchAreas();
-    public BranchAreas areas = new BranchAreas();
+	public String state;		// 'i' or 'e'
+	public Case internal = new Case();
+	public Case external = new Case();
+	public BusGen bus = new BusGen();
+	public BusGen gen = new BusGen();
+	public BranchAreas branch = new BranchAreas();
+	public BranchAreas areas = new BranchAreas();
 
 }

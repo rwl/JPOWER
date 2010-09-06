@@ -25,55 +25,55 @@ import cern.colt.matrix.tint.IntMatrix1D;
 
 public class DZjp_gencost {
 
-    /** cost model, 1 = piecewise linear, 2 = polynomial */
-    public IntMatrix1D model;
+	/** cost model, 1 = piecewise linear, 2 = polynomial */
+	public IntMatrix1D model;
 
-    /** startup cost in US dollars */
-    public DoubleMatrix1D startup;
+	/** startup cost in US dollars */
+	public DoubleMatrix1D startup;
 
-    /** shutdown cost in US dollars */
-    public DoubleMatrix1D shutdown;
+	/** shutdown cost in US dollars */
+	public DoubleMatrix1D shutdown;
 
-    /**
-     * number breakpoints in piecewise linear cost function,
-     * parameters defining total cost function begin in this col
-     */
-    public IntMatrix1D ncost;
+	/**
+	 * number breakpoints in piecewise linear cost function,
+	 * parameters defining total cost function begin in this col
+	 */
+	public IntMatrix1D ncost;
 
-    /**
-     * (MODEL = 1) : p0, f0, p1, f1, ..., pn, fn
-     * where p0 < p1 < ... < pn and the cost f(p) is defined
-     * by the coordinates (p0,f0), (p1,f1), ..., (pn,fn) of
-     * the end/break-points of the piecewise linear cost
-     * (MODEL = 2) : cn, ..., c1, c0
-     * n+1 coefficients of an n-th order polynomial cost fcn,
-     * starting with highest order, where cost is
-     * f(p) = cn*p^2 + ... + c1*p + c0
-     */
-    public DoubleMatrix1D cost;
+	/**
+	 * (MODEL = 1) : p0, f0, p1, f1, ..., pn, fn
+	 * where p0 < p1 < ... < pn and the cost f(p) is defined
+	 * by the coordinates (p0,f0), (p1,f1), ..., (pn,fn) of
+	 * the end/break-points of the piecewise linear cost
+	 * (MODEL = 2) : cn, ..., c1, c0
+	 * n+1 coefficients of an n-th order polynomial cost fcn,
+	 * starting with highest order, where cost is
+	 * f(p) = cn*p^2 + ... + c1*p + c0
+	 */
+	public DoubleMatrix1D cost;
 
-    /**
-     *
-     * @return the number of generator costs.
-     */
-    public int size() {
-        return (int) this.model.size();
-    }
+	/**
+	 *
+	 * @return the number of generator costs.
+	 */
+	public int size() {
+		return (int) this.model.size();
+	}
 
-    /**
-     *
-     * @return a copy of the gencost data.
-     */
-    public DZjp_gencost copy() {
-        DZjp_gencost other = new DZjp_gencost();
+	/**
+	 *
+	 * @return a copy of the gencost data.
+	 */
+	public DZjp_gencost copy() {
+		DZjp_gencost other = new DZjp_gencost();
 
-        other.model = this.model.copy();
-        other.startup = this.startup.copy();
-        other.shutdown = this.shutdown.copy();
-        other.ncost = this.ncost.copy();
-        other.cost = this.cost.copy();
+		other.model = this.model.copy();
+		other.startup = this.startup.copy();
+		other.shutdown = this.shutdown.copy();
+		other.ncost = this.ncost.copy();
+		other.cost = this.cost.copy();
 
-        return other;
-    }
+		return other;
+	}
 
 }

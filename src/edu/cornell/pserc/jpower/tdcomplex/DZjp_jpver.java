@@ -25,8 +25,8 @@ import java.util.Map;
 
 public class DZjp_jpver {
 
-    public static Map<String, String> jp_jpver(String all) {
-        return null;
-    }
+	public static Map<String, String> jp_jpver(String all) {
+		return null;
+	}
 
 }

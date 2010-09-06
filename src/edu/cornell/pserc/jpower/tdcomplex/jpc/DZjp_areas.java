@@ -24,51 +24,51 @@ import cern.colt.matrix.tint.IntMatrix1D;
 
 public class DZjp_areas {
 
-    /** area number */
-    public IntMatrix1D area_i;
+	/** area number */
+	public IntMatrix1D area_i;
 
-    /** price reference bus for this area */
-    public IntMatrix1D price_ref_bus;
+	/** price reference bus for this area */
+	public IntMatrix1D price_ref_bus;
 
-    /**
-     *
-     * @return the number of areas.
-     */
-    public int size() {
-        return (int) this.area_i.size();
-    }
+	/**
+	 *
+	 * @return the number of areas.
+	 */
+	public int size() {
+		return (int) this.area_i.size();
+	}
 
-    /**
-     *
-     * @return a full copy of the areas data.
-     */
-    public DZjp_areas copy() {
-        return copy(null);
-    }
+	/**
+	 *
+	 * @return a full copy of the areas data.
+	 */
+	public DZjp_areas copy() {
+		return copy(null);
+	}
 
-    /**
-     *
-     * @param indexes
-     * @return a copy of the areas data.
-     */
-    public DZjp_areas copy(int[] indexes) {
-        DZjp_areas other = new DZjp_areas();
+	/**
+	 *
+	 * @param indexes
+	 * @return a copy of the areas data.
+	 */
+	public DZjp_areas copy(int[] indexes) {
+		DZjp_areas other = new DZjp_areas();
 
-        other.area_i = this.area_i.viewSelection(indexes).copy();
-        other.price_ref_bus = this.price_ref_bus.viewSelection(indexes).copy();
+		other.area_i = this.area_i.viewSelection(indexes).copy();
+		other.price_ref_bus = this.price_ref_bus.viewSelection(indexes).copy();
 
-        return other;
-    }
+		return other;
+	}
 
-    /**
-     *
-     * @param other
-     * @param indexes
-     */
-    public void update(DZjp_areas other, int[] indexes) {
+	/**
+	 *
+	 * @param other
+	 * @param indexes
+	 */
+	public void update(DZjp_areas other, int[] indexes) {
 
-        this.area_i.viewSelection(indexes).assign(other.area_i.viewSelection(indexes));
-        this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus.viewSelection(indexes));
-    }
+		this.area_i.viewSelection(indexes).assign(other.area_i.viewSelection(indexes));
+		this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus.viewSelection(indexes));
+	}
 
 }

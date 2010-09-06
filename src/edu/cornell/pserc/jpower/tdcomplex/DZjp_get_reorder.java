@@ -32,7 +32,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
  */
 public class DZjp_get_reorder {
 
-    public static DoubleMatrix1D jp_get_reorder(AbstractMatrix A, int[] idx, int dim) {
-        return null;
-    }
+	public static DoubleMatrix1D jp_get_reorder(AbstractMatrix A, int[] idx, int dim) {
+		return null;
+	}
 }

@@ -25,8 +25,8 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 
 public class DZjp_run_userfcn {
 
-    public static DZjp_jpc jp_run_userfcn(String userfcn, String stage, DZjp_jpc jpc) {
-        return null;
-    }
+	public static DZjp_jpc jp_run_userfcn(String userfcn, String stage, DZjp_jpc jpc) {
+		return null;
+	}
 
 }

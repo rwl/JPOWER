@@ -25,20 +25,20 @@ import edu.cornell.pserc.jpower.tdcomplex.DZjp_order;
 
 public class DZjp_jpc {
 
-    public double baseMVA = 100;
-    public DZjp_bus bus = new DZjp_bus();
-    public DZjp_gen gen = new DZjp_gen();
-    public DZjp_branch branch = new DZjp_branch();
-    public DZjp_areas areas;
-    public DZjp_gencost gencost;
-    public DoubleMatrix2D A;
-    public DoubleMatrix2D N;
-    public String userfcn;
+	public double baseMVA = 100;
+	public DZjp_bus bus = new DZjp_bus();
+	public DZjp_gen gen = new DZjp_gen();
+	public DZjp_branch branch = new DZjp_branch();
+	public DZjp_areas areas;
+	public DZjp_gencost gencost;
+	public DoubleMatrix2D A;
+	public DoubleMatrix2D N;
+	public String userfcn;
 
-    public String version = "2";
-    public double et;	// elapsed time in seconds
-    public boolean success;
+	public String version = "2";
+	public double et;	// elapsed time in seconds
+	public boolean success;
 
-    public DZjp_order order;
+	public DZjp_order order;
 
 }
