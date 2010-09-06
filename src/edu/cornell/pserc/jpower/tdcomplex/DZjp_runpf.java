@@ -226,16 +226,16 @@ public class DZjp_runpf extends DZjp_idx {
             Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
             /* build B matrices and phase shift injections */
-            List<AbstractMatrix> Bdc = DZjp_makeBdc.jp_makeBdc(baseMVA, bus, branch);
-            DoubleMatrix2D B = (DoubleMatrix2D) Bdc.get(0);
-            DoubleMatrix2D Bf = (DoubleMatrix2D) Bdc.get(1);
-            DComplexMatrix1D Pbusinj = (DComplexMatrix1D) Bdc.get(2);
-            DoubleMatrix1D Pfinj = (DoubleMatrix1D) Bdc.get(3);
+            AbstractMatrix[] Bdc = DZjp_makeBdc.jp_makeBdc(baseMVA, bus, branch);
+            DoubleMatrix2D B = (DoubleMatrix2D) Bdc[0];
+            DoubleMatrix2D Bf = (DoubleMatrix2D) Bdc[1];
+            DoubleMatrix1D Pbusinj = (DoubleMatrix1D) Bdc[2];
+            DoubleMatrix1D Pfinj = (DoubleMatrix1D) Bdc[3];
 
             /* compute complex bus power injections (generation - load) */
             /* adjusted for phase shifters and real shunts */
             DoubleMatrix1D Pbus = DZjp_makeSbus.jp_makeSbus(baseMVA, bus, gen).getRealPart();
-            Pbus.assign(Pbusinj.getRealPart(), dfunc.minus);
+            Pbus.assign(Pbusinj, dfunc.minus);
             Pbus.assign(bus.viewColumn(GS), dfunc.chain(dfunc.div(baseMVA), dfunc.minus));
 
             /* "run" the power flow */
