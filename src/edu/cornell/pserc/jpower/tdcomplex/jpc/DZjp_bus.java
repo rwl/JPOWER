@@ -21,9 +21,11 @@
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
 
-public class DZjp_bus {
+public class DZjp_bus extends DZjp_idx {
 
 	/** bus number (1 to 29997) */
 	public IntMatrix1D bus_i;
@@ -81,6 +83,25 @@ public class DZjp_bus {
 
 	/** Kuhn-Tucker multiplier on lower voltage limit (u/p.u.) */
 	public DoubleMatrix1D mu_Vmin;
+
+//	private static final int BUS_I		= 1;
+//	private static final int BUS_TYPE	= 2;
+//	private static final int PD			= 3;
+//	private static final int QD			= 4;
+//	private static final int GS			= 5;
+//	private static final int BS			= 6;
+//	private static final int BUS_AREA	= 7;
+//	private static final int VM			= 8;
+//	private static final int VA			= 9;
+//	private static final int BASE_KV	= 10;
+//	private static final int ZONE		= 11;
+//	private static final int VMAX		= 12;
+//	private static final int VMIN		= 13;
+//
+//	private static final int LAM_P		= 14;
+//	private static final int LAM_Q		= 15;
+//	private static final int MU_VMAX	= 16;
+//	private static final int MU_VMIN	= 17;
 
 	/**
 	 *
@@ -154,7 +175,43 @@ public class DZjp_bus {
 		this.lam_Q.viewSelection(indexes).assign(other.lam_Q.viewSelection(indexes));
 		this.mu_Vmax.viewSelection(indexes).assign(other.mu_Vmax.viewSelection(indexes));
 		this.mu_Vmin.viewSelection(indexes).assign(other.mu_Vmin.viewSelection(indexes));
+	}
 
+	/**
+	 *
+	 * @param bus
+	 */
+	public void update(DoubleMatrix2D bus) {
+		update(bus, null);
+	}
+
+	/**
+	 *
+	 * @param bus
+	 * @param indexes
+	 */
+	public void update(DoubleMatrix2D bus, int[] indexes) {
+
+		this.bus_i.viewSelection(indexes).assign( intm(bus.viewColumn(BUS_I).viewSelection(indexes)) );
+		this.bus_type.viewSelection(indexes).assign( intm(bus.viewColumn(BUS_TYPE).viewSelection(indexes)) );
+		this.Pd.viewSelection(indexes).assign(bus.viewColumn(PD).viewSelection(indexes));
+		this.Qd.viewSelection(indexes).assign(bus.viewColumn(QD).viewSelection(indexes));
+		this.Gs.viewSelection(indexes).assign(bus.viewColumn(GS).viewSelection(indexes));
+		this.Bs.viewSelection(indexes).assign(bus.viewColumn(BS).viewSelection(indexes));
+		this.bus_area.viewSelection(indexes).assign( intm(bus.viewColumn(BUS_AREA).viewSelection(indexes)) );
+		this.Vm.viewSelection(indexes).assign(bus.viewColumn(VM).viewSelection(indexes));
+		this.Va.viewSelection(indexes).assign(bus.viewColumn(VA).viewSelection(indexes));
+		this.base_kV.viewSelection(indexes).assign(bus.viewColumn(BASE_KV).viewSelection(indexes));
+		this.zone.viewSelection(indexes).assign( intm(bus.viewColumn(ZONE).viewSelection(indexes)) );
+		this.Vmax.viewSelection(indexes).assign(bus.viewColumn(VMAX).viewSelection(indexes));
+		this.Vmin.viewSelection(indexes).assign(bus.viewColumn(VMIN).viewSelection(indexes));
+
+		if (bus.columns() > VMIN) {
+			this.lam_P.viewSelection(indexes).assign(bus.viewColumn(LAM_P).viewSelection(indexes));
+			this.lam_Q.viewSelection(indexes).assign(bus.viewColumn(LAM_Q).viewSelection(indexes));
+			this.mu_Vmax.viewSelection(indexes).assign(bus.viewColumn(MU_VMAX).viewSelection(indexes));
+			this.mu_Vmin.viewSelection(indexes).assign(bus.viewColumn(MU_VMIN).viewSelection(indexes));
+		}
 	}
 
 }

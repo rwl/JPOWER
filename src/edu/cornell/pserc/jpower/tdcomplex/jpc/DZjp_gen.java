@@ -21,9 +21,11 @@
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
 
-public class DZjp_gen {
+public class DZjp_gen extends DZjp_idx {
 
 	/** bus number */
 	public IntMatrix1D gen_bus;
@@ -173,7 +175,7 @@ public class DZjp_gen {
 		this.Qmax.viewSelection(indexes).assign(other.Qmax.viewSelection(indexes));
 		this.Qmin.viewSelection(indexes).assign(other.Qmin.viewSelection(indexes));
 		this.Vg.viewSelection(indexes).assign(other.Vg.viewSelection(indexes));
-		this.mBase.viewSelection(indexes).assign(other.mBase .viewSelection(indexes));
+		this.mBase.viewSelection(indexes).assign(other.mBase.viewSelection(indexes));
 		this.gen_status.viewSelection(indexes).assign(other.gen_status.viewSelection(indexes));
 		this.Pmax.viewSelection(indexes).assign(other.Pmax.viewSelection(indexes));
 		this.Pmin.viewSelection(indexes).assign(other.Pmin.viewSelection(indexes));
@@ -193,6 +195,51 @@ public class DZjp_gen {
 		this.mu_Pmin.viewSelection(indexes).assign(other.mu_Pmin.viewSelection(indexes));
 		this.mu_Qmax.viewSelection(indexes).assign(other.mu_Qmax.viewSelection(indexes));
 		this.mu_Qmin.viewSelection(indexes).assign(other.mu_Qmin.viewSelection(indexes));
+	}
+
+	/**
+	 *
+	 * @param other
+	 */
+	public void update(DoubleMatrix2D other) {
+		update(other, null);
+	}
+
+	/**
+	 *
+	 * @param other
+	 * @param indexes
+	 */
+	public void update(DoubleMatrix2D other, int[] indexes) {
+
+		this.gen_bus.viewSelection(indexes).assign( intm(other.viewColumn(GEN_BUS).viewSelection(indexes)) );
+		this.Pg.viewSelection(indexes).assign(other.viewColumn(PG).viewSelection(indexes));
+		this.Qg.viewSelection(indexes).assign(other.viewColumn(QG).viewSelection(indexes));
+		this.Qmax.viewSelection(indexes).assign(other.viewColumn(QMAX).viewSelection(indexes));
+		this.Qmin.viewSelection(indexes).assign(other.viewColumn(QMIN).viewSelection(indexes));
+		this.Vg.viewSelection(indexes).assign(other.viewColumn(VG).viewSelection(indexes));
+		this.mBase.viewSelection(indexes).assign(other.viewColumn(MBASE).viewSelection(indexes));
+		this.gen_status.viewSelection(indexes).assign( intm(other.viewColumn(GEN_STATUS).viewSelection(indexes)) );
+		this.Pmax.viewSelection(indexes).assign(other.viewColumn(PMAX).viewSelection(indexes));
+		this.Pmin.viewSelection(indexes).assign(other.viewColumn(PMIN).viewSelection(indexes));
+		this.Pc1.viewSelection(indexes).assign(other.viewColumn(PC1).viewSelection(indexes));
+		this.Pc2.viewSelection(indexes).assign(other.viewColumn(PC2).viewSelection(indexes));
+		this.Qc1min.viewSelection(indexes).assign(other.viewColumn(QC1MIN).viewSelection(indexes));
+		this.Qc1max.viewSelection(indexes).assign(other.viewColumn(QC1MAX).viewSelection(indexes));
+		this.Qc2min.viewSelection(indexes).assign(other.viewColumn(QC2MIN).viewSelection(indexes));
+		this.Qc2max.viewSelection(indexes).assign(other.viewColumn(QC2MAX).viewSelection(indexes));
+		this.ramp_agc.viewSelection(indexes).assign(other.viewColumn(RAMP_AGC).viewSelection(indexes));
+		this.ramp_10.viewSelection(indexes).assign(other.viewColumn(RAMP_10).viewSelection(indexes));
+		this.ramp_30.viewSelection(indexes).assign(other.viewColumn(RAMP_30).viewSelection(indexes));
+		this.ramp_q.viewSelection(indexes).assign(other.viewColumn(RAMP_Q).viewSelection(indexes));
+		this.apf.viewSelection(indexes).assign(other.viewColumn(APF).viewSelection(indexes));
+
+		if (other.columns() > APF) {
+			this.mu_Pmax.viewSelection(indexes).assign(other.viewColumn(MU_PMAX).viewSelection(indexes));
+			this.mu_Pmin.viewSelection(indexes).assign(other.viewColumn(MU_PMIN).viewSelection(indexes));
+			this.mu_Qmax.viewSelection(indexes).assign(other.viewColumn(MU_QMAX).viewSelection(indexes));
+			this.mu_Qmin.viewSelection(indexes).assign(other.viewColumn(MU_QMIN).viewSelection(indexes));
+		}
 	}
 
 }
