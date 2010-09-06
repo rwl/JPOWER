@@ -21,18 +21,22 @@
 package edu.cornell.pserc.jpower.tdcomplex;
 
 import cern.colt.list.tint.IntArrayList;
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_areas;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_branch;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gencost;
 
 public class DZjp_order {
 
     class Case {
-        DoubleMatrix2D areas;
-        DoubleMatrix2D bus;
-        DoubleMatrix2D branch;
-        DoubleMatrix2D gen;
-        DoubleMatrix2D gencost;
+        DZjp_areas areas;
+        DZjp_bus bus;
+        DZjp_branch branch;
+        DZjp_gen gen;
+        DZjp_gencost gencost;
         DoubleMatrix2D A;
         DoubleMatrix2D N;
     }

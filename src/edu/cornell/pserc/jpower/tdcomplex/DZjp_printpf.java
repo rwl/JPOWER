@@ -22,6 +22,7 @@
 package edu.cornell.pserc.jpower.tdcomplex;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 
 public class DZjp_printpf {
 

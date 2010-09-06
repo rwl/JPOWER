@@ -27,11 +27,15 @@ import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.DoubleSorting;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_areas;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_branch;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 
 /**
  * Converts external to internal indexing.
@@ -114,8 +118,7 @@ public class DZjp_ext2int extends DZjp_idx {
      * @param branch
      * @return
      */
-    public static DoubleMatrix2D[] jp_ext2int(DoubleMatrix2D bus, DoubleMatrix2D gen,
-            DoubleMatrix2D branch) {
+    public static Object[] jp_ext2int(DZjp_bus bus, DZjp_gen gen, DZjp_branch branch) {
         return jp_ext2int(bus, gen, branch, null);
     }
 
@@ -128,22 +131,22 @@ public class DZjp_ext2int extends DZjp_idx {
      * @param areas
      * @return
      */
-    public static DoubleMatrix2D[] jp_ext2int(DoubleMatrix2D bus,
-            DoubleMatrix2D gen, DoubleMatrix2D branch, DoubleMatrix2D areas) {
+    public static Object[] jp_ext2int(DZjp_bus bus,
+            DZjp_gen gen, DZjp_branch branch, DZjp_areas areas) {
 
-        int[] i2e = inta(bus.viewColumn(BUS_I));
-        DoubleMatrix1D e2i = DoubleFactory1D.sparse.make((int) max(i2e));
-        e2i.viewSelection(i2e).assign(drange(bus.rows()));
+        int[] i2e = bus.bus_i.toArray();
+        IntMatrix1D e2i = IntFactory1D.sparse.make((int) max(i2e));
+        e2i.viewSelection(i2e).assign(irange(bus.size()));
 
-        bus.viewColumn(BUS_I).assign( e2i.viewSelection(inta(bus.viewColumn(BUS_I))) );
-        gen.viewColumn(GEN_BUS).assign( e2i.viewSelection(inta(gen.viewColumn(GEN_BUS))) );
-        branch.viewColumn(F_BUS).assign( e2i.viewSelection(inta(branch.viewColumn(F_BUS))) );
-        branch.viewColumn(T_BUS).assign( e2i.viewSelection(inta(branch.viewColumn(T_BUS))) );
+        bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
+        gen.gen_bus.assign( e2i.viewSelection(gen.gen_bus.toArray()) );
+        branch.f_bus.assign( e2i.viewSelection(branch.f_bus.toArray()) );
+        branch.t_bus.assign( e2i.viewSelection(branch.t_bus.toArray()) );
 
         if (areas != null && areas.size() != 0)
-            areas.viewColumn(PRICE_REF_BUS).assign( e2i.viewSelection(inta(areas.viewColumn(PRICE_REF_BUS))) );
+            areas.price_ref_bus.assign( e2i.viewSelection(areas.price_ref_bus.toArray()) );
 
-        return new DoubleMatrix2D[] {bus, gen, branch, areas};
+        return new Object[] {bus, gen, branch, areas};
     }
 
     /**
@@ -163,8 +166,8 @@ public class DZjp_ext2int extends DZjp_idx {
                 o = jpc.order;
             }
             /* sizes */
-            int nb = jpc.bus.rows();
-            int ng = jpc.gen.rows();
+            int nb = jpc.bus.size();
+            int ng = jpc.gen.size();
             int ng0 = ng;
             boolean dc;
             if (jpc.A != null && jpc.A.columns() < 2*nb + 2*ng) {
@@ -190,14 +193,14 @@ public class DZjp_ext2int extends DZjp_idx {
             }
 
             /* check that all buses have a valid BUS_TYPE */
-            int[] bt = inta(jpc.bus.viewColumn(BUS_I));
+            int[] bt = jpc.bus.bus_i.toArray();
             for (int i = 0; i < nb; i++)
                 if (bt[i] != PQ || bt[i] != PV || bt[i] != REF || bt[i] != NONE)
                     System.out.printf("ext2int: bus %d has an invalid BUS_TYPE", i);
                     // TODO: Throw invalid bus type exception.
 
             /* determine which buses, branches, gens are connected & in-service */
-            int[] bi = inta(jpc.bus.viewColumn(BUS_I));
+            int[] bi = jpc.bus.bus_i.toArray();
             IntMatrix1D n2i = new SparseRCIntMatrix2D(max(bi), 1,
                   bi, ones(nb), irange(nb), false, false, false).viewColumn(0);
 
@@ -209,8 +212,8 @@ public class DZjp_ext2int extends DZjp_idx {
             bs.getNonZeros(o.bus.status.on, null);			// connected
 
             /* gen status */
-            IntMatrix1D gs = IntFactory1D.dense.make(inta(jpc.gen.viewColumn(GEN_STATUS)));
-            int[] gbus = inta(jpc.gen.viewColumn(GEN_BUS));
+            IntMatrix1D gs = IntFactory1D.dense.make(jpc.gen.gen_status.toArray());
+            int[] gbus = jpc.gen.gen_bus.toArray();
             gs.assign(ifunc.chain(ifunc.not, ifunc.and(0)));
             gs.assign(bs.viewSelection(n2i.viewSelection(gbus).toArray()), ifunc.and);
 
@@ -219,9 +222,9 @@ public class DZjp_ext2int extends DZjp_idx {
             gs.getNonZeros(o.gen.status.off, null);			// off or isolated
 
             /* branch status */
-            IntMatrix1D brs = IntFactory1D.dense.make(inta(jpc.branch.viewColumn(BR_STATUS)));
-            int[] fbus = inta(jpc.branch.viewColumn(F_BUS));
-            int[] tbus = inta(jpc.branch.viewColumn(T_BUS));
+            IntMatrix1D brs = jpc.branch.br_status;
+            int[] fbus = jpc.branch.f_bus.toArray();
+            int[] tbus = jpc.branch.t_bus.toArray();
             brs.assign(bs.viewSelection(n2i.viewSelection(fbus).toArray()), ifunc.and);
             brs.assign(bs.viewSelection(n2i.viewSelection(tbus).toArray()), ifunc.and);
             brs.getNonZeros(o.branch.status.on, null);		// on and connected
@@ -229,39 +232,39 @@ public class DZjp_ext2int extends DZjp_idx {
             brs.getNonZeros(o.branch.status.off, null);
 
             if (jpc.areas != null) {
-                int[] prbus = inta(jpc.areas.viewColumn(PRICE_REF_BUS));
+                int[] prbus = jpc.areas.price_ref_bus.toArray();
                 IntMatrix1D as = bs.viewSelection(n2i.viewSelection(prbus).toArray());
                 as.getNonZeros(o.areas.status.on, null);
             }
 
             /* delete stuff that is "out" */
             if (o.bus.status.off.size() > 0)
-                jpc.bus = jpc.bus.viewSelection(o.bus.status.on.elements(), null).copy();
+                jpc.bus = jpc.bus.copy(o.bus.status.on.elements());
             if (o.branch.status.off.size() > 0)
-                jpc.branch = jpc.branch.viewSelection(o.branch.status.on.elements(), null).copy();
+                jpc.branch = jpc.branch.copy(o.branch.status.on.elements());
             if (o.gen.status.off.size() > 0)
-                jpc.gen = jpc.gen.viewSelection(o.gen.status.on.elements(), null).copy();
+                jpc.gen = jpc.gen.copy(o.gen.status.on.elements());
             if (jpc.areas != null && o.areas.status.off.size() > 0)
-                jpc.areas = jpc.areas.viewSelection(o.areas.status.on.elements(), null).copy();
+                jpc.areas = jpc.areas.copy(o.areas.status.on.elements());
 
             /* update size */
-            nb = jpc.bus.rows();
+            nb = jpc.bus.size();
 
             /* apply consecutive bus numbering */
-            o.bus.i2e = intm(jpc.bus.viewColumn(BUS_I));
+            o.bus.i2e = jpc.bus.bus_i;
             o.bus.e2i = intm(DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(ifunc.max, ifunc.identity)));
             o.bus.e2i.viewSelection(o.bus.i2e.toArray()).assign(IntFactory1D.dense.make(irange(nb)));
-            jpc.bus.viewColumn(BUS_I).assign( dblm(o.bus.e2i.viewSelection(inta(jpc.bus.viewColumn(BUS_I)))) );
-            jpc.gen.viewColumn(GEN_BUS).assign( dblm(o.bus.e2i.viewSelection(inta(jpc.gen.viewColumn(GEN_BUS)))) );
-            jpc.branch.viewColumn(F_BUS).assign( dblm(o.bus.e2i.viewSelection( inta(jpc.branch.viewColumn(F_BUS)))) );
-            jpc.branch.viewColumn(T_BUS).assign( dblm(o.bus.e2i.viewSelection( inta(jpc.branch.viewColumn(T_BUS)))) );
+            jpc.bus.bus_i.assign( o.bus.e2i.viewSelection(jpc.bus.bus_i.toArray()) );
+            jpc.gen.gen_bus.assign( o.bus.e2i.viewSelection(jpc.gen.gen_bus.toArray()) );
+            jpc.branch.f_bus.assign( o.bus.e2i.viewSelection( jpc.branch.f_bus.toArray()) );
+            jpc.branch.t_bus.assign( o.bus.e2i.viewSelection( jpc.branch.t_bus.toArray()) );
             if (jpc.areas != null)
-                jpc.areas.viewColumn(PRICE_REF_BUS).assign( dblm(o.bus.e2i.viewSelection( inta(jpc.areas.viewColumn(PRICE_REF_BUS)))) );
+                jpc.areas.price_ref_bus.assign( o.bus.e2i.viewSelection( jpc.areas.price_ref_bus.toArray()) );
 
             /* reorder gens in order of increasing bus number */
-            o.gen.e2i = IntFactory1D.dense.make(DoubleSorting.quickSort.sortIndex(jpc.gen.viewColumn(GEN_BUS)));
+            o.gen.e2i = IntFactory1D.dense.make(IntSorting.quickSort.sortIndex(jpc.gen.gen_bus));
             o.gen.i2e = IntFactory1D.dense.make(IntSorting.quickSort.sortIndex(o.gen.e2i));
-            jpc.gen = jpc.gen.viewSelection(o.gen.e2i.toArray(), null).copy();
+            jpc.gen = jpc.gen.copy(o.gen.e2i.toArray());
 
             if (o.internal != null)
                 o.internal = null;
@@ -271,7 +274,7 @@ public class DZjp_ext2int extends DZjp_idx {
             /* update gencost, A and N */
             if (jpc.gencost != null) {
                 String[] ordering;
-                if (jpc.gencost.rows() == 2*ng0) {
+                if (jpc.gencost.size() == 2*ng0) {
                     ordering = new String[] {"gen", "gen"}; // Pg cost only
                 } else {
                     ordering = new String[] {"gen"}; // include Qg cost

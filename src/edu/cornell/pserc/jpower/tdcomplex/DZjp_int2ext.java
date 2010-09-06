@@ -22,6 +22,7 @@
 package edu.cornell.pserc.jpower.tdcomplex;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 
 /**
  * Converts internal to external bus numbering.
@@ -98,11 +99,11 @@ public class DZjp_int2ext extends DZjp_idx {
             }
 
             /* update data (in bus, branch and gen only) */
-            jpc.bus.viewSelection(o.bus.status.on.elements(), null).assign(o.internal.bus);
-            jpc.branch.viewSelection(o.branch.status.on.elements(), null).assign(o.internal.branch);
-            jpc.gen.viewSelection(o.gen.status.on.elements(), null).assign(o.internal.gen.viewSelection(o.gen.i2e.toArray(), null));
+            jpc.bus.update(o.internal.bus, o.bus.status.on.elements());
+            jpc.branch.update(o.internal.branch, o.branch.status.on.elements());
+            jpc.gen.update(o.internal.gen.copy(o.gen.i2e.toArray()), o.branch.status.on.elements());
             if (jpc.areas != null)
-                jpc.areas.viewSelection(o.areas.status.on.elements(), null).assign(o.internal.areas);
+                jpc.areas.update(o.internal.areas, o.areas.status.on.elements());
 
             /* revert to original bus numbers */
         }

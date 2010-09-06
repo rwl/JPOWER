@@ -21,18 +21,18 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import java.util.List;
 import java.util.Map;
 
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix;
-import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
+import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_branch;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 
 /**
  * Runs a power flow
@@ -182,18 +182,20 @@ public class DZjp_runpf extends DZjp_idx {
         DZjp_jpc jpc = DZjp_loadcase.loadcase(casedata);
 
         /* add zero columns to branch for flows if needed */
-        DoubleMatrix2D branch = (DoubleMatrix2D) jpc.branch;
-        if (branch.columns() < QT) {
-            DoubleMatrix2D flows = DoubleFactory2D.dense.make(branch.rows(),
-                    QT - branch.columns());
-            jpc.branch = DoubleFactory2D.dense.appendColumns(branch, flows);
+        DZjp_branch branch = jpc.branch;
+        if (branch.Qt == null) {
+            int nl = branch.size();
+            branch.Pf = DoubleFactory1D.dense.make(nl);
+            branch.Qf = DoubleFactory1D.dense.make(nl);
+            branch.Pt = DoubleFactory1D.dense.make(nl);
+            branch.Qt = DoubleFactory1D.dense.make(nl);
         }
 
         /* convert to internal indexing */
         jpc = DZjp_ext2int.jp_ext2int(jpc);
         double baseMVA = jpc.baseMVA;
-        DoubleMatrix2D bus = jpc.bus.copy();
-        DoubleMatrix2D gen = jpc.gen.copy();
+        DZjp_bus bus = jpc.bus.copy();
+        DZjp_gen gen = jpc.gen.copy();
         branch = jpc.branch.copy();
 
         /* get bus index lists of each type of bus */
@@ -204,10 +206,9 @@ public class DZjp_runpf extends DZjp_idx {
 
         /* generator info */
         IntArrayList on = new IntArrayList();     // which generators are on?
-        gen.viewColumn(GEN_STATUS).getPositiveValues(on, null);
-        double[] dgbus = gen.viewColumn(GEN_BUS).viewSelection(on.elements()).toArray();
-        int[] gbus = new int[dgbus.length];       // what buses are they at?
-        for (int i = 0; i < dgbus.length; i++) { gbus[i] = (int) dgbus[i]; }
+        gen.gen_status.getPositiveValues(on, null);
+        // what buses are they at?
+        int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
 
         /* -----  run the power flow  ----- */
         long t0 = System.currentTimeMillis();
@@ -222,7 +223,7 @@ public class DZjp_runpf extends DZjp_idx {
                 System.out.printf(" -- DC Power Flow\n");
 
             /* initial state */
-            DoubleMatrix1D Va0 = bus.viewColumn(VA).copy();
+            DoubleMatrix1D Va0 = bus.Va.copy();
             Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
             /* build B matrices and phase shift injections */
@@ -236,27 +237,25 @@ public class DZjp_runpf extends DZjp_idx {
             /* adjusted for phase shifters and real shunts */
             DoubleMatrix1D Pbus = DZjp_makeSbus.jp_makeSbus(baseMVA, bus, gen).getRealPart();
             Pbus.assign(Pbusinj, dfunc.minus);
-            Pbus.assign(bus.viewColumn(GS), dfunc.chain(dfunc.div(baseMVA), dfunc.minus));
+            Pbus.assign(bus.Gs, dfunc.chain(dfunc.div(baseMVA), dfunc.minus));
 
             /* "run" the power flow */
             DoubleMatrix1D Va = DZjp_dcpf.jp_dcpf(B, Pbus, Va0, ref, pv, pq);
 
             /* update data matrices with solution */
-            branch.viewColumn(QF).assign(0);
-            branch.viewColumn(QT).assign(0);
-            branch.viewColumn(PF).assign(
-                    Bf.zMult(Va, null).assign(Pfinj, dfunc.plus).assign(dfunc.mult(baseMVA)));
-            branch.viewColumn(PT).assign(
-                    branch.viewColumn(PT).copy().assign(dfunc.neg));
-            bus.viewColumn(VM).assign(1);
-            bus.viewColumn(VA).assign(Va);
-            bus.viewColumn(VA).assign(dfunc.chain(dfunc.mult(180), dfunc.div(Math.PI)));
+            branch.Qf.assign(0);
+            branch.Qt.assign(0);
+            branch.Pf.assign( Bf.zMult(Va, null).assign(Pfinj, dfunc.plus).assign(dfunc.mult(baseMVA)) );
+            branch.Pt.assign( branch.Pt.copy().assign(dfunc.neg) );
+            bus.Vm.assign(1);
+            bus.Va.assign(Va);
+            bus.Va.assign(dfunc.chain(dfunc.mult(180), dfunc.div(Math.PI)));
             // update Pg for swing generator (note: other gens at ref bus are accounted for in Pbus)
             //      Pg = Pinj + Pload + Gs
             //      newPg = oldPg + newPinj - oldPinj
             int refgen = 0;
             for (int i : gbus) if (i == ref) { refgen = i; break; }
-            gen.set(on.get(refgen), PG, gen.get(on.get(refgen), PG) + (B.viewRow(ref).zDotProduct(Va) - Pbus.get(ref)) * baseMVA);
+            gen.Pg.set(on.get(refgen), gen.Pg.get(on.get(refgen)) + (B.viewRow(ref).zDotProduct(Va) - Pbus.get(ref)) * baseMVA);
 
             success = true;
         } else {                                  // AC formulation
@@ -274,12 +273,16 @@ public class DZjp_runpf extends DZjp_idx {
         DZjp_jpc results = DZjp_int2ext.jp_int2ext(jpc);
 
         // zero out result fields of out-of-service gens & branches
-        if (results.order.gen.status.off.size() > 0)
-            results.gen.viewSelection(results.order.gen.status.off.elements(),
-                    new int[] {PG, QG}).assign(0);
-        if (results.order.branch.status.off.size() > 0)
-            results.branch.viewSelection(results.order.branch.status.off.elements(),
-                    new int[] {PF, QF, PT, QT}).assign(0);
+        if (results.order.gen.status.off.size() > 0) {
+            results.gen.Pg.viewSelection(results.order.gen.status.off.elements()).assign(0);
+            results.gen.Qg.viewSelection(results.order.gen.status.off.elements()).assign(0);
+        }
+        if (results.order.branch.status.off.size() > 0) {
+            results.branch.Pf.viewSelection(results.order.branch.status.off.elements()).assign(0);
+            results.branch.Qf.viewSelection(results.order.branch.status.off.elements()).assign(0);
+            results.branch.Pt.viewSelection(results.order.branch.status.off.elements()).assign(0);
+            results.branch.Qt.viewSelection(results.order.branch.status.off.elements()).assign(0);
+        }
 
         if (fname != "") {
             // TODO: printpf to file

@@ -21,6 +21,8 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
+
 public class DZjp_savecase {
 
 	public static void jp_savecase(String fname, DZjp_jpc casestruct) {

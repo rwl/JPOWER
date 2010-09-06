@@ -21,10 +21,11 @@
 
 package edu.cornell.pserc.jpower.tdcomplex;
 
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
 
 /**
  * Builds index lists for each type of bus (REF, PV, PQ).
@@ -45,26 +46,26 @@ public class DZjp_bustypes extends DZjp_idx {
      * @return
      */
     @SuppressWarnings("static-access")
-    public static IntMatrix1D[] jp_bustypes(DoubleMatrix2D bus, DoubleMatrix2D gen) {
+    public static IntMatrix1D[] jp_bustypes(DZjp_bus bus, DZjp_gen gen) {
 
         /* get generator status */
-        int nb = bus.rows();
-        int ng = gen.rows();
+        int nb = bus.size();
+        int ng = gen.size();
 
         /* gen connection matrix, element i, j is 1 if, generator j at bus i is ON */
         SparseRCIntMatrix2D Cg = new SparseRCIntMatrix2D(nb, ng,
-                inta(gen.viewColumn(GEN_BUS)), irange(ng),
-                inta(gen.viewColumn(GEN_STATUS).assign(dfunc.greater(0))), false, false, false);
+                gen.gen_bus.toArray(), irange(ng),
+                gen.gen_status.assign(ifunc.equals(1)).toArray(), false, false, false);
 
         /* number of generators at each bus that are ON */
         IntMatrix1D bus_gen_status = Cg.zMult(IntFactory1D.dense.make(ng, 1), null);
 
         /* form index lists for slack, PV, and PQ buses */
-        IntMatrix1D ref = intm(bus.viewColumn(BUS_TYPE).assign(dfunc.equals(REF)));
+        IntMatrix1D ref = bus.bus_type.assign(ifunc.equals(REF));
         ref.assign(bus_gen_status, ifunc.and);		// reference bus index
-        IntMatrix1D pv = intm(bus.viewColumn(BUS_TYPE).assign(dfunc.equals(PV)));
+        IntMatrix1D pv = bus.bus_type.assign(ifunc.equals(PV));
         pv.assign(bus_gen_status, ifunc.and);		// PV bus indices
-        IntMatrix1D pq = intm(bus.viewColumn(BUS_TYPE).assign(dfunc.equals(PQ)));
+        IntMatrix1D pq = bus.bus_type.assign(ifunc.equals(PQ));
         pv.assign(bus_gen_status.assign(ifunc.not), ifunc.or);
 
         /* pick a new reference bus if for some reason there is none (may have been shut down) */

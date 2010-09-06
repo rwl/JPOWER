@@ -18,18 +18,19 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdcomplex;
+package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_order;
 
 public class DZjp_jpc {
 
     public double baseMVA = 100;
-    public DoubleMatrix2D bus;
-    public DoubleMatrix2D gen;
-    public DoubleMatrix2D branch;
-    public DoubleMatrix2D areas;
-    public DoubleMatrix2D gencost;
+    public DZjp_bus bus = new DZjp_bus();
+    public DZjp_gen gen = new DZjp_gen();
+    public DZjp_branch branch = new DZjp_branch();
+    public DZjp_areas areas;
+    public DZjp_gencost gencost;
     public DoubleMatrix2D A;
     public DoubleMatrix2D N;
     public String userfcn;

@@ -24,6 +24,7 @@ package edu.cornell.pserc.jpower.tdcomplex;
 import java.util.Map;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 
 public class DZjp_loadcase {
 

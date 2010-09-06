@@ -25,7 +25,8 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
 
 /**
  * Builds the vector of complex bus power injections.
@@ -48,28 +49,27 @@ public class DZjp_makeSbus extends DZjp_idx {
      * @return vector of complex bus power injections
      */
     @SuppressWarnings("static-access")
-    public static DComplexMatrix1D jp_makeSbus(double baseMVA, DoubleMatrix2D bus,
-            DoubleMatrix2D gen) {
+    public static DComplexMatrix1D jp_makeSbus(double baseMVA, DZjp_bus bus, DZjp_gen gen) {
 
         /* generator info */
         IntArrayList on = new IntArrayList();		// which generators are on?
-        gen.viewColumn(GEN_STATUS).assign(dfunc.greater(0)).getNonZeros(on, null);
-        int[] gbus = inta(gen.viewColumn(GEN_BUS).viewSelection(on.elements()));
+        gen.gen_status.assign(ifunc.equals(1)).getNonZeros(on, null);
+        int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
 
         /* form net complex bus power injection vector */
-        int nb = bus.rows();
+        int nb = bus.size();
         int ngon = on.size();
         // connection matrix, element i, j is 1 if gen on(j) at bus i is ON
         SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
                 gbus, irange(ngon), 1, 0, false);
 
         DComplexMatrix1D Sg = DComplexFactory1D.dense.make(nb);
-        Sg.assignReal(gen.viewColumn(PG).viewSelection(on.elements()));
-        Sg.assignImaginary(gen.viewColumn(QG).viewSelection(on.elements()));
+        Sg.assignReal(gen.Pg.viewSelection(on.elements()));
+        Sg.assignImaginary(gen.Qg.viewSelection(on.elements()));
 
         DComplexMatrix1D Sd = DComplexFactory1D.dense.make(nb);
-        Sd.assignReal(bus.viewColumn(PD));
-        Sd.assignImaginary(bus.viewColumn(QD));
+        Sd.assignReal(bus.Pd);
+        Sd.assignImaginary(bus.Qd);
 
         // power injected by generators plus power injected by loads ...
         DComplexMatrix1D Sbus = Cg.zMult(Sg.assign(Sd, cfunc.minus), null);
