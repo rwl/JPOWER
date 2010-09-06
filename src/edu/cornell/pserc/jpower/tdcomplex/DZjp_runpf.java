@@ -30,6 +30,7 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 
@@ -196,10 +197,10 @@ public class DZjp_runpf extends DZjp_idx {
         branch = jpc.branch.copy();
 
         /* get bus index lists of each type of bus */
-        List<int[]> bustypes = DZjp_bustypes.jp_bustypes(bus, gen);
-        int ref = bustypes.get(0)[0];
-        int[] pv = bustypes.get(1);
-        int[] pq = bustypes.get(2);
+        IntMatrix1D[] bustypes = DZjp_bustypes.jp_bustypes(bus, gen);
+        int ref = bustypes[0].get(0);
+        int[] pv = bustypes[1].toArray();
+        int[] pq = bustypes[2].toArray();
 
         /* generator info */
         IntArrayList on = new IntArrayList();     // which generators are on?
