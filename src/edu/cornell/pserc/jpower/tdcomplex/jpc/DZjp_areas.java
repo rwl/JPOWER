@@ -20,9 +20,11 @@
 
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
 
-public class DZjp_areas {
+public class DZjp_areas extends DZjp_idx {
 
 	/** area number */
 	public IntMatrix1D area_i;
@@ -69,6 +71,16 @@ public class DZjp_areas {
 
 		this.area_i.viewSelection(indexes).assign(other.area_i.viewSelection(indexes));
 		this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus.viewSelection(indexes));
+	}
+
+	/**
+	 *
+	 * @param other
+	 */
+	public void update(DoubleMatrix2D other) {
+
+		this.area_i.assign( intm(other.viewColumn(AREA_I) ) );
+		this.price_ref_bus.assign( intm(other.viewColumn(PRICE_REF_BUS)) );
 	}
 
 }

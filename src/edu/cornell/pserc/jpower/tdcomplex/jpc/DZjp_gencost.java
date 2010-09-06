@@ -21,9 +21,11 @@
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
 
-public class DZjp_gencost {
+public class DZjp_gencost extends DZjp_idx {
 
 	/** cost model, 1 = piecewise linear, 2 = polynomial */
 	public IntMatrix1D model;
@@ -74,6 +76,19 @@ public class DZjp_gencost {
 		other.cost = this.cost.copy();
 
 		return other;
+	}
+
+	/**
+	 *
+	 * @param other
+	 */
+	public void update(DoubleMatrix2D other) {
+
+		this.model.assign( intm(other.viewColumn(MODEL) ) );
+		this.startup.assign( other.viewColumn(STARTUP) );
+		this.shutdown.assign( other.viewColumn(SHUTDOWN) );
+		this.ncost.assign( intm(other.viewColumn(NCOST) ) );
+		this.cost.assign( other.viewColumn(COST) );
 	}
 
 }
