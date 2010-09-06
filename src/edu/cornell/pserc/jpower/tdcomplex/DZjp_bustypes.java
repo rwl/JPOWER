@@ -26,11 +26,16 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
 
+/**
+ * Builds index lists for each type of bus (REF, PV, PQ).
+ *
+ * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
 public class DZjp_bustypes extends DZjp_idx {
 
     /**
-     * Builds index lists for each type of bus (REF, PV, PQ).
-     *
      * Generators with "out-of-service" status are treated as PQ buses with
      * zero generation (regardless of Pg/Qg values in gen). Expects BUS and
      * GEN have been converted to use internal consecutive bus numbering.

@@ -24,6 +24,12 @@ package edu.cornell.pserc.jpower.tdcomplex;
 import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 
+/**
+ *
+ * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
 public class DZjp_get_reorder {
 
     public static DoubleMatrix1D jp_get_reorder(AbstractMatrix A, int[] idx, int dim) {
