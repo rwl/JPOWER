@@ -19,17 +19,41 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdcomplex;
+package edu.cornell.pserc.jpower.tdcomplex.test;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_jpoption;
 
-public class DZjp_printpf {
+/**
+ * Tests for power flow solvers.
+ *
+ * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
+public class DZjp_t_pf {
 
-	public static void jp_printpf(DZjp_jpc results, int fd, Map<String, Double> jpopt) {
-
+	public static void jp_t_pf() {
+		jp_t_pf(false);
 	}
+
+	/**
+	 * Tests for power flow solvers.
+	 *
+	 * @param quiet
+	 */
+	public static void jp_t_pf(boolean quiet) {
+
+		DZjp_t_begin.jp_t_begin(25, quiet);
+
+		String casefile = "t_case9_pf";
+		Map<String, Double> opt = new HashMap<String, Double>();
+		opt.put("OUT_ALL", 0.0);
+		opt.put("VERBOSE", quiet ? 0.0 : 1.0);
+		Map<String, Double> jpopt = DZjp_jpoption.jp_jpoption();
+	}
+
 
 }

@@ -94,7 +94,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param jpopt
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata, DoubleMatrix1D jpopt) {
+	public static Object[] jp_runpf(String casedata, Map<String, Double> jpopt) {
 
 		return jp_runpf(casedata, jpopt, "");
 	}
@@ -106,7 +106,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param fname
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata, DoubleMatrix1D jpopt,
+	public static Object[] jp_runpf(String casedata, Map<String, Double> jpopt,
 			String fname) {
 
 		return jp_runpf(casedata, jpopt, fname, "");
@@ -120,7 +120,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata, DoubleMatrix1D jpopt,
+	public static Object[] jp_runpf(String casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
 		return jp_runpf(casedata, jpopt, fname, "");
@@ -142,8 +142,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param jpopt
 	 * @return
 	 */
-	public static Object[] jp_runpf(DZjp_jpc casedata,
-			DoubleMatrix1D jpopt) {
+	public static Object[] jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt) {
 
 		return jp_runpf(casedata, jpopt, "");
 	}
@@ -155,8 +154,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param fname
 	 * @return
 	 */
-	public static Object[] jp_runpf(DZjp_jpc casedata,
-			DoubleMatrix1D jpopt, String fname) {
+	public static Object[] jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt, String fname) {
 
 		return jp_runpf(casedata, jpopt, "", "");
 	}
@@ -170,11 +168,11 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_runpf(DZjp_jpc casedata,
-			DoubleMatrix1D jpopt, String fname, String solvedcase) {
+	public static Object[] jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt,
+			String fname, String solvedcase) {
 
 		/* options */
-		int verbose = (int) jpopt.get(31);
+		int verbose = jpopt.get("VERBOSE").intValue();
 		boolean qlim = jpopt.get(6) != 0.0;     /* enforce Q limits on gens? */
 		boolean dc = jpopt.get(10) != 0.0;      /* use DC formulation? */
 
