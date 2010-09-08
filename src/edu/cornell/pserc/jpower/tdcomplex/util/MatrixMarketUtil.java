@@ -21,6 +21,7 @@
 
 package edu.cornell.pserc.jpower.tdcomplex.util;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -54,14 +55,25 @@ public class MatrixMarketUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static AbstractMatrix readMatrix(String fileName) throws IOException {
+	public static AbstractMatrix readMatrix(String fileName) {
 
-		FileReader fileReader = new FileReader(fileName);
+		FileReader fileReader = null;
+		try {
+			fileReader = new FileReader(fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		MatrixVectorReader reader = new MatrixVectorReader(fileReader);
 
-		MatrixInfo info = reader.readMatrixInfo();
-		MatrixSize size = reader.readMatrixSize(info);
+		MatrixInfo info = null;
+		MatrixSize size = null;
+		try {
+			info = reader.readMatrixInfo();
+			size = reader.readMatrixSize(info);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		double[] data = new double[size.numEntries()];
 		double[] dataR = new double[size.numEntries()];
@@ -74,7 +86,11 @@ public class MatrixMarketUtil {
 
 		if (info.isArray()) {
 			if (info.isComplex()) {
-				reader.readArray(dataR, dataI);
+				try {
+					reader.readArray(dataR, dataI);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				if (info.isDense()) {
 					m = DComplexFactory1D.dense.make(size.numEntries());
 					for (int i = 0; i < size.numEntries(); i++)
@@ -87,7 +103,11 @@ public class MatrixMarketUtil {
 					throw new UnsupportedOperationException();
 				}
 			} else {
-				reader.readArray(data);
+				try {
+					reader.readArray(data);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
 				if (size.numRows() == 1 || size.numColumns() == 1) {
 					if (info.isDense()) {
@@ -123,7 +143,11 @@ public class MatrixMarketUtil {
 			}
 		} else if (info.isCoordinate()) {
 			if (info.isComplex()) {
-				reader.readCoordinate(row, col, dataR, dataI);
+				try {
+					reader.readCoordinate(row, col, dataR, dataI);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				if (info.isDense()) {
 					m = DComplexFactory2D.dense.make(size.numRows(), size.numColumns());
 					for (int i = 0; i < size.numEntries(); i++) {
@@ -142,7 +166,11 @@ public class MatrixMarketUtil {
 					throw new UnsupportedOperationException();
 				}
 			} else {
-				reader.readCoordinate(row, col, data);
+				try {
+					reader.readCoordinate(row, col, data);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				if (info.isDense()) {
 					m = DoubleFactory2D.dense.make(size.numRows(), size.numColumns());
 					for (int i = 0; i < size.numEntries(); i++) {

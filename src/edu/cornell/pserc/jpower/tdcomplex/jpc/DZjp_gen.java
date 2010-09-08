@@ -20,6 +20,7 @@
 
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
@@ -240,6 +241,55 @@ public class DZjp_gen extends DZjp_idx {
 			this.mu_Qmax.viewSelection(indexes).assign(other.viewColumn(MU_QMAX).viewSelection(indexes));
 			this.mu_Qmin.viewSelection(indexes).assign(other.viewColumn(MU_QMIN).viewSelection(indexes));
 		}
+	}
+
+	public DoubleMatrix2D toMatrix() {
+		return toMatrix(true);
+	}
+
+	/**
+	 *
+	 * @param opf include OPF solution data
+	 * @return generator data matrix
+	 */
+	public DoubleMatrix2D toMatrix(boolean opf) {
+		DoubleMatrix2D matrix;
+		if (opf) {
+			matrix = DoubleFactory2D.dense.make(size(), 25);
+		} else {
+			matrix = DoubleFactory2D.dense.make(size(), 21);
+		}
+
+		matrix.viewColumn(GEN_BUS).assign( dblm(this.gen_bus) );
+		matrix.viewColumn(PG).assign(this.Pg);
+		matrix.viewColumn(QG).assign(this.Qg);
+		matrix.viewColumn(QMAX).assign(this.Qmax);
+		matrix.viewColumn(QMIN).assign(this.Qmin);
+		matrix.viewColumn(VG).assign(this.Vg);
+		matrix.viewColumn(MBASE).assign(this.mBase);
+		matrix.viewColumn(GEN_STATUS).assign( dblm(this.gen_status) );
+		matrix.viewColumn(PMAX).assign(this.Pmax);
+		matrix.viewColumn(PMIN).assign(this.Pmin);
+		matrix.viewColumn(PC1).assign(this.Pc1);
+		matrix.viewColumn(PC2).assign(this.Pc2);
+		matrix.viewColumn(QC1MIN).assign(this.Qc1min);
+		matrix.viewColumn(QC1MAX).assign(this.Qc1max);
+		matrix.viewColumn(QC2MIN).assign(this.Qc2min);
+		matrix.viewColumn(QC2MAX).assign(this.Qc2max);
+		matrix.viewColumn(RAMP_AGC).assign(this.ramp_agc);
+		matrix.viewColumn(RAMP_10).assign(this.ramp_10);
+		matrix.viewColumn(RAMP_30).assign(this.ramp_30);
+		matrix.viewColumn(RAMP_Q).assign(this.ramp_q);
+		matrix.viewColumn(APF).assign(this.apf);
+
+		if (opf) {
+			matrix.viewColumn(MU_PMAX).assign(this.mu_Pmax);
+			matrix.viewColumn(MU_PMIN).assign(this.mu_Pmin);
+			matrix.viewColumn(MU_QMAX).assign(this.mu_Qmax);
+			matrix.viewColumn(MU_QMIN).assign(this.mu_Qmin);
+		}
+
+		return matrix;
 	}
 
 }

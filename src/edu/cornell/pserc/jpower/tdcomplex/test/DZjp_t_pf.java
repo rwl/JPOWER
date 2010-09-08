@@ -28,6 +28,7 @@ import java.util.Map;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 import edu.cornell.pserc.jpower.tdcomplex.DZjp_jpoption;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_rundcpf;
 import edu.cornell.pserc.jpower.tdcomplex.DZjp_runpf;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
 import edu.cornell.pserc.jpower.tdcomplex.util.MatrixMarketUtil;
@@ -44,6 +45,10 @@ public class DZjp_t_pf {
 	private static final String BUS_SOLN9 = "soln9_pf/bus_soln.mtx";
 	private static final String GEN_SOLN9 = "soln9_pf/gen_soln.mtx";
 	private static final String BRANCH_SOLN9 = "soln9_pf/branch_soln.mtx";
+
+	private static final String BUS_SOLN9_DC = "soln9_dcpf/bus_soln.mtx";
+	private static final String GEN_SOLN9_DC = "soln9_dcpf/gen_soln.mtx";
+	private static final String BRANCH_SOLN9_DC = "soln9_dcpf/branch_soln.mtx";
 
 	public static void jp_t_pf() {
 		jp_t_pf(false);
@@ -65,23 +70,67 @@ public class DZjp_t_pf {
 		Map<String, Double> jpopt = DZjp_jpoption.jp_jpoption();
 
 		/* get solved AC power flow case from MatrixMarket file. */
-		try {
-			DoubleMatrix2D bus_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BUS_SOLN9);
-			DoubleMatrix2D gen_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(GEN_SOLN9);
-			DoubleMatrix2D branch_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BRANCH_SOLN9);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		DoubleMatrix2D bus_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BUS_SOLN9);
+		DoubleMatrix2D gen_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(GEN_SOLN9);
+		DoubleMatrix2D branch_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BRANCH_SOLN9);
 
+		String t;
 		DZjp_jpc jpc;
 		Map<String, Double> alg = new HashMap<String, Double>();
 
 		/* run Newton PF */
-		String t = "Newton PF : ";
-		alg.put("PF_ALG", 1.0);
+		t = "Newton PF : ";
+		alg.put("PF_ALG", (double) 1);
 		jpopt = DZjp_jpoption.jp_jpoption(jpopt, alg);
-//		jpc = DZjp_runpf.jp_runpf(casefile, jpopt);
+		jpc = DZjp_runpf.jp_runpf(casefile, jpopt);
+		DZjp_t_ok.jp_t_ok(jpc.success, t + "success");
+		DZjp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
+		DZjp_t_is.jp_t_is(jpc.gen.toMatrix(), gen_soln, 6, t + "gen");
+		DZjp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
+
+		/* run fast-decoupled PF (XB version) */
+		t = "Fast Decoupled (XB) PF : ";
+		alg.put("PF_ALG", (double) 2);
+		jpopt = DZjp_jpoption.jp_jpoption(jpopt, alg);
+		jpc = DZjp_runpf.jp_runpf(casefile, jpopt);
+		DZjp_t_ok.jp_t_ok(jpc.success, t + "success");
+		DZjp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
+		DZjp_t_is.jp_t_is(jpc.gen.toMatrix(), gen_soln, 6, t + "gen");
+		DZjp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
+
+		/* run fast-decoupled PF (BX version) */
+		t = "Fast Decoupled (BX) PF : ";
+		alg.put("PF_ALG", (double) 3);
+		jpopt = DZjp_jpoption.jp_jpoption(jpopt, alg);
+		jpc = DZjp_runpf.jp_runpf(casefile, jpopt);
+		DZjp_t_ok.jp_t_ok(jpc.success, t + "success");
+		DZjp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
+		DZjp_t_is.jp_t_is(jpc.gen.toMatrix(), gen_soln, 6, t + "gen");
+		DZjp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
+
+		/* run Gauss-Seidel PF */
+		t = "Gauss-Seidel PF : ";
+		alg.put("PF_ALG", (double) 4);
+		jpopt = DZjp_jpoption.jp_jpoption(jpopt, alg);
+		jpc = DZjp_runpf.jp_runpf(casefile, jpopt);
+		DZjp_t_ok.jp_t_ok(jpc.success, t + "success");
+		DZjp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
+		DZjp_t_is.jp_t_is(jpc.gen.toMatrix(), gen_soln, 6, t + "gen");
+		DZjp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
+
+		/* get solved DC power flow case from MAT-file */
+		bus_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BUS_SOLN9_DC);
+		gen_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(GEN_SOLN9_DC);
+		branch_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BRANCH_SOLN9_DC);
+
+		/* run DC PF */
+		t = "DC PF : ";
+		jpc = DZjp_rundcpf.jp_rundcpf(casefile, jpopt);
+		DZjp_t_ok.jp_t_ok(jpc.success, t + "success");
+		DZjp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
+		DZjp_t_is.jp_t_is(jpc.gen.toMatrix(), gen_soln, 6, t + "gen");
+		DZjp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
+
+		/* check Qg distribution, when Qmin = Qmax */
 	}
-
-
 }

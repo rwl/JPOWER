@@ -20,6 +20,7 @@
 
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
@@ -212,6 +213,47 @@ public class DZjp_bus extends DZjp_idx {
 			this.mu_Vmax.viewSelection(indexes).assign(bus.viewColumn(MU_VMAX).viewSelection(indexes));
 			this.mu_Vmin.viewSelection(indexes).assign(bus.viewColumn(MU_VMIN).viewSelection(indexes));
 		}
+	}
+
+	public DoubleMatrix2D toMatrix() {
+		return toMatrix(true);
+	}
+
+	/**
+	 *
+	 * @param opf include opf data
+	 * @return bus data matrix
+	 */
+	public DoubleMatrix2D toMatrix(boolean opf) {
+		DoubleMatrix2D matrix;
+		if (opf) {
+			matrix = DoubleFactory2D.dense.make(size(), 17);
+		} else {
+			matrix = DoubleFactory2D.dense.make(size(), 13);
+		}
+
+		matrix.viewColumn(BUS_I).assign( dblm(this.bus_i) );
+		matrix.viewColumn(BUS_TYPE).assign( dblm(this.bus_type) );
+		matrix.viewColumn(PD).assign(this.Pd);
+		matrix.viewColumn(QD).assign(this.Qd);
+		matrix.viewColumn(GS).assign(this.Gs);
+		matrix.viewColumn(BS).assign(this.Bs);
+		matrix.viewColumn(BUS_AREA).assign( dblm(this.bus_area) );
+		matrix.viewColumn(VM).assign(this.Vm);
+		matrix.viewColumn(VA).assign(this.Va);
+		matrix.viewColumn(BASE_KV).assign(this.base_kV);
+		matrix.viewColumn(ZONE).assign( dblm(this.zone) );
+		matrix.viewColumn(VMAX).assign(this.Vmax);
+		matrix.viewColumn(VMIN).assign(this.Vmin);
+
+		if (opf) {
+			matrix.viewColumn(LAM_P).assign(this.lam_P);
+			matrix.viewColumn(LAM_Q).assign(this.lam_Q);
+			matrix.viewColumn(MU_VMAX).assign(this.mu_Vmax);
+			matrix.viewColumn(MU_VMIN).assign(this.mu_Vmin);
+		}
+
+		return matrix;
 	}
 
 }

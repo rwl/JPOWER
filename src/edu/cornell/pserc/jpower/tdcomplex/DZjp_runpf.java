@@ -73,7 +73,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 *
 	 * @return
 	 */
-	public static Object[] jp_runpf() {
+	public static DZjp_jpc jp_runpf() {
 
 		return jp_runpf("case9");
 	}
@@ -83,7 +83,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param casedata
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata) {
+	public static DZjp_jpc jp_runpf(String casedata) {
 
 		return jp_runpf(casedata, DZjp_jpoption.jp_jpoption());
 	}
@@ -94,7 +94,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param jpopt
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata, Map<String, Double> jpopt) {
+	public static DZjp_jpc jp_runpf(String casedata, Map<String, Double> jpopt) {
 
 		return jp_runpf(casedata, jpopt, "");
 	}
@@ -106,7 +106,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param fname
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata, Map<String, Double> jpopt,
+	public static DZjp_jpc jp_runpf(String casedata, Map<String, Double> jpopt,
 			String fname) {
 
 		return jp_runpf(casedata, jpopt, fname, "");
@@ -120,7 +120,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Object[] jp_runpf(String casedata, Map<String, Double> jpopt,
+	public static DZjp_jpc jp_runpf(String casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
 		return jp_runpf(casedata, jpopt, fname, "");
@@ -131,7 +131,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param casedata
 	 * @return
 	 */
-	public static Object[] jp_runpf(DZjp_jpc casedata) {
+	public static DZjp_jpc jp_runpf(DZjp_jpc casedata) {
 
 		return jp_runpf(casedata, DZjp_jpoption.jp_jpoption());
 	}
@@ -142,7 +142,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param jpopt
 	 * @return
 	 */
-	public static Object[] jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt) {
+	public static DZjp_jpc jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt) {
 
 		return jp_runpf(casedata, jpopt, "");
 	}
@@ -154,7 +154,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @param fname
 	 * @return
 	 */
-	public static Object[] jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt, String fname) {
+	public static DZjp_jpc jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt, String fname) {
 
 		return jp_runpf(casedata, jpopt, "", "");
 	}
@@ -168,7 +168,7 @@ public class DZjp_runpf extends DZjp_idx {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt,
+	public static DZjp_jpc jp_runpf(DZjp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
 		/* options */
@@ -291,7 +291,7 @@ public class DZjp_runpf extends DZjp_idx {
 		if (solvedcase != "")
 			DZjp_savecase.jp_savecase(solvedcase, results);
 
-		return new Object[] {baseMVA, jpc.bus, jpc.gen, jpc.branch, jpc.et};
+		return results;
 	}
 
 }

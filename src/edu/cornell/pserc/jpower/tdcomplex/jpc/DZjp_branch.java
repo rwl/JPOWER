@@ -20,6 +20,7 @@
 
 package edu.cornell.pserc.jpower.tdcomplex.jpc;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
@@ -226,5 +227,58 @@ public class DZjp_branch extends DZjp_idx {
 			this.mu_angmin.viewSelection(indexes).assign(other.viewColumn(MU_ANGMIN).viewSelection(indexes));
 			this.mu_angmax.viewSelection(indexes).assign(other.viewColumn(MU_ANGMAX).viewSelection(indexes));
 		}
+	}
+
+	public DoubleMatrix2D toMatrix() {
+		return toMatrix(true, true);
+	}
+
+	/**
+	 *
+	 * @param pf include power flow solution data
+	 * @param opf include optimal power flow solution data
+	 * @return branch data matrix
+	 */
+	public DoubleMatrix2D toMatrix(boolean pf, boolean opf) {
+		DoubleMatrix2D matrix;
+		if (pf && opf) {
+			matrix = DoubleFactory2D.dense.make(size(), 21);
+		} else if (opf) {
+			matrix = DoubleFactory2D.dense.make(size(), 17);
+		} else if (pf) {
+			matrix = DoubleFactory2D.dense.make(size(), 17);
+		} else {
+			matrix = DoubleFactory2D.dense.make(size(), 13);
+		}
+
+		matrix.viewColumn(F_BUS).assign( dblm(this.f_bus) );
+		matrix.viewColumn(T_BUS).assign( dblm(this.t_bus) );
+		matrix.viewColumn(BR_R).assign(this.br_r);
+		matrix.viewColumn(BR_X).assign(this.br_x);
+		matrix.viewColumn(BR_B).assign(this.br_b);
+		matrix.viewColumn(RATE_A).assign(this.rate_a);
+		matrix.viewColumn(RATE_B).assign(this.rate_b);
+		matrix.viewColumn(RATE_C).assign(this.rate_c);
+		matrix.viewColumn(TAP).assign(this.tap);
+		matrix.viewColumn(SHIFT).assign(this.shift);
+		matrix.viewColumn(BR_STATUS).assign( dblm(this.br_status) );
+		matrix.viewColumn(ANGMIN).assign(this.ang_min);
+		matrix.viewColumn(ANGMAX).assign(this.ang_max);
+
+		if (pf) {
+			matrix.viewColumn(PF).assign(this.Pf);
+			matrix.viewColumn(QF).assign(this.Qf);
+			matrix.viewColumn(PT).assign(this.Pt);
+			matrix.viewColumn(QT).assign(this.Qt);
+		}
+
+		if (opf) {
+			matrix.viewColumn(MU_SF).assign(this.mu_Sf);
+			matrix.viewColumn(MU_ST).assign(this.mu_St);
+			matrix.viewColumn(MU_ANGMIN).assign(this.mu_angmin);
+			matrix.viewColumn(MU_ANGMAX).assign(this.mu_angmax);
+		}
+
+		return matrix;
 	}
 }
