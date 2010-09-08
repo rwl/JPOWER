@@ -21,10 +21,16 @@
 
 package edu.cornell.pserc.jpower.tdcomplex.test;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
+
 import edu.cornell.pserc.jpower.tdcomplex.DZjp_jpoption;
+import edu.cornell.pserc.jpower.tdcomplex.DZjp_runpf;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
+import edu.cornell.pserc.jpower.tdcomplex.util.MatrixMarketUtil;
 
 /**
  * Tests for power flow solvers.
@@ -34,6 +40,10 @@ import edu.cornell.pserc.jpower.tdcomplex.DZjp_jpoption;
  *
  */
 public class DZjp_t_pf {
+
+	private static final String BUS_SOLN9 = "soln9_pf/bus_soln.mtx";
+	private static final String GEN_SOLN9 = "soln9_pf/gen_soln.mtx";
+	private static final String BRANCH_SOLN9 = "soln9_pf/branch_soln.mtx";
 
 	public static void jp_t_pf() {
 		jp_t_pf(false);
@@ -53,6 +63,24 @@ public class DZjp_t_pf {
 		opt.put("OUT_ALL", 0.0);
 		opt.put("VERBOSE", quiet ? 0.0 : 1.0);
 		Map<String, Double> jpopt = DZjp_jpoption.jp_jpoption();
+
+		/* get solved AC power flow case from MatrixMarket file. */
+		try {
+			DoubleMatrix2D bus_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BUS_SOLN9);
+			DoubleMatrix2D gen_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(GEN_SOLN9);
+			DoubleMatrix2D branch_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BRANCH_SOLN9);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		DZjp_jpc jpc;
+		Map<String, Double> alg = new HashMap<String, Double>();
+
+		/* run Newton PF */
+		String t = "Newton PF : ";
+		alg.put("PF_ALG", 1.0);
+		jpopt = DZjp_jpoption.jp_jpoption(jpopt, alg);
+//		jpc = DZjp_runpf.jp_runpf(casefile, jpopt);
 	}
 
 
