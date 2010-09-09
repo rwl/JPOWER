@@ -39,7 +39,7 @@ public class Djp_case30Q {
 	 *
 	 * @return power flow data for 30 bus, 6 generator case.
 	 */
-	public Djp_jpc jp_case30Q() {
+	public static Djp_jpc jp_case30Q() {
 
 		Djp_jpc jpc = new Djp_jpc();
 
@@ -53,7 +53,7 @@ public class Djp_case30Q {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	3,	0,	0,	0,	0,	1,	1,	0,	135,	1,	1.05,	0.95},
 			{2,	2,	21.7,	12.7,	0,	0,	1,	1,	0,	135,	1,	1.1,	0.95},
 			{3,	1,	2.4,	1.2,	0,	0,	1,	1,	0,	135,	1,	1.05,	0.95},
@@ -88,7 +88,7 @@ public class Djp_case30Q {
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	23.54,	0,	150,	-20,	1,	100,	1,	80,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{2,	60.97,	0,	60,	-20,	1,	100,	1,	80,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{22,	21.59,	0,	62.5,	-15,	1,	100,	1,	50,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
@@ -99,7 +99,7 @@ public class Djp_case30Q {
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	2,	0.02,	0.06,	0.03,	130,	130,	130,	0,	0,	1,	-360,	360},
 			{1,	3,	0.05,	0.19,	0.02,	130,	130,	130,	0,	0,	1,	-360,	360},
 			{2,	4,	0.06,	0.17,	0.02,	65,	65,	65,	0,	0,	1,	-360,	360},
@@ -147,7 +147,7 @@ public class Djp_case30Q {
 
 		/* area data */
 		//	area	refbus
-		jpc.areas.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.areas.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	8},
 			{2,	23},
 			{3,	26}
@@ -156,7 +156,7 @@ public class Djp_case30Q {
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gencost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{2,	0,	0,	3,	0.02,	2,	0},
 			{2,	0,	0,	3,	0.0175,	1.75,	0},
 			{2,	0,	0,	3,	0.0625,	1,	0},

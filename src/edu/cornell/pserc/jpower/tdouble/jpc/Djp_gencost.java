@@ -96,13 +96,13 @@ public class Djp_gencost {
 	 * @param other
 	 */
 	@SuppressWarnings("static-access")
-	public void update(DoubleMatrix2D other) {
+	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.model.assign( util.intm(other.viewColumn(MODEL) ) );
-		this.startup.assign( other.viewColumn(STARTUP) );
-		this.shutdown.assign( other.viewColumn(SHUTDOWN) );
-		this.ncost.assign( util.intm(other.viewColumn(NCOST) ) );
-		this.cost.assign( other.viewColumn(COST) );
+		this.model = util.intm(other.viewColumn(MODEL));
+		this.startup = other.viewColumn(STARTUP);
+		this.shutdown = other.viewColumn(SHUTDOWN);
+		this.ncost = util.intm(other.viewColumn(NCOST));
+		this.cost = other.viewColumn(COST);
 	}
 
 }

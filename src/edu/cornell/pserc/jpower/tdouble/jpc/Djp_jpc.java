@@ -21,7 +21,6 @@
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import edu.cornell.pserc.jpower.tdouble.Djp_order;
 
 public class Djp_jpc {
 

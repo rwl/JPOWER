@@ -55,7 +55,7 @@ public class Djp_case24_ieee_rts {
 	 *
 	 * @return power flow data for the IEEE RELIABILITY TEST SYSTEM.
 	 */
-	public Djp_jpc jp_case24_ieee_rts() {
+	public static Djp_jpc jp_case24_ieee_rts() {
 
 		Djp_jpc jpc = new Djp_jpc();
 
@@ -69,7 +69,7 @@ public class Djp_case24_ieee_rts {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	2,	108,	22,	0,	0,	1,	1,	0,	138,	1,	1.05,	0.95},
 			{2,	2,	97,	20,	0,	0,	1,	1,	0,	138,	1,	1.05,	0.95},
 			{3,	1,	180,	37,	0,	0,	1,	1,	0,	138,	1,	1.05,	0.95},
@@ -98,7 +98,7 @@ public class Djp_case24_ieee_rts {
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	10,	0,	10,	0,	1.035,	100,	1,	20,	16,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},	//,	U20
 			{1,	10,	0,	10,	0,	1.035,	100,	1,	20,	16,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},	//,	U20
 			{1,	76,	0,	30,	-25,	1.035,	100,	1,	76,	15.2,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},	//,	U76
@@ -136,7 +136,7 @@ public class Djp_case24_ieee_rts {
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	2,	0.0026,	0.0139,	0.4611,	175,	250,	200,	0,	0,	1,	-360,	360},
 			{1,	3,	0.0546,	0.2112,	0.0572,	175,	208,	220,	0,	0,	1,	-360,	360},
 			{1,	5,	0.0218,	0.0845,	0.0229,	175,	208,	220,	0,	0,	1,	-360,	360},
@@ -181,7 +181,7 @@ public class Djp_case24_ieee_rts {
 
 		/* area data */
 		//	area	refbus
-		jpc.areas.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.areas.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	1},
 			{2,	3},
 			{3,	8},
@@ -191,7 +191,7 @@ public class Djp_case24_ieee_rts {
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost.update( DoubleFactory2D.dense.make(new double[][] {								//	bus	Pmin	Pmax	Qmin	Qmax	Unit Code
+		jpc.gencost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {								//	bus	Pmin	Pmax	Qmin	Qmax	Unit Code
 			{2,	1500,	0,	3,	0,	130,	400.6849},	//	1,	16,	20,	0,	10,	U20
 			{2,	1500,	0,	3,	0,	130,	400.6849},	//	1,	16,	20,	0,	10,	U20
 			{2,	1500,	0,	3,	0.014142,	16.0811,	212.3076},	//	1,	15.2,	76,	-25,	30,	U76

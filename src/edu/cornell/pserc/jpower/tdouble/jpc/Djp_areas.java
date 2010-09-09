@@ -88,10 +88,10 @@ public class Djp_areas {
 	 * @param other
 	 */
 	@SuppressWarnings("static-access")
-	public void update(DoubleMatrix2D other) {
+	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.area_i.assign( util.intm(other.viewColumn(AREA_I) ) );
-		this.price_ref_bus.assign( util.intm(other.viewColumn(PRICE_REF_BUS)) );
+		this.area_i = util.intm(other.viewColumn(AREA_I));
+		this.price_ref_bus = util.intm(other.viewColumn(PRICE_REF_BUS));
 	}
 
 }

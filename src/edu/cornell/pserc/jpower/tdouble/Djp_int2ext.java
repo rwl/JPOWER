@@ -23,6 +23,7 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
 
 /**
  * Converts internal to external bus numbering.

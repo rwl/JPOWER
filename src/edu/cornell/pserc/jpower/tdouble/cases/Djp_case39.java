@@ -102,7 +102,7 @@ public class Djp_case39 {
 	 *
 	 * @return power flow data for 39 bus New England system.
 	 */
-	public Djp_jpc jp_case39() {
+	public static Djp_jpc jp_case39() {
 
 		Djp_jpc jpc = new Djp_jpc();
 
@@ -116,7 +116,7 @@ public class Djp_case39 {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	1,	97.6,	44.2,	0,	0,	2,	1.0393836,	-13.536602,	345,	1,	1.06,	0.94},
 			{2,	1,	0,	0,	0,	0,	2,	1.0484941,	-9.7852666,	345,	1,	1.06,	0.94},
 			{3,	1,	322,	2.4,	0,	0,	2,	1.0307077,	-12.276384,	345,	1,	1.06,	0.94},
@@ -160,7 +160,7 @@ public class Djp_case39 {
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{30,	250,	161.762,	400,	140,	1.0499,	100,	1,	1040,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{31,	677.871,	221.574,	300,	-100,	0.982,	100,	1,	646,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{32,	650,	206.965,	300,	150,	0.9841,	100,	1,	725,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
@@ -175,7 +175,7 @@ public class Djp_case39 {
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	2,	0.0035,	0.0411,	0.6987,	600,	600,	600,	0,	0,	1,	-360,	360},
 			{1,	39,	0.001,	0.025,	0.75,	1000,	1000,	1000,	0,	0,	1,	-360,	360},
 			{2,	3,	0.0013,	0.0151,	0.2572,	500,	500,	500,	0,	0,	1,	-360,	360},
@@ -229,7 +229,7 @@ public class Djp_case39 {
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost.update( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gencost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{2,	0,	0,	3,	0.01,	0.3,	0.2},
 			{2,	0,	0,	3,	0.01,	0.3,	0.2},
 			{2,	0,	0,	3,	0.01,	0.3,	0.2},

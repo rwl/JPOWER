@@ -21,12 +21,24 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
+import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
 public class Djp_jpver {
 
 	public static Map<String, String> jp_jpver(String all) {
-		return null;
+		Map<String, String> ver = new HashMap<String, String>();
+		ver.put("Name", "JPOWER");
+		ver.put("Version", "0.4.2");
+		ver.put("Release", "");
+		ver.put("Date", "9-Sept-2010");
+		return ver;
 	}
 
 }

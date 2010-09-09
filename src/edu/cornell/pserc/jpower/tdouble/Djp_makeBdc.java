@@ -21,6 +21,7 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
+import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
@@ -85,7 +86,8 @@ public class Djp_makeBdc {
 		DoubleMatrix1D tap = DoubleFactory1D.dense.make(nl, 1);
 		// indices of non-zero tap ratios
 		IntArrayList i = new IntArrayList();
-		branch.tap.getNonZeros(i, null);
+		branch.tap.getNonZeros(i, new DoubleArrayList());
+		i.trimToSize();
 		// assign non-zero tap ratios
 		tap.viewSelection(i.elements()).assign(branch.tap.viewSelection(i.elements()));
 		b.assign(tap, dfunc.div);

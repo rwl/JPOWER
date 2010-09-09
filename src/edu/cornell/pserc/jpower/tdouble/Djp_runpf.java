@@ -72,93 +72,36 @@ public class Djp_runpf {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
-	/**
-	 *
-	 * @return
-	 */
 	public static Djp_jpc jp_runpf() {
-
 		return jp_runpf("case9");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @return
-	 */
 	public static Djp_jpc jp_runpf(String casedata) {
-
 		return jp_runpf(casedata, Djp_jpoption.jp_jpoption());
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @return
-	 */
 	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt) {
-
 		return jp_runpf(casedata, jpopt, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @param fname
-	 * @return
-	 */
-	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt,
-			String fname) {
-
+	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt, String fname) {
 		return jp_runpf(casedata, jpopt, fname, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @param fname
-	 * @param solvedcase
-	 * @return
-	 */
-	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt,
-			String fname, String solvedcase) {
-
-		return jp_runpf(casedata, jpopt, fname, "");
+	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		return jp_runpf(jpc, jpopt, fname, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @return
-	 */
 	public static Djp_jpc jp_runpf(Djp_jpc casedata) {
-
 		return jp_runpf(casedata, Djp_jpoption.jp_jpoption());
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @return
-	 */
 	public static Djp_jpc jp_runpf(Djp_jpc casedata, Map<String, Double> jpopt) {
-
 		return jp_runpf(casedata, jpopt, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @param fname
-	 * @return
-	 */
 	public static Djp_jpc jp_runpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
-
 		return jp_runpf(casedata, jpopt, "", "");
 	}
 
@@ -176,8 +119,8 @@ public class Djp_runpf {
 
 		/* options */
 		int verbose = jpopt.get("VERBOSE").intValue();
-		boolean qlim = jpopt.get(6) != 0.0;     /* enforce Q limits on gens? */
-		boolean dc = jpopt.get(10) != 0.0;      /* use DC formulation? */
+		boolean qlim = jpopt.get("ENFORCE_Q_LIMS") != 0.0;	/* enforce Q limits on gens? */
+		boolean dc = jpopt.get("PF_DC") != 0.0;				/* use DC formulation? */
 
 		/* read data */
 		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
@@ -207,7 +150,8 @@ public class Djp_runpf {
 
 		/* generator info */
 		IntArrayList on = new IntArrayList();     // which generators are on?
-		gen.gen_status.getPositiveValues(on, null);
+		gen.gen_status.getNonZeros(on, new IntArrayList());
+		on.trimToSize();
 		// what buses are they at?
 		int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
 

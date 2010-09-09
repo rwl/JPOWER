@@ -188,10 +188,14 @@ public class Djp_gen {
 		other.ramp_q = this.ramp_q.viewSelection(indexes).copy();
 		other.apf = this.apf.viewSelection(indexes).copy();
 
-		other.mu_Pmax = this.mu_Pmax.viewSelection(indexes).copy();
-		other.mu_Pmin = this.mu_Pmin.viewSelection(indexes).copy();
-		other.mu_Qmax = this.mu_Qmax.viewSelection(indexes).copy();
-		other.mu_Qmin = this.mu_Qmin.viewSelection(indexes).copy();
+		if (this.mu_Pmax != null)
+			other.mu_Pmax = this.mu_Pmax.viewSelection(indexes).copy();
+		if (this.mu_Pmin != null)
+			other.mu_Pmin = this.mu_Pmin.viewSelection(indexes).copy();
+		if (this.mu_Qmax != null)
+			other.mu_Qmax = this.mu_Qmax.viewSelection(indexes).copy();
+		if (this.mu_Qmin != null)
+			other.mu_Qmin = this.mu_Qmin.viewSelection(indexes).copy();
 
 		return other;
 	}
@@ -236,45 +240,36 @@ public class Djp_gen {
 	 *
 	 * @param other
 	 */
-	public void update(DoubleMatrix2D other) {
-		update(other, null);
-	}
-
-	/**
-	 *
-	 * @param other
-	 * @param indexes
-	 */
 	@SuppressWarnings("static-access")
-	public void update(DoubleMatrix2D other, int[] indexes) {
+	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.gen_bus.viewSelection(indexes).assign( util.intm(other.viewColumn(GEN_BUS).viewSelection(indexes)) );
-		this.Pg.viewSelection(indexes).assign(other.viewColumn(PG).viewSelection(indexes));
-		this.Qg.viewSelection(indexes).assign(other.viewColumn(QG).viewSelection(indexes));
-		this.Qmax.viewSelection(indexes).assign(other.viewColumn(QMAX).viewSelection(indexes));
-		this.Qmin.viewSelection(indexes).assign(other.viewColumn(QMIN).viewSelection(indexes));
-		this.Vg.viewSelection(indexes).assign(other.viewColumn(VG).viewSelection(indexes));
-		this.mBase.viewSelection(indexes).assign(other.viewColumn(MBASE).viewSelection(indexes));
-		this.gen_status.viewSelection(indexes).assign( util.intm(other.viewColumn(GEN_STATUS).viewSelection(indexes)) );
-		this.Pmax.viewSelection(indexes).assign(other.viewColumn(PMAX).viewSelection(indexes));
-		this.Pmin.viewSelection(indexes).assign(other.viewColumn(PMIN).viewSelection(indexes));
-		this.Pc1.viewSelection(indexes).assign(other.viewColumn(PC1).viewSelection(indexes));
-		this.Pc2.viewSelection(indexes).assign(other.viewColumn(PC2).viewSelection(indexes));
-		this.Qc1min.viewSelection(indexes).assign(other.viewColumn(QC1MIN).viewSelection(indexes));
-		this.Qc1max.viewSelection(indexes).assign(other.viewColumn(QC1MAX).viewSelection(indexes));
-		this.Qc2min.viewSelection(indexes).assign(other.viewColumn(QC2MIN).viewSelection(indexes));
-		this.Qc2max.viewSelection(indexes).assign(other.viewColumn(QC2MAX).viewSelection(indexes));
-		this.ramp_agc.viewSelection(indexes).assign(other.viewColumn(RAMP_AGC).viewSelection(indexes));
-		this.ramp_10.viewSelection(indexes).assign(other.viewColumn(RAMP_10).viewSelection(indexes));
-		this.ramp_30.viewSelection(indexes).assign(other.viewColumn(RAMP_30).viewSelection(indexes));
-		this.ramp_q.viewSelection(indexes).assign(other.viewColumn(RAMP_Q).viewSelection(indexes));
-		this.apf.viewSelection(indexes).assign(other.viewColumn(APF).viewSelection(indexes));
+		this.gen_bus = util.intm(other.viewColumn(GEN_BUS));
+		this.Pg = other.viewColumn(PG);
+		this.Qg = other.viewColumn(QG);
+		this.Qmax = other.viewColumn(QMAX);
+		this.Qmin = other.viewColumn(QMIN);
+		this.Vg = other.viewColumn(VG);
+		this.mBase = other.viewColumn(MBASE);
+		this.gen_status = util.intm(other.viewColumn(GEN_STATUS));
+		this.Pmax = other.viewColumn(PMAX);
+		this.Pmin = other.viewColumn(PMIN);
+		this.Pc1 = other.viewColumn(PC1);
+		this.Pc2 = other.viewColumn(PC2);
+		this.Qc1min = other.viewColumn(QC1MIN);
+		this.Qc1max = other.viewColumn(QC1MAX);
+		this.Qc2min = other.viewColumn(QC2MIN);
+		this.Qc2max = other.viewColumn(QC2MAX);
+		this.ramp_agc = other.viewColumn(RAMP_AGC);
+		this.ramp_10 = other.viewColumn(RAMP_10);
+		this.ramp_30 = other.viewColumn(RAMP_30);
+		this.ramp_q = other.viewColumn(RAMP_Q);
+		this.apf = other.viewColumn(APF);
 
-		if (other.columns() > APF) {
-			this.mu_Pmax.viewSelection(indexes).assign(other.viewColumn(MU_PMAX).viewSelection(indexes));
-			this.mu_Pmin.viewSelection(indexes).assign(other.viewColumn(MU_PMIN).viewSelection(indexes));
-			this.mu_Qmax.viewSelection(indexes).assign(other.viewColumn(MU_QMAX).viewSelection(indexes));
-			this.mu_Qmin.viewSelection(indexes).assign(other.viewColumn(MU_QMIN).viewSelection(indexes));
+		if (other.columns() > APF + 1) {
+			this.mu_Pmax = other.viewColumn(MU_PMAX);
+			this.mu_Pmin = other.viewColumn(MU_PMIN);
+			this.mu_Qmax = other.viewColumn(MU_QMAX);
+			this.mu_Qmin = other.viewColumn(MU_QMIN);
 		}
 	}
 

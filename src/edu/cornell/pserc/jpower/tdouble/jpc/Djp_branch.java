@@ -170,15 +170,23 @@ public class Djp_branch {
 		other.ang_min = this.ang_min.viewSelection(indexes).copy();
 		other.ang_max = this.ang_max.viewSelection(indexes).copy();
 
-		other.Pf = this.Pf.viewSelection(indexes).copy();
-		other.Qf = this.Qf.viewSelection(indexes).copy();
-		other.Pt = this.Pt.viewSelection(indexes).copy();
-		other.Qt = this.Qt.viewSelection(indexes).copy();
+		if (this.Pf != null)
+			other.Pf = this.Pf.viewSelection(indexes).copy();
+		if (this.Qf != null)
+			other.Qf = this.Qf.viewSelection(indexes).copy();
+		if (this.Pt != null)
+			other.Pt = this.Pt.viewSelection(indexes).copy();
+		if (this.Qt != null)
+			other.Qt = this.Qt.viewSelection(indexes).copy();
 
-		other.mu_Sf = this.mu_Sf.viewSelection(indexes).copy();
-		other.mu_St = this.mu_St.viewSelection(indexes).copy();
-		other.mu_angmin = this.mu_angmin.viewSelection(indexes).copy();
-		other.mu_angmax = this.mu_angmax.viewSelection(indexes).copy();
+		if (this.mu_Sf != null)
+			other.mu_Sf = this.mu_Sf.viewSelection(indexes).copy();
+		if (this.mu_St != null)
+			other.mu_St = this.mu_St.viewSelection(indexes).copy();
+		if (this.mu_angmin != null)
+			other.mu_angmin = this.mu_angmin.viewSelection(indexes).copy();
+		if (this.mu_angmax != null)
+			other.mu_angmax = this.mu_angmax.viewSelection(indexes).copy();
 
 		return other;
 	}
@@ -220,44 +228,35 @@ public class Djp_branch {
 	 *
 	 * @param other
 	 */
-	public void update(DoubleMatrix2D other) {
-		update(other, null);
-	}
-
-	/**
-	 *
-	 * @param other
-	 * @param indexes
-	 */
 	@SuppressWarnings("static-access")
-	public void update(DoubleMatrix2D other, int[] indexes) {
+	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.f_bus.viewSelection(indexes).assign( util.intm(other.viewColumn(F_BUS).viewSelection(indexes)) );
-		this.t_bus.viewSelection(indexes).assign( util.intm(other.viewColumn(T_BUS).viewSelection(indexes)) );
-		this.br_r.viewSelection(indexes).assign(other.viewColumn(BR_R).viewSelection(indexes));
-		this.br_x.viewSelection(indexes).assign(other.viewColumn(BR_X).viewSelection(indexes));
-		this.br_b.viewSelection(indexes).assign(other.viewColumn(BR_B).viewSelection(indexes));
-		this.rate_a.viewSelection(indexes).assign(other.viewColumn(RATE_A).viewSelection(indexes));
-		this.rate_b.viewSelection(indexes).assign(other.viewColumn(RATE_B).viewSelection(indexes));
-		this.rate_c.viewSelection(indexes).assign(other.viewColumn(RATE_C).viewSelection(indexes));
-		this.tap.viewSelection(indexes).assign(other.viewColumn(TAP).viewSelection(indexes));
-		this.shift.viewSelection(indexes).assign(other.viewColumn(SHIFT).viewSelection(indexes));
-		this.br_status.viewSelection(indexes).assign( util.intm(other.viewColumn(BR_STATUS).viewSelection(indexes)) );
-		this.ang_min.viewSelection(indexes).assign(other.viewColumn(ANGMIN).viewSelection(indexes));
-		this.ang_max.viewSelection(indexes).assign(other.viewColumn(ANGMAX).viewSelection(indexes));
+		this.f_bus = util.intm(other.viewColumn(F_BUS));
+		this.t_bus = util.intm(other.viewColumn(T_BUS));
+		this.br_r = other.viewColumn(BR_R);
+		this.br_x = other.viewColumn(BR_X);
+		this.br_b = other.viewColumn(BR_B);
+		this.rate_a = other.viewColumn(RATE_A);
+		this.rate_b = other.viewColumn(RATE_B);
+		this.rate_c = other.viewColumn(RATE_C);
+		this.tap = other.viewColumn(TAP);
+		this.shift = other.viewColumn(SHIFT);
+		this.br_status = util.intm(other.viewColumn(BR_STATUS));
+		this.ang_min = other.viewColumn(ANGMIN);
+		this.ang_max = other.viewColumn(ANGMAX);
 
-		if (other.columns() > ANGMAX) {
-			this.Pf.viewSelection(indexes).assign(other.viewColumn(PF).viewSelection(indexes));
-			this.Qf.viewSelection(indexes).assign(other.viewColumn(QF).viewSelection(indexes));
-			this.Pt.viewSelection(indexes).assign(other.viewColumn(PT).viewSelection(indexes));
-			this.Qt.viewSelection(indexes).assign(other.viewColumn(QT).viewSelection(indexes));
+		if (other.columns() > ANGMAX + 1) {
+			this.Pf = other.viewColumn(PF);
+			this.Qf = other.viewColumn(QF);
+			this.Pt = other.viewColumn(PT);
+			this.Qt = other.viewColumn(QT);
 		}
 
-		if (other.columns() > QT) {
-			this.mu_Sf.viewSelection(indexes).assign(other.viewColumn(MU_SF).viewSelection(indexes));
-			this.mu_St.viewSelection(indexes).assign(other.viewColumn(MU_ST).viewSelection(indexes));
-			this.mu_angmin.viewSelection(indexes).assign(other.viewColumn(MU_ANGMIN).viewSelection(indexes));
-			this.mu_angmax.viewSelection(indexes).assign(other.viewColumn(MU_ANGMAX).viewSelection(indexes));
+		if (other.columns() > QT + 1) {
+			this.mu_Sf = other.viewColumn(MU_SF);
+			this.mu_St = other.viewColumn(MU_ST);
+			this.mu_angmin = other.viewColumn(MU_ANGMIN);
+			this.mu_angmax = other.viewColumn(MU_ANGMAX);
 		}
 	}
 

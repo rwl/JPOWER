@@ -18,42 +18,37 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble;
+package edu.cornell.pserc.jpower.tdouble.jpc;
 
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 
 public class Djp_order {
 
-	class Case {
-		Djp_areas areas;
-		Djp_bus bus;
-		Djp_branch branch;
-		Djp_gen gen;
-		Djp_gencost gencost;
-		DoubleMatrix2D A;
-		DoubleMatrix2D N;
+	public class Case {
+		public Djp_areas areas;
+		public Djp_bus bus;
+		public Djp_branch branch;
+		public Djp_gen gen;
+		public Djp_gencost gencost;
+		public DoubleMatrix2D A;
+		public DoubleMatrix2D N;
 	}
 
-	class Status {
+	public class Status {
 		public IntArrayList on = new IntArrayList();
 		public IntArrayList off = new IntArrayList();
 	}
 
-	class BusGen {
-		IntMatrix1D e2i;
-		IntMatrix1D i2e;
-		Status status = new Status();
+	public class BusGen {
+		public IntMatrix1D e2i;
+		public IntMatrix1D i2e;
+		public Status status = new Status();
 	}
 
-	class BranchAreas {
-		Status status = new Status();
+	public class BranchAreas {
+		public Status status = new Status();
 	}
 
 	public String state;		// 'i' or 'e'

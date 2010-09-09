@@ -21,19 +21,17 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import java.util.Map;
-
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_loadcase {
 
-	public static Map<String, DoubleMatrix2D> loadcase(String casefile) {
-		return null;
+	public static Djp_jpc loadcase(String casefile) {
+		throw new UnsupportedOperationException();
 	}
 
-	public static Djp_jpc loadcase(Djp_jpc casefile) {
-		return null;
+	public static Djp_jpc loadcase(Djp_jpc jpc) {
+		// TODO: -----  check contents of struct  -----
+		return jpc;
 	}
 
 }

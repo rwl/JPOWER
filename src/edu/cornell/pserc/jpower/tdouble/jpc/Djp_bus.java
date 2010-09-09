@@ -149,10 +149,14 @@ public class Djp_bus {
 		other.Vmax = this.Vmax.viewSelection(indexes).copy();
 		other.Vmin = this.Vmin.viewSelection(indexes).copy();
 
-		other.lam_P = this.lam_P.viewSelection(indexes).copy();
-		other.lam_Q = this.lam_Q.viewSelection(indexes).copy();
-		other.mu_Vmax = this.mu_Vmax.viewSelection(indexes).copy();
-		other.mu_Vmin = this.mu_Vmin.viewSelection(indexes).copy();
+		if (this.lam_P != null)
+			other.lam_P = this.lam_P.viewSelection(indexes).copy();
+		if (this.lam_Q != null)
+			other.lam_Q = this.lam_Q.viewSelection(indexes).copy();
+		if (this.mu_Vmax != null)
+			other.mu_Vmax = this.mu_Vmax.viewSelection(indexes).copy();
+		if (this.mu_Vmin != null)
+			other.mu_Vmin = this.mu_Vmin.viewSelection(indexes).copy();
 
 		return other;
 	}
@@ -189,37 +193,28 @@ public class Djp_bus {
 	 *
 	 * @param bus
 	 */
-	public void update(DoubleMatrix2D bus) {
-		update(bus, null);
-	}
-
-	/**
-	 *
-	 * @param bus
-	 * @param indexes
-	 */
 	@SuppressWarnings("static-access")
-	public void update(DoubleMatrix2D bus, int[] indexes) {
+	public void fromMatrix(DoubleMatrix2D bus) {
 
-		this.bus_i.viewSelection(indexes).assign( util.intm(bus.viewColumn(BUS_I).viewSelection(indexes)) );
-		this.bus_type.viewSelection(indexes).assign( util.intm(bus.viewColumn(BUS_TYPE).viewSelection(indexes)) );
-		this.Pd.viewSelection(indexes).assign(bus.viewColumn(PD).viewSelection(indexes));
-		this.Qd.viewSelection(indexes).assign(bus.viewColumn(QD).viewSelection(indexes));
-		this.Gs.viewSelection(indexes).assign(bus.viewColumn(GS).viewSelection(indexes));
-		this.Bs.viewSelection(indexes).assign(bus.viewColumn(BS).viewSelection(indexes));
-		this.bus_area.viewSelection(indexes).assign( util.intm(bus.viewColumn(BUS_AREA).viewSelection(indexes)) );
-		this.Vm.viewSelection(indexes).assign(bus.viewColumn(VM).viewSelection(indexes));
-		this.Va.viewSelection(indexes).assign(bus.viewColumn(VA).viewSelection(indexes));
-		this.base_kV.viewSelection(indexes).assign(bus.viewColumn(BASE_KV).viewSelection(indexes));
-		this.zone.viewSelection(indexes).assign( util.intm(bus.viewColumn(ZONE).viewSelection(indexes)) );
-		this.Vmax.viewSelection(indexes).assign(bus.viewColumn(VMAX).viewSelection(indexes));
-		this.Vmin.viewSelection(indexes).assign(bus.viewColumn(VMIN).viewSelection(indexes));
+		this.bus_i = util.intm(bus.viewColumn(BUS_I));
+		this.bus_type = util.intm(bus.viewColumn(BUS_TYPE));
+		this.Pd = bus.viewColumn(PD);
+		this.Qd = bus.viewColumn(QD);
+		this.Gs = bus.viewColumn(GS);
+		this.Bs = bus.viewColumn(BS);
+		this.bus_area = util.intm(bus.viewColumn(BUS_AREA));
+		this.Vm = bus.viewColumn(VM);
+		this.Va = bus.viewColumn(VA);
+		this.base_kV = bus.viewColumn(BASE_KV);
+		this.zone = util.intm(bus.viewColumn(ZONE));
+		this.Vmax = bus.viewColumn(VMAX);
+		this.Vmin = bus.viewColumn(VMIN);
 
-		if (bus.columns() > VMIN) {
-			this.lam_P.viewSelection(indexes).assign(bus.viewColumn(LAM_P).viewSelection(indexes));
-			this.lam_Q.viewSelection(indexes).assign(bus.viewColumn(LAM_Q).viewSelection(indexes));
-			this.mu_Vmax.viewSelection(indexes).assign(bus.viewColumn(MU_VMAX).viewSelection(indexes));
-			this.mu_Vmin.viewSelection(indexes).assign(bus.viewColumn(MU_VMIN).viewSelection(indexes));
+		if (bus.columns() > VMIN + 1) {
+			this.lam_P = bus.viewColumn(LAM_P);
+			this.lam_Q = bus.viewColumn(LAM_Q);
+			this.mu_Vmax = bus.viewColumn(MU_VMAX);
+			this.mu_Vmin = bus.viewColumn(MU_VMIN);
 		}
 	}
 

@@ -23,6 +23,7 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.lang.reflect.Field;
 
+import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -37,6 +38,7 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
 
 /**
@@ -193,34 +195,34 @@ public class Djp_ext2int {
 			o.external.bus    = jpc.bus;
 			o.external.branch = jpc.branch;
 			o.external.gen    = jpc.gen;
-			if (jpc.areas != null) {
-				// if areas field is empty delete it (so it gets ignored)
+			if (jpc.areas != null)
 				if (jpc.areas.size() == 0) {
-					jpc.areas = null;
+					jpc.areas = null;				// if areas field is empty delete it (so it gets ignored)
 				} else {
-					// otherwise save it
-					o.external.areas = jpc.areas;
+					o.external.areas = jpc.areas;	// otherwise save it
 				}
-			}
 
 			/* check that all buses have a valid BUS_TYPE */
-			int[] bt = jpc.bus.bus_i.toArray();
+			int[] bt = jpc.bus.bus_type.toArray();
 			for (int i = 0; i < nb; i++)
-				if (bt[i] != PQ || bt[i] != PV || bt[i] != REF || bt[i] != NONE)
-					System.out.printf("ext2int: bus %d has an invalid BUS_TYPE", i);
+				if (!(bt[i] == PQ || bt[i] == PV || bt[i] == REF || bt[i] == NONE))
+					System.err.printf("ext2int: bus %d has an invalid BUS_TYPE [%d]\n", i, bt[i]);
 					// TODO: Throw invalid bus type exception.
 
 			/* determine which buses, branches, gens are connected & in-service */
 			int[] bi = jpc.bus.bus_i.toArray();
-			IntMatrix1D n2i = new SparseRCIntMatrix2D(util.max(bi), 1,
+			IntMatrix1D n2i = new SparseRCIntMatrix2D(util.max(bi) + 1, 1,
 				bi, util.ones(nb), util.irange(nb), false, false, false).viewColumn(0);
 
 			/* bus status */
 			IntMatrix1D bs = IntFactory1D.dense.make(bt);
 			bs.assign(ifunc.equals(NONE));
-			bs.getPositiveValues(o.bus.status.off, null);	// isolated
+			bs.getNonZeros(o.bus.status.off, new IntArrayList());	// isolated
+			o.bus.status.off.trimToSize();
 			bs.assign(ifunc.not);
-			bs.getNonZeros(o.bus.status.on, null);			// connected
+			bs.getNonZeros(o.bus.status.on, new IntArrayList());		// connected
+			o.bus.status.on.trimToSize();
+			// TODO: patch IntMatrix1D null arguments
 
 			/* gen status */
 			IntMatrix1D gs = IntFactory1D.dense.make(jpc.gen.gen_status.toArray());
@@ -228,9 +230,11 @@ public class Djp_ext2int {
 			gs.assign(ifunc.chain(ifunc.not, ifunc.and(0)));
 			gs.assign(bs.viewSelection(n2i.viewSelection(gbus).toArray()), ifunc.and);
 
-			gs.getNonZeros(o.gen.status.on, null);			// on and connected
+			gs.getNonZeros(o.gen.status.on, new IntArrayList());		// on and connected
+			o.gen.status.on.trimToSize();
 			gs.assign(ifunc.not);
-			gs.getNonZeros(o.gen.status.off, null);			// off or isolated
+			gs.getNonZeros(o.gen.status.off, new IntArrayList());	// off or isolated
+			o.gen.status.off.trimToSize();
 
 			/* branch status */
 			IntMatrix1D brs = jpc.branch.br_status;
@@ -238,14 +242,17 @@ public class Djp_ext2int {
 			int[] tbus = jpc.branch.t_bus.toArray();
 			brs.assign(bs.viewSelection(n2i.viewSelection(fbus).toArray()), ifunc.and);
 			brs.assign(bs.viewSelection(n2i.viewSelection(tbus).toArray()), ifunc.and);
-			brs.getNonZeros(o.branch.status.on, null);		// on and connected
+			brs.getNonZeros(o.branch.status.on, new IntArrayList());	// on and connected
+			o.branch.status.on.trimToSize();
 			brs.assign(ifunc.not);
-			brs.getNonZeros(o.branch.status.off, null);
+			brs.getNonZeros(o.branch.status.off, new IntArrayList());
+			o.branch.status.off.trimToSize();
 
 			if (jpc.areas != null) {
 				int[] prbus = jpc.areas.price_ref_bus.toArray();
 				IntMatrix1D as = bs.viewSelection(n2i.viewSelection(prbus).toArray());
-				as.getNonZeros(o.areas.status.on, null);
+				as.getNonZeros(o.areas.status.on, new IntArrayList());
+				o.areas.status.on.trimToSize();
 			}
 
 			/* delete stuff that is "out" */
@@ -263,7 +270,7 @@ public class Djp_ext2int {
 
 			/* apply consecutive bus numbering */
 			o.bus.i2e = jpc.bus.bus_i;
-			o.bus.e2i = util.intm(DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(ifunc.max, ifunc.identity)));
+			o.bus.e2i = IntFactory1D.sparse.make(o.bus.i2e.aggregate(ifunc.max, ifunc.identity) + 1);
 			o.bus.e2i.viewSelection(o.bus.i2e.toArray()).assign(IntFactory1D.dense.make(util.irange(nb)));
 			jpc.bus.bus_i.assign( o.bus.e2i.viewSelection(jpc.bus.bus_i.toArray()) );
 			jpc.gen.gen_bus.assign( o.bus.e2i.viewSelection(jpc.gen.gen_bus.toArray()) );
@@ -308,13 +315,11 @@ public class Djp_ext2int {
 				if (jpc.userfcn != null)
 					jpc = Djp_run_userfcn.jp_run_userfcn(jpc.userfcn, "ext2int", jpc);
 			}
-
-			Djp_jpc i2e = jpc;
 		} else {
 //            ordering = branch; // rename argument
 		}
 
-		return null;
+		return jpc;
 	}
 
 

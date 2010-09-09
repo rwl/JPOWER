@@ -26,7 +26,6 @@ import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
@@ -41,7 +40,6 @@ import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
 public class Djp_makeSbus {
 
 	private static final Djp_util util = new Djp_util();
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
@@ -60,12 +58,19 @@ public class Djp_makeSbus {
 
 		/* generator info */
 		IntArrayList on = new IntArrayList();		// which generators are on?
-		gen.gen_status.assign(ifunc.equals(1)).getNonZeros(on, null);
+		gen.gen_status.getNonZeros(on, new IntArrayList());
+		on.trimToSize();
 		int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
 
 		/* form net complex bus power injection vector */
 		int nb = bus.size();
 		int ngon = on.size();
+
+//		for (int i : gbus) {
+//			System.out.println(gbus[i]);
+//		}
+//		System.out.println("Cg: " + nb + " " + ngon + " " + gbus.length + " " + on.elements().length);
+
 		// connection matrix, element i, j is 1 if gen on(j) at bus i is ON
 		SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
 				gbus, util.irange(ngon), 1, 0, false);

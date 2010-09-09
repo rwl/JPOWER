@@ -35,93 +35,36 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  */
 public class Djp_rundcpf {
 
-	/**
-	 *
-	 * @return
-	 */
 	public static Djp_jpc jp_rundcpf() {
-
 		return jp_rundcpf("case9");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @return
-	 */
 	public static Djp_jpc jp_rundcpf(String casedata) {
-
 		return jp_rundcpf(casedata, Djp_jpoption.jp_jpoption());
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @return
-	 */
 	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt) {
-
 		return jp_rundcpf(casedata, jpopt, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @param fname
-	 * @return
-	 */
-	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt,
-			String fname) {
-
+	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt, String fname) {
 		return jp_rundcpf(casedata, jpopt, fname, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @param fname
-	 * @param solvedcase
-	 * @return
-	 */
-	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt,
-			String fname, String solvedcase) {
-
-		return jp_rundcpf(casedata, jpopt, fname, "");
+	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		return jp_rundcpf(jpc, jpopt, fname, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @return
-	 */
 	public static Djp_jpc jp_rundcpf(Djp_jpc casedata) {
-
 		return jp_rundcpf(casedata, Djp_jpoption.jp_jpoption());
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @return
-	 */
 	public static Djp_jpc jp_rundcpf(Djp_jpc casedata, Map<String, Double> jpopt) {
-
 		return jp_rundcpf(casedata, jpopt, "");
 	}
 
-	/**
-	 *
-	 * @param casedata
-	 * @param jpopt
-	 * @param fname
-	 * @return
-	 */
 	public static Djp_jpc jp_rundcpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
-
 		return jp_rundcpf(casedata, jpopt, "", "");
 	}
 
