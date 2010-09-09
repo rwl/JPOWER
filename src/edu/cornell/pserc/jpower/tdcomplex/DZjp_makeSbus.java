@@ -25,8 +25,11 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
+import cern.jet.math.tdcomplex.DComplexFunctions;
+import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
 /**
  * Builds the vector of complex bus power injections.
@@ -35,7 +38,11 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_makeSbus extends DZjp_idx {
+public class DZjp_makeSbus {
+
+	private static final DZjp_util util = new DZjp_util();
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
+	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Returns the vector of complex bus
@@ -61,7 +68,7 @@ public class DZjp_makeSbus extends DZjp_idx {
 		int ngon = on.size();
 		// connection matrix, element i, j is 1 if gen on(j) at bus i is ON
 		SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
-				gbus, irange(ngon), 1, 0, false);
+				gbus, util.irange(ngon), 1, 0, false);
 
 		DComplexMatrix1D Sg = DComplexFactory1D.dense.make(nb);
 		Sg.assignReal(gen.Pg.viewSelection(on.elements()));

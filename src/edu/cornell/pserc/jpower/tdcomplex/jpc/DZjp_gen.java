@@ -24,9 +24,43 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
-public class DZjp_gen extends DZjp_idx {
+/**
+ *
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
+public class DZjp_gen {
+
+	private static final DZjp_util util = new DZjp_util();
+
+	private static final int GEN_BUS	= 0;
+	private static final int PG			= 1;
+	private static final int QG			= 2;
+	private static final int QMAX		= 3;
+	private static final int QMIN		= 4;
+	private static final int VG			= 5;
+	private static final int MBASE		= 6;
+	private static final int GEN_STATUS	= 7;
+	private static final int PMAX		= 8;
+	private static final int PMIN		= 9;
+	private static final int PC1		= 10;
+	private static final int PC2		= 11;
+	private static final int QC1MIN		= 12;
+	private static final int QC1MAX		= 13;
+	private static final int QC2MIN		= 14;
+	private static final int QC2MAX		= 15;
+	private static final int RAMP_AGC	= 16;
+	private static final int RAMP_10	= 17;
+	private static final int RAMP_30	= 18;
+	private static final int RAMP_Q		= 19;
+	private static final int APF		= 20;
+
+	private static final int MU_PMAX	= 21;
+	private static final int MU_PMIN	= 22;
+	private static final int MU_QMAX	= 23;
+	private static final int MU_QMIN	= 24;
 
 	/** bus number */
 	public IntMatrix1D gen_bus;
@@ -98,16 +132,16 @@ public class DZjp_gen extends DZjp_idx {
 	 */
 
 	/** Kuhn-Tucker multiplier on upper Pg limit (u/MW) */
-	protected DoubleMatrix1D mu_Pmax;
+	public DoubleMatrix1D mu_Pmax;
 
 	/** Kuhn-Tucker multiplier on lower Pg limit (u/MW) */
-	protected DoubleMatrix1D mu_Pmin;
+	public DoubleMatrix1D mu_Pmin;
 
 	/** Kuhn-Tucker multiplier on upper Qg limit (u/MVAr) */
-	protected DoubleMatrix1D mu_Qmax;
+	public DoubleMatrix1D mu_Qmax;
 
 	/** Kuhn-Tucker multiplier on lower Qg limit (u/MVAr) */
-	protected DoubleMatrix1D mu_Qmin;
+	public DoubleMatrix1D mu_Qmin;
 
 	/**
 	 *
@@ -211,16 +245,17 @@ public class DZjp_gen extends DZjp_idx {
 	 * @param other
 	 * @param indexes
 	 */
+	@SuppressWarnings("static-access")
 	public void update(DoubleMatrix2D other, int[] indexes) {
 
-		this.gen_bus.viewSelection(indexes).assign( intm(other.viewColumn(GEN_BUS).viewSelection(indexes)) );
+		this.gen_bus.viewSelection(indexes).assign( util.intm(other.viewColumn(GEN_BUS).viewSelection(indexes)) );
 		this.Pg.viewSelection(indexes).assign(other.viewColumn(PG).viewSelection(indexes));
 		this.Qg.viewSelection(indexes).assign(other.viewColumn(QG).viewSelection(indexes));
 		this.Qmax.viewSelection(indexes).assign(other.viewColumn(QMAX).viewSelection(indexes));
 		this.Qmin.viewSelection(indexes).assign(other.viewColumn(QMIN).viewSelection(indexes));
 		this.Vg.viewSelection(indexes).assign(other.viewColumn(VG).viewSelection(indexes));
 		this.mBase.viewSelection(indexes).assign(other.viewColumn(MBASE).viewSelection(indexes));
-		this.gen_status.viewSelection(indexes).assign( intm(other.viewColumn(GEN_STATUS).viewSelection(indexes)) );
+		this.gen_status.viewSelection(indexes).assign( util.intm(other.viewColumn(GEN_STATUS).viewSelection(indexes)) );
 		this.Pmax.viewSelection(indexes).assign(other.viewColumn(PMAX).viewSelection(indexes));
 		this.Pmin.viewSelection(indexes).assign(other.viewColumn(PMIN).viewSelection(indexes));
 		this.Pc1.viewSelection(indexes).assign(other.viewColumn(PC1).viewSelection(indexes));
@@ -252,6 +287,7 @@ public class DZjp_gen extends DZjp_idx {
 	 * @param opf include OPF solution data
 	 * @return generator data matrix
 	 */
+	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix(boolean opf) {
 		DoubleMatrix2D matrix;
 		if (opf) {
@@ -260,14 +296,14 @@ public class DZjp_gen extends DZjp_idx {
 			matrix = DoubleFactory2D.dense.make(size(), 21);
 		}
 
-		matrix.viewColumn(GEN_BUS).assign( dblm(this.gen_bus) );
+		matrix.viewColumn(GEN_BUS).assign( util.dblm(this.gen_bus) );
 		matrix.viewColumn(PG).assign(this.Pg);
 		matrix.viewColumn(QG).assign(this.Qg);
 		matrix.viewColumn(QMAX).assign(this.Qmax);
 		matrix.viewColumn(QMIN).assign(this.Qmin);
 		matrix.viewColumn(VG).assign(this.Vg);
 		matrix.viewColumn(MBASE).assign(this.mBase);
-		matrix.viewColumn(GEN_STATUS).assign( dblm(this.gen_status) );
+		matrix.viewColumn(GEN_STATUS).assign( util.dblm(this.gen_status) );
 		matrix.viewColumn(PMAX).assign(this.Pmax);
 		matrix.viewColumn(PMIN).assign(this.Pmin);
 		matrix.viewColumn(PC1).assign(this.Pc1);

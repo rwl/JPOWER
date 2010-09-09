@@ -23,9 +23,22 @@ package edu.cornell.pserc.jpower.tdcomplex.jpc;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
-public class DZjp_gencost extends DZjp_idx {
+/**
+ *
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
+public class DZjp_gencost {
+
+	private static final DZjp_util util = new DZjp_util();
+
+	private static final int MODEL	= 0;
+	private static final int STARTUP	= 1;
+	private static final int SHUTDOWN	= 2;
+	private static final int NCOST	= 3;
+	private static final int COST		= 4;
 
 	/** cost model, 1 = piecewise linear, 2 = polynomial */
 	public IntMatrix1D model;
@@ -82,12 +95,13 @@ public class DZjp_gencost extends DZjp_idx {
 	 *
 	 * @param other
 	 */
+	@SuppressWarnings("static-access")
 	public void update(DoubleMatrix2D other) {
 
-		this.model.assign( intm(other.viewColumn(MODEL) ) );
+		this.model.assign( util.intm(other.viewColumn(MODEL) ) );
 		this.startup.assign( other.viewColumn(STARTUP) );
 		this.shutdown.assign( other.viewColumn(SHUTDOWN) );
-		this.ncost.assign( intm(other.viewColumn(NCOST) ) );
+		this.ncost.assign( util.intm(other.viewColumn(NCOST) ) );
 		this.cost.assign( other.viewColumn(COST) );
 	}
 

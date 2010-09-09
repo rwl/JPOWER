@@ -31,7 +31,7 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_int2ext extends DZjp_idx {
+public class DZjp_int2ext {
 
 	public static DoubleMatrix2D[] jp_int2ext(DoubleMatrix2D bus, DoubleMatrix2D gen,
 			DoubleMatrix2D branch) {

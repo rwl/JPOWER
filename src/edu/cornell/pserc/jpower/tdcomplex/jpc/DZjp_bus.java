@@ -24,9 +24,35 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
-public class DZjp_bus extends DZjp_idx {
+/**
+ *
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
+public class DZjp_bus {
+
+	private static final DZjp_util util = new DZjp_util();
+
+	private static final int BUS_I		= 0;
+	private static final int BUS_TYPE	= 1;
+	private static final int PD			= 2;
+	private static final int QD			= 3;
+	private static final int GS			= 4;
+	private static final int BS			= 5;
+	private static final int BUS_AREA	= 6;
+	private static final int VM			= 7;
+	private static final int VA			= 8;
+	private static final int BASE_KV	= 9;
+	private static final int ZONE		= 10;
+	private static final int VMAX		= 11;
+	private static final int VMIN		= 12;
+
+	private static final int LAM_P		= 13;
+	private static final int LAM_Q		= 14;
+	private static final int MU_VMAX	= 15;
+	private static final int MU_VMIN	= 16;
 
 	/** bus number (1 to 29997) */
 	public IntMatrix1D bus_i;
@@ -84,25 +110,6 @@ public class DZjp_bus extends DZjp_idx {
 
 	/** Kuhn-Tucker multiplier on lower voltage limit (u/p.u.) */
 	public DoubleMatrix1D mu_Vmin;
-
-//	private static final int BUS_I		= 1;
-//	private static final int BUS_TYPE	= 2;
-//	private static final int PD			= 3;
-//	private static final int QD			= 4;
-//	private static final int GS			= 5;
-//	private static final int BS			= 6;
-//	private static final int BUS_AREA	= 7;
-//	private static final int VM			= 8;
-//	private static final int VA			= 9;
-//	private static final int BASE_KV	= 10;
-//	private static final int ZONE		= 11;
-//	private static final int VMAX		= 12;
-//	private static final int VMIN		= 13;
-//
-//	private static final int LAM_P		= 14;
-//	private static final int LAM_Q		= 15;
-//	private static final int MU_VMAX	= 16;
-//	private static final int MU_VMIN	= 17;
 
 	/**
 	 *
@@ -191,19 +198,20 @@ public class DZjp_bus extends DZjp_idx {
 	 * @param bus
 	 * @param indexes
 	 */
+	@SuppressWarnings("static-access")
 	public void update(DoubleMatrix2D bus, int[] indexes) {
 
-		this.bus_i.viewSelection(indexes).assign( intm(bus.viewColumn(BUS_I).viewSelection(indexes)) );
-		this.bus_type.viewSelection(indexes).assign( intm(bus.viewColumn(BUS_TYPE).viewSelection(indexes)) );
+		this.bus_i.viewSelection(indexes).assign( util.intm(bus.viewColumn(BUS_I).viewSelection(indexes)) );
+		this.bus_type.viewSelection(indexes).assign( util.intm(bus.viewColumn(BUS_TYPE).viewSelection(indexes)) );
 		this.Pd.viewSelection(indexes).assign(bus.viewColumn(PD).viewSelection(indexes));
 		this.Qd.viewSelection(indexes).assign(bus.viewColumn(QD).viewSelection(indexes));
 		this.Gs.viewSelection(indexes).assign(bus.viewColumn(GS).viewSelection(indexes));
 		this.Bs.viewSelection(indexes).assign(bus.viewColumn(BS).viewSelection(indexes));
-		this.bus_area.viewSelection(indexes).assign( intm(bus.viewColumn(BUS_AREA).viewSelection(indexes)) );
+		this.bus_area.viewSelection(indexes).assign( util.intm(bus.viewColumn(BUS_AREA).viewSelection(indexes)) );
 		this.Vm.viewSelection(indexes).assign(bus.viewColumn(VM).viewSelection(indexes));
 		this.Va.viewSelection(indexes).assign(bus.viewColumn(VA).viewSelection(indexes));
 		this.base_kV.viewSelection(indexes).assign(bus.viewColumn(BASE_KV).viewSelection(indexes));
-		this.zone.viewSelection(indexes).assign( intm(bus.viewColumn(ZONE).viewSelection(indexes)) );
+		this.zone.viewSelection(indexes).assign( util.intm(bus.viewColumn(ZONE).viewSelection(indexes)) );
 		this.Vmax.viewSelection(indexes).assign(bus.viewColumn(VMAX).viewSelection(indexes));
 		this.Vmin.viewSelection(indexes).assign(bus.viewColumn(VMIN).viewSelection(indexes));
 
@@ -224,6 +232,7 @@ public class DZjp_bus extends DZjp_idx {
 	 * @param opf include opf data
 	 * @return bus data matrix
 	 */
+	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix(boolean opf) {
 		DoubleMatrix2D matrix;
 		if (opf) {
@@ -232,17 +241,17 @@ public class DZjp_bus extends DZjp_idx {
 			matrix = DoubleFactory2D.dense.make(size(), 13);
 		}
 
-		matrix.viewColumn(BUS_I).assign( dblm(this.bus_i) );
-		matrix.viewColumn(BUS_TYPE).assign( dblm(this.bus_type) );
+		matrix.viewColumn(BUS_I).assign( util.dblm(this.bus_i) );
+		matrix.viewColumn(BUS_TYPE).assign( util.dblm(this.bus_type) );
 		matrix.viewColumn(PD).assign(this.Pd);
 		matrix.viewColumn(QD).assign(this.Qd);
 		matrix.viewColumn(GS).assign(this.Gs);
 		matrix.viewColumn(BS).assign(this.Bs);
-		matrix.viewColumn(BUS_AREA).assign( dblm(this.bus_area) );
+		matrix.viewColumn(BUS_AREA).assign( util.dblm(this.bus_area) );
 		matrix.viewColumn(VM).assign(this.Vm);
 		matrix.viewColumn(VA).assign(this.Va);
 		matrix.viewColumn(BASE_KV).assign(this.base_kV);
-		matrix.viewColumn(ZONE).assign( dblm(this.zone) );
+		matrix.viewColumn(ZONE).assign( util.dblm(this.zone) );
 		matrix.viewColumn(VMAX).assign(this.Vmax);
 		matrix.viewColumn(VMIN).assign(this.Vmin);
 

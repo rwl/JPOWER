@@ -47,7 +47,7 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class MatrixMarketUtil {
+public class DZjp_mm {
 
 	/**
 	 *

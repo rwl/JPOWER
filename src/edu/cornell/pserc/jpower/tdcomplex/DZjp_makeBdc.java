@@ -29,10 +29,15 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_branch;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
-public class DZjp_makeBdc extends DZjp_idx {
+public class DZjp_makeBdc {
+
+	private static final DZjp_util util = new DZjp_util();
+	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 * Builds the B matrices and phase shift injections for DC power flow.
@@ -73,7 +78,7 @@ public class DZjp_makeBdc extends DZjp_idx {
 		//      | Pt |   | Btf  Btt |   | Vat |   | Ptinj |
 
 		// ones at in-service branches
-		DoubleMatrix1D stat = dblm(branch.br_status);
+		DoubleMatrix1D stat = util.dblm(branch.br_status);
 		// series susceptance
 		DoubleMatrix1D b = stat.copy().assign(branch.br_x, dfunc.div);
 		// default tap ratio = 1
@@ -88,7 +93,7 @@ public class DZjp_makeBdc extends DZjp_idx {
 		/* build connection matrix Cft = Cf - Ct for line and from - to buses */
 		int[] f = branch.f_bus.toArray();
 		int[] t = branch.t_bus.toArray();
-		int[] il = irange(nl);
+		int[] il = util.irange(nl);
 //        SparseRCDoubleMatrix2D Cf = new SparseRCDoubleMatrix2D(nl, nb, irange(nl),
 //                f, 1.0, false, false);
 //        SparseRCDoubleMatrix2D Ct = new SparseRCDoubleMatrix2D(nl, nb, irange(nl),
@@ -98,7 +103,7 @@ public class DZjp_makeBdc extends DZjp_idx {
 		Cft.viewSelection(il, t).assign(dfunc.minus(1));
 
 		/* build Bf such that Bf * Va is the vector of real branch powers injected
-		   at each branch's "from" bus */
+		at each branch's "from" bus */
 //        SparseRCDoubleMatrix2D Bf = new SparseRCDoubleMatrix2D(nl, nl,
 //                il, f, b.toArray(), false, false, false);
 //        Bf.viewSelection(il, t).assign(b.copy().assign(dfunc.neg));

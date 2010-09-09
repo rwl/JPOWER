@@ -24,8 +24,11 @@ package edu.cornell.pserc.jpower.tdcomplex;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
+import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
 /**
  * Builds index lists for each type of bus (REF, PV, PQ).
@@ -34,7 +37,14 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_bustypes extends DZjp_idx {
+public class DZjp_bustypes {
+
+	private static final DZjp_util util = new DZjp_util();
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
+
+	private static final int REF = DZjp_jpc.REF;
+	private static final int PV = DZjp_jpc.PV;
+	private static final int PQ = DZjp_jpc.PQ;
 
 	/**
 	 * Generators with "out-of-service" status are treated as PQ buses with
@@ -54,7 +64,7 @@ public class DZjp_bustypes extends DZjp_idx {
 
 		/* gen connection matrix, element i, j is 1 if, generator j at bus i is ON */
 		SparseRCIntMatrix2D Cg = new SparseRCIntMatrix2D(nb, ng,
-				gen.gen_bus.toArray(), irange(ng),
+				gen.gen_bus.toArray(), util.irange(ng),
 				gen.gen_status.assign(ifunc.equals(1)).toArray(), false, false, false);
 
 		/* number of generators at each bus that are ON */

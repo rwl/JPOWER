@@ -24,9 +24,40 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdcomplex.DZjp_idx;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
-public class DZjp_branch extends DZjp_idx {
+/**
+ *
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
+public class DZjp_branch {
+
+	private static final DZjp_util util = new DZjp_util();
+
+	private static final int F_BUS		= 0;
+	private static final int T_BUS		= 1;
+	private static final int BR_R		= 2;
+	private static final int BR_X		= 3;
+	private static final int BR_B		= 4;
+	private static final int RATE_A		= 5;
+	private static final int RATE_B		= 6;
+	private static final int RATE_C		= 7;
+	private static final int TAP		= 8;
+	private static final int SHIFT		= 9;
+	private static final int BR_STATUS	= 10;
+	private static final int ANGMIN		= 11;
+	private static final int ANGMAX		= 12;
+
+	private static final int PF			= 13;
+	private static final int QF			= 14;
+	private static final int PT			= 15;
+	private static final int QT			= 16;
+
+	private static final int MU_SF		= 17;
+	private static final int MU_ST		= 18;
+	private static final int MU_ANGMIN	= 19;
+	private static final int MU_ANGMAX	= 20;
 
 	/** f, from bus number */
 	public IntMatrix1D f_bus;
@@ -198,10 +229,11 @@ public class DZjp_branch extends DZjp_idx {
 	 * @param other
 	 * @param indexes
 	 */
+	@SuppressWarnings("static-access")
 	public void update(DoubleMatrix2D other, int[] indexes) {
 
-		this.f_bus.viewSelection(indexes).assign( intm(other.viewColumn(F_BUS).viewSelection(indexes)) );
-		this.t_bus.viewSelection(indexes).assign( intm(other.viewColumn(T_BUS).viewSelection(indexes)) );
+		this.f_bus.viewSelection(indexes).assign( util.intm(other.viewColumn(F_BUS).viewSelection(indexes)) );
+		this.t_bus.viewSelection(indexes).assign( util.intm(other.viewColumn(T_BUS).viewSelection(indexes)) );
 		this.br_r.viewSelection(indexes).assign(other.viewColumn(BR_R).viewSelection(indexes));
 		this.br_x.viewSelection(indexes).assign(other.viewColumn(BR_X).viewSelection(indexes));
 		this.br_b.viewSelection(indexes).assign(other.viewColumn(BR_B).viewSelection(indexes));
@@ -210,7 +242,7 @@ public class DZjp_branch extends DZjp_idx {
 		this.rate_c.viewSelection(indexes).assign(other.viewColumn(RATE_C).viewSelection(indexes));
 		this.tap.viewSelection(indexes).assign(other.viewColumn(TAP).viewSelection(indexes));
 		this.shift.viewSelection(indexes).assign(other.viewColumn(SHIFT).viewSelection(indexes));
-		this.br_status.viewSelection(indexes).assign( intm(other.viewColumn(BR_STATUS).viewSelection(indexes)) );
+		this.br_status.viewSelection(indexes).assign( util.intm(other.viewColumn(BR_STATUS).viewSelection(indexes)) );
 		this.ang_min.viewSelection(indexes).assign(other.viewColumn(ANGMIN).viewSelection(indexes));
 		this.ang_max.viewSelection(indexes).assign(other.viewColumn(ANGMAX).viewSelection(indexes));
 
@@ -239,6 +271,7 @@ public class DZjp_branch extends DZjp_idx {
 	 * @param opf include optimal power flow solution data
 	 * @return branch data matrix
 	 */
+	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix(boolean pf, boolean opf) {
 		DoubleMatrix2D matrix;
 		if (pf && opf) {
@@ -251,8 +284,8 @@ public class DZjp_branch extends DZjp_idx {
 			matrix = DoubleFactory2D.dense.make(size(), 13);
 		}
 
-		matrix.viewColumn(F_BUS).assign( dblm(this.f_bus) );
-		matrix.viewColumn(T_BUS).assign( dblm(this.t_bus) );
+		matrix.viewColumn(F_BUS).assign( util.dblm(this.f_bus) );
+		matrix.viewColumn(T_BUS).assign( util.dblm(this.t_bus) );
 		matrix.viewColumn(BR_R).assign(this.br_r);
 		matrix.viewColumn(BR_X).assign(this.br_x);
 		matrix.viewColumn(BR_B).assign(this.br_b);
@@ -261,7 +294,7 @@ public class DZjp_branch extends DZjp_idx {
 		matrix.viewColumn(RATE_C).assign(this.rate_c);
 		matrix.viewColumn(TAP).assign(this.tap);
 		matrix.viewColumn(SHIFT).assign(this.shift);
-		matrix.viewColumn(BR_STATUS).assign( dblm(this.br_status) );
+		matrix.viewColumn(BR_STATUS).assign( util.dblm(this.br_status) );
 		matrix.viewColumn(ANGMIN).assign(this.ang_min);
 		matrix.viewColumn(ANGMAX).assign(this.ang_max);
 

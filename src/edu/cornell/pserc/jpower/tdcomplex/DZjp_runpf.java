@@ -29,6 +29,7 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_branch;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
@@ -67,7 +68,9 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_runpf extends DZjp_idx {
+public class DZjp_runpf {
+
+	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 *

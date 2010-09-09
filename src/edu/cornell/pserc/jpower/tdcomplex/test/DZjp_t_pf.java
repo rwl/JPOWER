@@ -31,7 +31,7 @@ import edu.cornell.pserc.jpower.tdcomplex.DZjp_jpoption;
 import edu.cornell.pserc.jpower.tdcomplex.DZjp_rundcpf;
 import edu.cornell.pserc.jpower.tdcomplex.DZjp_runpf;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
-import edu.cornell.pserc.jpower.tdcomplex.util.MatrixMarketUtil;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_mm;
 
 /**
  * Tests for power flow solvers.
@@ -70,9 +70,9 @@ public class DZjp_t_pf {
 		Map<String, Double> jpopt = DZjp_jpoption.jp_jpoption();
 
 		/* get solved AC power flow case from MatrixMarket file. */
-		DoubleMatrix2D bus_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BUS_SOLN9);
-		DoubleMatrix2D gen_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(GEN_SOLN9);
-		DoubleMatrix2D branch_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BRANCH_SOLN9);
+		DoubleMatrix2D bus_soln = (DoubleMatrix2D) DZjp_mm.readMatrix(BUS_SOLN9);
+		DoubleMatrix2D gen_soln = (DoubleMatrix2D) DZjp_mm.readMatrix(GEN_SOLN9);
+		DoubleMatrix2D branch_soln = (DoubleMatrix2D) DZjp_mm.readMatrix(BRANCH_SOLN9);
 
 		String t;
 		DZjp_jpc jpc;
@@ -119,9 +119,9 @@ public class DZjp_t_pf {
 		DZjp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
 
 		/* get solved DC power flow case from MAT-file */
-		bus_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BUS_SOLN9_DC);
-		gen_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(GEN_SOLN9_DC);
-		branch_soln = (DoubleMatrix2D) MatrixMarketUtil.readMatrix(BRANCH_SOLN9_DC);
+		bus_soln = (DoubleMatrix2D) DZjp_mm.readMatrix(BUS_SOLN9_DC);
+		gen_soln = (DoubleMatrix2D) DZjp_mm.readMatrix(GEN_SOLN9_DC);
+		branch_soln = (DoubleMatrix2D) DZjp_mm.readMatrix(BRANCH_SOLN9_DC);
 
 		/* run DC PF */
 		t = "DC PF : ";

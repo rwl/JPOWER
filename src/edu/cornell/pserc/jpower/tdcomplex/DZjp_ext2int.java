@@ -31,11 +31,13 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_areas;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_branch;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_bus;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_gen;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
 /**
  * Converts external to internal indexing.
@@ -109,7 +111,15 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_ext2int extends DZjp_idx {
+public class DZjp_ext2int {
+
+	private static final DZjp_util util = new DZjp_util();
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
+
+	private static final int REF = DZjp_jpc.REF;
+	private static final int PV = DZjp_jpc.PV;
+	private static final int PQ = DZjp_jpc.PQ;
+	private static final int NONE = DZjp_jpc.NONE;
 
 	/**
 	 *
@@ -131,12 +141,13 @@ public class DZjp_ext2int extends DZjp_idx {
 	 * @param areas
 	 * @return
 	 */
+	@SuppressWarnings("static-access")
 	public static Object[] jp_ext2int(DZjp_bus bus,
 			DZjp_gen gen, DZjp_branch branch, DZjp_areas areas) {
 
 		int[] i2e = bus.bus_i.toArray();
-		IntMatrix1D e2i = IntFactory1D.sparse.make((int) max(i2e));
-		e2i.viewSelection(i2e).assign(irange(bus.size()));
+		IntMatrix1D e2i = IntFactory1D.sparse.make((int) util.max(i2e));
+		e2i.viewSelection(i2e).assign(util.irange(bus.size()));
 
 		bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
 		gen.gen_bus.assign( e2i.viewSelection(gen.gen_bus.toArray()) );
@@ -201,8 +212,8 @@ public class DZjp_ext2int extends DZjp_idx {
 
 			/* determine which buses, branches, gens are connected & in-service */
 			int[] bi = jpc.bus.bus_i.toArray();
-			IntMatrix1D n2i = new SparseRCIntMatrix2D(max(bi), 1,
-				bi, ones(nb), irange(nb), false, false, false).viewColumn(0);
+			IntMatrix1D n2i = new SparseRCIntMatrix2D(util.max(bi), 1,
+				bi, util.ones(nb), util.irange(nb), false, false, false).viewColumn(0);
 
 			/* bus status */
 			IntMatrix1D bs = IntFactory1D.dense.make(bt);
@@ -252,8 +263,8 @@ public class DZjp_ext2int extends DZjp_idx {
 
 			/* apply consecutive bus numbering */
 			o.bus.i2e = jpc.bus.bus_i;
-			o.bus.e2i = intm(DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(ifunc.max, ifunc.identity)));
-			o.bus.e2i.viewSelection(o.bus.i2e.toArray()).assign(IntFactory1D.dense.make(irange(nb)));
+			o.bus.e2i = util.intm(DoubleFactory1D.sparse.make((int) o.bus.i2e.aggregate(ifunc.max, ifunc.identity)));
+			o.bus.e2i.viewSelection(o.bus.i2e.toArray()).assign(IntFactory1D.dense.make(util.irange(nb)));
 			jpc.bus.bus_i.assign( o.bus.e2i.viewSelection(jpc.bus.bus_i.toArray()) );
 			jpc.gen.gen_bus.assign( o.bus.e2i.viewSelection(jpc.gen.gen_bus.toArray()) );
 			jpc.branch.f_bus.assign( o.bus.e2i.viewSelection( jpc.branch.f_bus.toArray()) );
@@ -372,6 +383,7 @@ public class DZjp_ext2int extends DZjp_idx {
 	 * @param dim
 	 * @return
 	 */
+	@SuppressWarnings("static-access")
 	public static DZjp_jpc jp_ext2int(DZjp_jpc jpc, AbstractMatrix val, String[] ordering, int dim) {
 		DZjp_order o = jpc.order;
 
@@ -393,7 +405,7 @@ public class DZjp_ext2int extends DZjp_idx {
 					Field fld = o.external.getClass().getField(odr);
 					DoubleMatrix2D f = (DoubleMatrix2D) fld.get(o.external);
 					int n = f.rows();
-					DoubleMatrix1D v = DZjp_get_reorder.jp_get_reorder(val, irange(b, b+n), dim);
+					DoubleMatrix1D v = DZjp_get_reorder.jp_get_reorder(val, util.irange(b, b+n), dim);
 
 					b += n;
 				} catch (SecurityException e) {

@@ -24,6 +24,8 @@ package edu.cornell.pserc.jpower.tdcomplex;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
+import cern.jet.math.tdouble.DoubleFunctions;
+import edu.cornell.pserc.jpower.tdcomplex.util.DZjp_util;
 
 /**
  * Solves a DC power flow.
@@ -32,7 +34,9 @@ import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_dcpf extends DZjp_idx {
+public class DZjp_dcpf {
+
+	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 * Solves for the bus voltage angles at all but the reference bus.
@@ -53,7 +57,7 @@ public class DZjp_dcpf extends DZjp_idx {
 		DoubleMatrix1D Va = Va0.copy();
 
 		/* update angles for non-reference buses */
-		int[] pvpq = cat(pv, pq);
+		int[] pvpq = DZjp_util.cat(pv, pq);
 		DoubleMatrix2D A = B.viewSelection(pvpq, pvpq);
 		DoubleMatrix1D b = B.viewColumn(ref).viewSelection(pvpq).copy();
 		b.assign(dfunc.mult(Va.get(ref)));

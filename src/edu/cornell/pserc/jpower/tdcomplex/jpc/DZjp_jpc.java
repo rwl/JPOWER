@@ -25,6 +25,16 @@ import edu.cornell.pserc.jpower.tdcomplex.DZjp_order;
 
 public class DZjp_jpc {
 
+	/* define bus types */
+	public static final int PQ = 1;
+	public static final int PV = 2;
+	public static final int REF = 3;
+	public static final int NONE = 4;
+
+	/* define cost models */
+	public static final int PW_LINEAR	= 1;
+	public static final int POLYNOMIAL	= 2;
+
 	public double baseMVA = 100;
 	public DZjp_bus bus = new DZjp_bus();
 	public DZjp_gen gen = new DZjp_gen();
