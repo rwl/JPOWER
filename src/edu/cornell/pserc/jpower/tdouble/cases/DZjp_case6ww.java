@@ -19,26 +19,28 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble.data;
+package edu.cornell.pserc.jpower.tdouble.cases;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import edu.cornell.pserc.jpower.tdouble.jpc.DZjp_jpc;
 
 /**
- * Power flow data for 9 bus, 3 generator case.
+ * Power flow data for 6 bus, 3 gen case from Wood & Wollenberg.
  *
  * @author Ray Zimmerman (rz10@cornell.edu)
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_case9 {
+public class DZjp_case6ww {
 
 	/**
-	 * Based on data from Joe H. Chow's book, p. 70.
+	 * This is the 6 bus example from pp. 104, 112, 119, 123-124, 549 of
+	 * "Power Generation, Operation, and Control, 2nd Edition",
+	 * by Allen. J. Wood and Bruce F. Wollenberg, John Wiley & Sons, NY, Jan 1996.
 	 *
-	 * @return a 9 bus, 3 generator case.
+	 * @return a 6 bus, 3 gen case from Wood & Wollenberg.
 	 */
-	public DZjp_jpc jp_case9() {
+	public DZjp_jpc jp_case6ww() {
 
 		DZjp_jpc jpc = new DZjp_jpc();
 
@@ -53,54 +55,47 @@ public class DZjp_case9 {
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
 		jpc.bus.update( DoubleFactory2D.dense.make(new double[][] {
-			{1,	3,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{2,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{3,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{4,	1,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{5,	1,	90,	30,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{6,	1,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{7,	1,	100,	35,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{8,	1,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{9,	1,	125,	50,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9}
+			{1,	3,	0,	0,	0,	0,	1,	1.05,	0,	230,	1,	1.05,	1.05},
+			{2,	2,	0,	0,	0,	0,	1,	1.05,	0,	230,	1,	1.05,	1.05},
+			{3,	2,	0,	0,	0,	0,	1,	1.07,	0,	230,	1,	1.07,	1.07},
+			{4,	1,	70,	70,	0,	0,	1,	1,	0,	230,	1,	1.05,	0.95},
+			{5,	1,	70,	70,	0,	0,	1,	1,	0,	230,	1,	1.05,	0.95},
+			{6,	1,	70,	70,	0,	0,	1,	1,	0,	230,	1,	1.05,	0.95}
 		}) );
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
 		jpc.gen.update( DoubleFactory2D.dense.make(new double[][] {
-			{1,	0,	0,	300,	-300,	1,	100,	1,	250,	10,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
-			{2,	163,	0,	300,	-300,	1,	100,	1,	300,	10,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
-			{3,	85,	0,	300,	-300,	1,	100,	1,	270,	10,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0}
+			{1,	0,	0,	100,	-100,	1.05,	100,	1,	200,	50,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+			{2,	50,	0,	100,	-100,	1.05,	100,	1,	150,	37.5,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+			{3,	60,	0,	100,	-100,	1.07,	100,	1,	180,	45,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0}
 		}) );
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
 		jpc.branch.update( DoubleFactory2D.dense.make(new double[][] {
-			{1,	4,	0,	0.0576,	0,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{4,	5,	0.017,	0.092,	0.158,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{5,	6,	0.039,	0.17,	0.358,	150,	150,	150,	0,	0,	1,	-360,	360},
-			{3,	6,	0,	0.0586,	0,	300,	300,	300,	0,	0,	1,	-360,	360},
-			{6,	7,	0.0119,	0.1008,	0.209,	150,	150,	150,	0,	0,	1,	-360,	360},
-			{7,	8,	0.0085,	0.072,	0.149,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{8,	2,	0,	0.0625,	0,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{8,	9,	0.032,	0.161,	0.306,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{9,	4,	0.01,	0.085,	0.176,	250,	250,	250,	0,	0,	1,	-360,	360},
+			{1,	2,	0.1,	0.2,	0.04,	40,	40,	40,	0,	0,	1,	-360,	360},
+			{1,	4,	0.05,	0.2,	0.04,	60,	60,	60,	0,	0,	1,	-360,	360},
+			{1,	5,	0.08,	0.3,	0.06,	40,	40,	40,	0,	0,	1,	-360,	360},
+			{2,	3,	0.05,	0.25,	0.06,	40,	40,	40,	0,	0,	1,	-360,	360},
+			{2,	4,	0.05,	0.1,	0.02,	60,	60,	60,	0,	0,	1,	-360,	360},
+			{2,	5,	0.1,	0.3,	0.04,	30,	30,	30,	0,	0,	1,	-360,	360},
+			{2,	6,	0.07,	0.2,	0.05,	90,	90,	90,	0,	0,	1,	-360,	360},
+			{3,	5,	0.12,	0.26,	0.05,	70,	70,	70,	0,	0,	1,	-360,	360},
+			{3,	6,	0.02,	0.1,	0.02,	80,	80,	80,	0,	0,	1,	-360,	360},
+			{4,	5,	0.2,	0.4,	0.08,	20,	20,	20,	0,	0,	1,	-360,	360},
+			{5,	6,	0.1,	0.3,	0.06,	40,	40,	40,	0,	0,	1,	-360,	360},
 		}) );
 
 		/* -----  OPF Data  ----- */
-
-		/* area data */
-		//	area	refbus
-		jpc.areas.update( DoubleFactory2D.dense.make(new double[][] {
-			{1,	5}
-		}) );
 
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
 		jpc.gencost.update( DoubleFactory2D.dense.make(new double[][] {
-			{2,	1500,	0,	3,	0.11,	5,	150},
-			{2,	2000,	0,	3,	0.085,	1.2,	600},
-			{2,	3000,	0,	3,	0.1225,	1,	335}
+			{2,	0,	0,	3,	.00533,	11.669,	213.1},
+			{2,	0,	0,	3,	.00889,	10.333,	200},
+			{2,	0,	0,	3,	.00741,	10.833,	240}
 		}) );
 
 		return jpc;
