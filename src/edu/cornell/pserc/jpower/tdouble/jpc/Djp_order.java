@@ -20,25 +20,24 @@
 
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
-import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
 public class Djp_order {
 
-	public class Case {
-		public Djp_areas areas;
-		public Djp_bus bus;
-		public Djp_branch branch;
-		public Djp_gen gen;
-		public Djp_gencost gencost;
-		public DoubleMatrix2D A;
-		public DoubleMatrix2D N;
-	}
+//	public class Case {
+//		public Djp_areas areas;
+//		public Djp_bus bus;
+//		public Djp_branch branch;
+//		public Djp_gen gen;
+//		public Djp_gencost gencost;
+//		public DoubleMatrix2D A;
+//		public DoubleMatrix2D N;
+//	}
 
 	public class Status {
-		public IntArrayList on = new IntArrayList();
-		public IntArrayList off = new IntArrayList();
+		public int[] on = new int[0];
+		public int[] off = new int[0];
 	}
 
 	public class BusGen {
@@ -52,8 +51,8 @@ public class Djp_order {
 	}
 
 	public String state;		// 'i' or 'e'
-	public Case internal = new Case();
-	public Case external = new Case();
+	public Djp_jpc internal = new Djp_jpc();
+	public Djp_jpc external = new Djp_jpc();
 	public BusGen bus = new BusGen();
 	public BusGen gen = new BusGen();
 	public BranchAreas branch = new BranchAreas();

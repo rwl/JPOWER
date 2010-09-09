@@ -20,6 +20,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
@@ -65,7 +66,7 @@ public class Djp_gencost {
 	 * starting with highest order, where cost is
 	 * f(p) = cn*p^2 + ... + c1*p + c0
 	 */
-	public DoubleMatrix1D cost;
+	public DoubleMatrix2D cost;
 
 	/**
 	 *
@@ -102,7 +103,24 @@ public class Djp_gencost {
 		this.startup = other.viewColumn(STARTUP);
 		this.shutdown = other.viewColumn(SHUTDOWN);
 		this.ncost = util.intm(other.viewColumn(NCOST));
-		this.cost = other.viewColumn(COST);
+		this.cost = other.viewSelection(null, util.irange(COST, other.columns()));
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	@SuppressWarnings("static-access")
+	public DoubleMatrix2D toMatrix() {
+		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), util.max(ncost.toArray()) + 4);
+
+		matrix.viewColumn(MODEL).assign( util.dblm(this.model) );
+		matrix.viewColumn(MODEL).assign(this.startup);
+		matrix.viewColumn(SHUTDOWN).assign(this.shutdown);
+		matrix.viewColumn(NCOST).assign( util.dblm(this.ncost) );
+		matrix.viewSelection(null, util.irange(COST, COST + this.cost.columns())).assign(this.cost);
+
+		return matrix;
 	}
 
 }

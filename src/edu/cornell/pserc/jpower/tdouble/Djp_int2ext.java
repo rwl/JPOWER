@@ -76,6 +76,7 @@ public class Djp_int2ext {
 				jpc = Djp_run_userfcn.jp_run_userfcn(jpc.userfcn, "int2ext", jpc);
 
 			/* save data matrices with internal ordering & restore originals */
+			o.internal = new Djp_jpc();
 			o.internal.bus    = jpc.bus.copy();
 			o.internal.branch = jpc.branch.copy();
 			o.internal.gen    = jpc.gen.copy();
@@ -100,11 +101,11 @@ public class Djp_int2ext {
 			}
 
 			/* update data (in bus, branch and gen only) */
-			jpc.bus.update(o.internal.bus, o.bus.status.on.elements());
-			jpc.branch.update(o.internal.branch, o.branch.status.on.elements());
-			jpc.gen.update(o.internal.gen.copy(o.gen.i2e.toArray()), o.branch.status.on.elements());
+			jpc.bus.update(o.internal.bus, o.bus.status.on);
+			jpc.branch.update(o.internal.branch, o.branch.status.on);
+			jpc.gen.update(o.internal.gen.copy(o.gen.i2e.toArray()), o.branch.status.on);
 			if (jpc.areas != null)
-				jpc.areas.update(o.internal.areas, o.areas.status.on.elements());
+				jpc.areas.update(o.internal.areas, o.areas.status.on);
 
 			/* revert to original bus numbers */
 		}

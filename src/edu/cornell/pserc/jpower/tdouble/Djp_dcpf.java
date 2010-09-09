@@ -58,8 +58,9 @@ public class Djp_dcpf {
 
 		/* update angles for non-reference buses */
 		int[] pvpq = Djp_util.cat(pv, pq);
-		DoubleMatrix2D A = B.viewSelection(pvpq, pvpq);
-		DoubleMatrix1D b = B.viewColumn(ref).viewSelection(pvpq).copy();
+
+		DoubleMatrix2D A = B.viewSelection(pvpq, pvpq).copy();
+		DoubleMatrix1D b = B.viewSelection(pvpq, null).copy().viewColumn(ref);
 		b.assign(dfunc.mult(Va.get(ref)));
 		b.assign(Pbus.viewSelection(pvpq), dfunc.swapArgs(dfunc.minus));
 		Va.viewSelection(pvpq).assign(SparseDoubleAlgebra.DEFAULT.solve(A, b));

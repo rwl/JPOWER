@@ -183,10 +183,14 @@ public class Djp_bus {
 		this.Vmax.viewSelection(indexes).assign(other.Vmax.viewSelection(indexes));
 		this.Vmin.viewSelection(indexes).assign(other.Vmin.viewSelection(indexes));
 
-		this.lam_P.viewSelection(indexes).assign(other.lam_P.viewSelection(indexes));
-		this.lam_Q.viewSelection(indexes).assign(other.lam_Q.viewSelection(indexes));
-		this.mu_Vmax.viewSelection(indexes).assign(other.mu_Vmax.viewSelection(indexes));
-		this.mu_Vmin.viewSelection(indexes).assign(other.mu_Vmin.viewSelection(indexes));
+		if (this.lam_P != null)
+			this.lam_P.viewSelection(indexes).assign(other.lam_P.viewSelection(indexes));
+		if (this.lam_Q != null)
+			this.lam_Q.viewSelection(indexes).assign(other.lam_Q.viewSelection(indexes));
+		if (this.mu_Vmax != null)
+			this.mu_Vmax.viewSelection(indexes).assign(other.mu_Vmax.viewSelection(indexes));
+		if (this.mu_Vmin != null)
+			this.mu_Vmin.viewSelection(indexes).assign(other.mu_Vmin.viewSelection(indexes));
 	}
 
 	/**

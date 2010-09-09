@@ -218,10 +218,14 @@ public class Djp_branch {
 		this.Pt.viewSelection(indexes).assign(other.Pt.viewSelection(indexes));
 		this.Qt.viewSelection(indexes).assign(other.Qt.viewSelection(indexes));
 
-		this.mu_Sf.viewSelection(indexes).assign(other.mu_Sf.viewSelection(indexes));
-		this.mu_St.viewSelection(indexes).assign(other.mu_St.viewSelection(indexes));
-		this.mu_angmin.viewSelection(indexes).assign(other.mu_angmin.viewSelection(indexes));
-		this.mu_angmax.viewSelection(indexes).assign(other.mu_angmax.viewSelection(indexes));
+		if (this.mu_Sf != null)
+			this.mu_Sf.viewSelection(indexes).assign(other.mu_Sf.viewSelection(indexes));
+		if (this.mu_St != null)
+			this.mu_St.viewSelection(indexes).assign(other.mu_St.viewSelection(indexes));
+		if (this.mu_angmin != null)
+			this.mu_angmin.viewSelection(indexes).assign(other.mu_angmin.viewSelection(indexes));
+		if (this.mu_angmax != null)
+			this.mu_angmax.viewSelection(indexes).assign(other.mu_angmax.viewSelection(indexes));
 	}
 
 	/**

@@ -66,16 +66,11 @@ public class Djp_makeSbus {
 		int nb = bus.size();
 		int ngon = on.size();
 
-//		for (int i : gbus) {
-//			System.out.println(gbus[i]);
-//		}
-//		System.out.println("Cg: " + nb + " " + ngon + " " + gbus.length + " " + on.elements().length);
-
 		// connection matrix, element i, j is 1 if gen on(j) at bus i is ON
 		SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
 				gbus, util.irange(ngon), 1, 0, false);
 
-		DComplexMatrix1D Sg = DComplexFactory1D.dense.make(nb);
+		DComplexMatrix1D Sg = DComplexFactory1D.dense.make(ngon);
 		Sg.assignReal(gen.Pg.viewSelection(on.elements()));
 		Sg.assignImaginary(gen.Qg.viewSelection(on.elements()));
 
@@ -83,9 +78,9 @@ public class Djp_makeSbus {
 		Sd.assignReal(bus.Pd);
 		Sd.assignImaginary(bus.Qd);
 
-		// power injected by generators plus power injected by loads ...
-		DComplexMatrix1D Sbus = Cg.zMult(Sg.assign(Sd, cfunc.minus), null);
-		Sbus.assign(cfunc.div(baseMVA));	// converted to p.u.
+		DComplexMatrix1D Sbus = Cg.zMult(Sg, null);	// power injected by generators
+		Sbus.assign(Sd, cfunc.minus);				// plus power injected by loads
+		Sbus.assign(cfunc.div(baseMVA));			// converted to p.u.
 
 		return Sbus;
 	}

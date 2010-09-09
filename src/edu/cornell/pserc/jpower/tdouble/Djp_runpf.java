@@ -34,6 +34,7 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
 
 /**
  * Runs a power flow
@@ -143,17 +144,15 @@ public class Djp_runpf {
 		branch = jpc.branch.copy();
 
 		/* get bus index lists of each type of bus */
-		IntMatrix1D[] bustypes = Djp_bustypes.jp_bustypes(bus, gen);
+		IntArrayList[] bustypes = Djp_bustypes.jp_bustypes(bus, gen);
 		int ref = bustypes[0].get(0);
-		int[] pv = bustypes[1].toArray();
-		int[] pq = bustypes[2].toArray();
+		int[] pv = bustypes[1].elements();
+		int[] pq = bustypes[2].elements();
 
 		/* generator info */
-		IntArrayList on = new IntArrayList();     // which generators are on?
-		gen.gen_status.getNonZeros(on, new IntArrayList());
-		on.trimToSize();
+		int[] on = Djp_util.nonzero(gen.gen_status);     // which generators are on?
 		// what buses are they at?
-		int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
+		int[] gbus = gen.gen_bus.viewSelection(on).toArray();
 
 		/* -----  run the power flow  ----- */
 		long t0 = System.currentTimeMillis();
@@ -200,7 +199,7 @@ public class Djp_runpf {
 			//      newPg = oldPg + newPinj - oldPinj
 			int refgen = 0;
 			for (int i : gbus) if (i == ref) { refgen = i; break; }
-			gen.Pg.set(on.get(refgen), gen.Pg.get(on.get(refgen)) + (B.viewRow(ref).zDotProduct(Va) - Pbus.get(ref)) * baseMVA);
+			gen.Pg.set(on[refgen], gen.Pg.get(on[refgen]) + (B.viewRow(ref).zDotProduct(Va) - Pbus.get(ref)) * baseMVA);
 
 			success = true;
 		} else {                                  // AC formulation
@@ -218,15 +217,15 @@ public class Djp_runpf {
 		Djp_jpc results = Djp_int2ext.jp_int2ext(jpc);
 
 		// zero out result fields of out-of-service gens & branches
-		if (results.order.gen.status.off.size() > 0) {
-			results.gen.Pg.viewSelection(results.order.gen.status.off.elements()).assign(0);
-			results.gen.Qg.viewSelection(results.order.gen.status.off.elements()).assign(0);
+		if (results.order.gen.status.off.length > 0) {
+			results.gen.Pg.viewSelection(results.order.gen.status.off).assign(0);
+			results.gen.Qg.viewSelection(results.order.gen.status.off).assign(0);
 		}
-		if (results.order.branch.status.off.size() > 0) {
-			results.branch.Pf.viewSelection(results.order.branch.status.off.elements()).assign(0);
-			results.branch.Qf.viewSelection(results.order.branch.status.off.elements()).assign(0);
-			results.branch.Pt.viewSelection(results.order.branch.status.off.elements()).assign(0);
-			results.branch.Qt.viewSelection(results.order.branch.status.off.elements()).assign(0);
+		if (results.order.branch.status.off.length > 0) {
+			results.branch.Pf.viewSelection(results.order.branch.status.off).assign(0);
+			results.branch.Qf.viewSelection(results.order.branch.status.off).assign(0);
+			results.branch.Pt.viewSelection(results.order.branch.status.off).assign(0);
+			results.branch.Qt.viewSelection(results.order.branch.status.off).assign(0);
 		}
 
 		if (fname != "") {
