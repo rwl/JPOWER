@@ -19,7 +19,7 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdcomplex;
+package edu.cornell.pserc.jpower.tdcomplex.data;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
@@ -31,15 +31,14 @@ import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class DZjp_case30Q {
+public class DZjp_case30pwl {
 
 	/**
-	 * Identical to case30.m, with the addition of non-zero costs for
-	 * reactive power.
+	 * Identical to case30.m, except with piece-wise linear generator costs.
 	 *
 	 * @return power flow data for 30 bus, 6 generator case.
 	 */
-	public DZjp_jpc jp_case30Q() {
+	public DZjp_jpc jp_case30pwl() {
 
 		DZjp_jpc jpc = new DZjp_jpc();
 
@@ -157,18 +156,12 @@ public class DZjp_case30Q {
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
 		jpc.gencost.update( DoubleFactory2D.dense.make(new double[][] {
-			{2,	0,	0,	3,	0.02,	2,	0},
-			{2,	0,	0,	3,	0.0175,	1.75,	0},
-			{2,	0,	0,	3,	0.0625,	1,	0},
-			{2,	0,	0,	3,	0.00834,	3.25,	0},
-			{2,	0,	0,	3,	0.025,	3,	0},
-			{2,	0,	0,	3,	0.025,	3,	0},
-			{2,	0,	0,	3,	0.02,	0,	0},
-			{2,	0,	0,	3,	0.0175,	0,	0},
-			{2,	0,	0,	3,	0.0625,	0,	0},
-			{2,	0,	0,	3,	0.00834,	0,	0},
-			{2,	0,	0,	3,	0.025,	0,	0},
-			{2,	0,	0,	3,	0.025,	0,	0},
+			{1,	0,	0,	4,	0,	0,	12,	144,	36,	1008,	60,	2832},
+			{1,	0,	0,	4,	0,	0,	12,	240,	36,	1296,	60,	3312},
+			{1,	0,	0,	4,	0,	0,	12,	240,	36,	1296,	60,	3312},
+			{1,	0,	0,	4,	0,	0,	12,	144,	36,	1008,	60,	2832},
+			{1,	0,	0,	4,	0,	0,	12,	240,	36,	1296,	60,	3312},
+			{1,	0,	0,	4,	0,	0,	12,	144,	36,	1008,	60,	2832},
 		}) );
 
 		return jpc;

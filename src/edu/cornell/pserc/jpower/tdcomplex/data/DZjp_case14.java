@@ -19,7 +19,7 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdcomplex;
+package edu.cornell.pserc.jpower.tdcomplex.data;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import edu.cornell.pserc.jpower.tdcomplex.jpc.DZjp_jpc;
