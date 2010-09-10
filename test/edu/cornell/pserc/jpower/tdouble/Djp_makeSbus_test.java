@@ -22,9 +22,7 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.io.File;
 
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tint.IntMatrix1D;
-import cern.jet.math.tint.IntFunctions;
+import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_mm;
 
@@ -33,37 +31,26 @@ import edu.cornell.pserc.jpower.tdouble.util.Djp_mm;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public abstract class Djp_bustypes_test extends Djp_base_test {
+public abstract class Djp_makeSbus_test extends Djp_base_test {
 
 	protected Djp_jpc jpc;
 
-	public Djp_bustypes_test(String name) {
+	public Djp_makeSbus_test(String name) {
 		super(name);
-		this.fname = "bustypes";
+		this.fname = "makeSbus";
 		/* Set 'jpc' in subclasses. */
 	}
 
-	@SuppressWarnings("static-access")
-	public void test_bustypes() {
+	public void test_makeBdc() {
 		Djp_jpc jpc = Djp_loadcase.jp_loadcase(this.jpc);
 		jpc = Djp_ext2int.jp_ext2int(jpc);
-		IntMatrix1D[] bustypes = Djp_bustypes.jp_bustypes(jpc.bus, jpc.gen);
+		DComplexMatrix1D Sbus = Djp_makeSbus.jp_makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
 
-		File ref_file = new File(fdir, "ref.mtx");
-		File pv_file = new File(fdir, "pv.mtx");
-		File pq_file = new File(fdir, "pq.mtx");
+		File Sbus_file = new File(fdir, "Sbus.mtx");;
 
-		IntMatrix1D ref = util.intm((DoubleMatrix1D) Djp_mm.readMatrix(ref_file));
-		IntMatrix1D pv = util.intm((DoubleMatrix1D) Djp_mm.readMatrix(pv_file));
-		IntMatrix1D pq = util.intm((DoubleMatrix1D) Djp_mm.readMatrix(pq_file));
+		DComplexMatrix1D mpSbus = (DComplexMatrix1D) Djp_mm.readMatrix(Sbus_file);
 
-		ref.assign(IntFunctions.minus(1)); // Correct for Matlab indexing.
-		pv.assign(IntFunctions.minus(1));
-		pq.assign(IntFunctions.minus(1));
-
-		assertTrue(iprop.equals(bustypes[0], ref));
-		assertTrue(iprop.equals(bustypes[1], pv));
-		assertTrue(iprop.equals(bustypes[2], pq));
+		assertTrue(cprop.equals(Sbus, mpSbus));
 	}
 
 }

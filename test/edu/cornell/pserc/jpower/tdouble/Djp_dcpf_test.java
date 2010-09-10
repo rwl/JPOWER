@@ -22,9 +22,12 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.io.File;
 
+import cern.colt.matrix.AbstractMatrix;
+import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.jet.math.tint.IntFunctions;
+import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_mm;
 
@@ -33,37 +36,40 @@ import edu.cornell.pserc.jpower.tdouble.util.Djp_mm;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public abstract class Djp_bustypes_test extends Djp_base_test {
+public abstract class Djp_dcpf_test extends Djp_base_test {
 
 	protected Djp_jpc jpc;
 
-	public Djp_bustypes_test(String name) {
+	public Djp_dcpf_test(String name) {
 		super(name);
-		this.fname = "bustypes";
+		this.fname = "dcpf";
 		/* Set 'jpc' in subclasses. */
 	}
 
 	@SuppressWarnings("static-access")
-	public void test_bustypes() {
+	public void test_makeBdc() {
+		DoubleFunctions dfunc = DoubleFunctions.functions;
+
 		Djp_jpc jpc = Djp_loadcase.jp_loadcase(this.jpc);
 		jpc = Djp_ext2int.jp_ext2int(jpc);
 		IntMatrix1D[] bustypes = Djp_bustypes.jp_bustypes(jpc.bus, jpc.gen);
+		int ref = bustypes[0].get(0);
+		int[] pv = bustypes[1].toArray();
+		int[] pq = bustypes[2].toArray();
+		AbstractMatrix[] Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
+		DoubleMatrix2D Bbus = (DoubleMatrix2D) Bdc[0];
+		DComplexMatrix1D Sbus = Djp_makeSbus.jp_makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
+		DoubleMatrix1D Pbus = Sbus.getRealPart();
+		DoubleMatrix1D Va0 = jpc.bus.Va.copy();
+		Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
-		File ref_file = new File(fdir, "ref.mtx");
-		File pv_file = new File(fdir, "pv.mtx");
-		File pq_file = new File(fdir, "pq.mtx");
+		DoubleMatrix1D Va = Djp_dcpf.jp_dcpf(Bbus, Pbus, Va0, ref, pv, pq);
 
-		IntMatrix1D ref = util.intm((DoubleMatrix1D) Djp_mm.readMatrix(ref_file));
-		IntMatrix1D pv = util.intm((DoubleMatrix1D) Djp_mm.readMatrix(pv_file));
-		IntMatrix1D pq = util.intm((DoubleMatrix1D) Djp_mm.readMatrix(pq_file));
+		File Va_file = new File(fdir, "Va.mtx");;
 
-		ref.assign(IntFunctions.minus(1)); // Correct for Matlab indexing.
-		pv.assign(IntFunctions.minus(1));
-		pq.assign(IntFunctions.minus(1));
+		DoubleMatrix1D mpVa = (DoubleMatrix1D) Djp_mm.readMatrix(Va_file);
 
-		assertTrue(iprop.equals(bustypes[0], ref));
-		assertTrue(iprop.equals(bustypes[1], pv));
-		assertTrue(iprop.equals(bustypes[2], pq));
+		assertTrue(dprop.equals(Va, mpVa));
 	}
 
 }

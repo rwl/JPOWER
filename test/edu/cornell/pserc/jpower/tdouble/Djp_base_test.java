@@ -22,6 +22,7 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.io.File;
 
+import cern.colt.matrix.tdcomplex.algo.DComplexProperty;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
@@ -36,8 +37,9 @@ abstract class Djp_base_test extends TestCase {
 
 	protected static Djp_mm mm = new Djp_mm();
 	protected static Djp_util util = new Djp_util();
-	protected static DoubleProperty dprop;
 	protected static IntProperty iprop = new IntProperty();
+	protected static DoubleProperty dprop;
+	protected static DComplexProperty cprop;
 
 	public File data = new File("matrix");
 	public String fname;
@@ -50,8 +52,10 @@ abstract class Djp_base_test extends TestCase {
 		/* Set 'fname' and 'casename' in subclasses. */
 	}
 
+	@SuppressWarnings("static-access")
 	protected void setUp() {
 		this.dprop = new DoubleProperty(precision);
+		this.cprop = new DComplexProperty(precision);
 
 		File casedir = new File(data, casename);
 		this.fdir = new File(casedir, fname);
