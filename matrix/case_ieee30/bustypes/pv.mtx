@@ -1,0 +1,8 @@
+%%MatrixMarket matrix array real general
+%case_ieee30 PV bus indices
+5 1
+ 2
+ 5
+ 8
+ 11
+ 13
