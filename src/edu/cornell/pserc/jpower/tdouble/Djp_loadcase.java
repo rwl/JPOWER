@@ -25,11 +25,11 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_loadcase {
 
-	public static Djp_jpc loadcase(String casefile) {
+	public static Djp_jpc jp_loadcase(String casefile) {
 		throw new UnsupportedOperationException();
 	}
 
-	public static Djp_jpc loadcase(Djp_jpc jpc) {
+	public static Djp_jpc jp_loadcase(Djp_jpc jpc) {
 		// TODO: -----  check contents of struct  -----
 		return jpc;
 	}

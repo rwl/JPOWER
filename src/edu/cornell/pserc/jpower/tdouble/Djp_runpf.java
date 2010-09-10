@@ -90,7 +90,7 @@ public class Djp_runpf {
 	}
 
 	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		Djp_jpc jpc = Djp_loadcase.jp_loadcase(casedata);
 		return jp_runpf(jpc, jpopt, fname, "");
 	}
 
@@ -124,7 +124,7 @@ public class Djp_runpf {
 		boolean dc = jpopt.get("PF_DC") != 0.0;				/* use DC formulation? */
 
 		/* read data */
-		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		Djp_jpc jpc = Djp_loadcase.jp_loadcase(casedata);
 
 		/* add zero columns to branch for flows if needed */
 		Djp_branch branch = jpc.branch;

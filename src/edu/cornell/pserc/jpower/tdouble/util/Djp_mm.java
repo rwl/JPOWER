@@ -21,6 +21,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.util;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -48,6 +49,10 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
  *
  */
 public class Djp_mm {
+
+	public static AbstractMatrix readMatrix(File file) {
+		return readMatrix(file.getAbsolutePath());
+	}
 
 	/**
 	 *

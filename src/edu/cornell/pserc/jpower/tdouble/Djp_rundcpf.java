@@ -52,7 +52,7 @@ public class Djp_rundcpf {
 	}
 
 	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		Djp_jpc jpc = Djp_loadcase.jp_loadcase(casedata);
 		return jp_rundcpf(jpc, jpopt, fname, "");
 	}
 
