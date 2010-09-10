@@ -56,10 +56,14 @@ Va0 = mpc.bus(:, 9) * (pi/180);
 Va = dcpf(Bbus, real(Sbus), Va0, ref, pv, pq);
 mmwrite(strcat(root, '/', casename, '/dcpf/', 'Va.mtx'), Va, str2mat(strcat(casename,' Va')))
 
+%% test int2ext
+mpc = int2ext(mpc);
+mmwrite_case(mpc, root, casename, 'int2ext');
+
 %% test rundcpf
 mpopt = mpoption('OUT_ALL', 0, 'VERBOSE', 0);
 results = rundcpf(casename, mpopt);
-mmwrite_case(mpc, root, casename, 'rundcpf');
+mmwrite_case(results, root, casename, 'rundcpf');
 
 
 function mmwrite_case(mpc, root, casename, fname)
@@ -85,6 +89,7 @@ for i=1:size(casenames, 2)
   mkdir(strcat(root, '/', cn), 'makeBdc');
   mkdir(strcat(root, '/', cn), 'makeSbus');
   mkdir(strcat(root, '/', cn), 'dcpf');
+  mkdir(strcat(root, '/', cn), 'int2ext');
   mkdir(strcat(root, '/', cn), 'rundcpf');
 end
 
