@@ -86,11 +86,9 @@ public class Djp_makeBdc {
 		// default tap ratio = 1
 		DoubleMatrix1D tap = DoubleFactory1D.dense.make(nl, 1);
 		// indices of non-zero tap ratios
-		IntArrayList i = new IntArrayList();
-		branch.tap.getNonZeros(i, new DoubleArrayList());
-		i.trimToSize();
+		int[] xfmr = util.nonzero(branch.tap);
 		// assign non-zero tap ratios
-		tap.viewSelection(i.elements()).assign(branch.tap.viewSelection(i.elements()));
+		tap.viewSelection(xfmr).assign(branch.tap.viewSelection(xfmr));
 		b.assign(tap, dfunc.div);
 
 		/* build connection matrix Cft = Cf - Ct for line and from - to buses */

@@ -57,22 +57,20 @@ public class Djp_makeSbus {
 	public static DComplexMatrix1D jp_makeSbus(double baseMVA, Djp_bus bus, Djp_gen gen) {
 
 		/* generator info */
-		IntArrayList on = new IntArrayList();		// which generators are on?
-		gen.gen_status.getNonZeros(on, new IntArrayList());
-		on.trimToSize();
-		int[] gbus = gen.gen_bus.viewSelection(on.elements()).toArray();
+		int[] on = util.nonzero(gen.gen_status);		// which generators are on?
+		int[] gbus = gen.gen_bus.viewSelection(on).toArray();
 
 		/* form net complex bus power injection vector */
 		int nb = bus.size();
-		int ngon = on.size();
+		int ngon = on.length;
 
 		// connection matrix, element i, j is 1 if gen on(j) at bus i is ON
 		SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
 				gbus, util.irange(ngon), 1, 0, false);
 
 		DComplexMatrix1D Sg = DComplexFactory1D.dense.make(ngon);
-		Sg.assignReal(gen.Pg.viewSelection(on.elements()));
-		Sg.assignImaginary(gen.Qg.viewSelection(on.elements()));
+		Sg.assignReal(gen.Pg.viewSelection(on));
+		Sg.assignImaginary(gen.Qg.viewSelection(on));
 
 		DComplexMatrix1D Sd = DComplexFactory1D.dense.make(nb);
 		Sd.assignReal(bus.Pd);

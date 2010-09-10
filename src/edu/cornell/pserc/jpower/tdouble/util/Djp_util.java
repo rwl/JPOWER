@@ -356,4 +356,31 @@ public class Djp_util {
 		indexList.trimToSize();
 		return indexList.elements();
 	}
+
+	/**
+	 *
+	 * @param a
+	 * @return
+	 */
+	public static int[] nonzero(DoubleMatrix1D a) {
+		IntArrayList indexList = new IntArrayList();
+		int size = (int) a.size();
+		int rem = size % 2;
+		if (rem == 1) {
+			double value = a.getQuick(0);
+			if (value != 0)
+				indexList.add(0);
+		}
+
+		for (int i = rem; i < size; i += 2) {
+			double value = a.getQuick(i);
+			if (value != 0)
+				indexList.add(i);
+			value = a.getQuick(i + 1);
+			if (value != 0)
+				indexList.add(i + 1);
+		}
+		indexList.trimToSize();
+		return indexList.elements();
+	}
 }
