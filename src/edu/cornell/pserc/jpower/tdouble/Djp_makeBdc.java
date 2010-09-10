@@ -71,12 +71,12 @@ public class Djp_makeBdc {
 				System.err.println("makeBdc: buses must be numbered consecutively in bus matrix");
 				// TODO: throw non consecutive bus numbers exception.
 
-		// for each branch, compute the elements of the branch B matrix and the phase
-		// shift "quiescent" injections, where
-		//
-		//      | Pf |   | Bff  Bft |   | Vaf |   | Pfinj |
-		//      |    | = |          | * |     | + |       |
-		//      | Pt |   | Btf  Btt |   | Vat |   | Ptinj |
+		/* for each branch, compute the elements of the branch B matrix and the phase
+		shift "quiescent" injections, where
+
+			| Pf |   | Bff  Bft |   | Vaf |   | Pfinj |
+			|    | = |          | * |     | + |       |
+			| Pt |   | Btf  Btt |   | Vat |   | Ptinj | */
 
 		// ones at in-service branches
 		DoubleMatrix1D stat = util.dblm(branch.br_status);

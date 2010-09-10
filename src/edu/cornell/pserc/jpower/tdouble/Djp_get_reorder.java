@@ -21,8 +21,8 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 /**
  *
@@ -32,7 +32,26 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
  */
 public class Djp_get_reorder {
 
-	public static DoubleMatrix1D jp_get_reorder(AbstractMatrix A, int[] idx, int dim) {
+	/**
+	 *
+	 * @param A
+	 * @param idx
+	 * @param dim
+	 * @return
+	 */
+	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx, int dim) {
 		return null;
 	}
+
+	/**
+	 *
+	 * @param A
+	 * @param idx
+	 * @param dim
+	 * @return
+	 */
+	public static DoubleMatrix2D jp_get_reorder(DoubleMatrix2D A, int[] idx, int dim) {
+		return null;
+	}
+
 }

@@ -57,7 +57,7 @@ public class Djp_bustypes {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntArrayList[] jp_bustypes(Djp_bus bus, Djp_gen gen) {
+	public static IntMatrix1D[] jp_bustypes(Djp_bus bus, Djp_gen gen) {
 
 		/* get generator status */
 		int nb = bus.size();
@@ -75,23 +75,23 @@ public class Djp_bustypes {
 		/* form index lists for slack, PV, and PQ buses */
 		IntMatrix1D ref_types = bus.bus_type.copy().assign(ifunc.equals(REF));
 		ref_types.assign(bus_gen_status, ifunc.and);		// reference bus index
-		IntArrayList ref = new IntArrayList(util.nonzero(ref_types));
+		IntMatrix1D ref = IntFactory1D.dense.make(util.nonzero(ref_types));
 
 		IntMatrix1D pv_types = bus.bus_type.copy().assign(ifunc.equals(PV));
 		pv_types.assign(bus_gen_status, ifunc.and);		// PV bus indices
-		IntArrayList pv = new IntArrayList(util.nonzero(pv_types));
+		IntMatrix1D pv = IntFactory1D.dense.make(util.nonzero(pv_types));
 
 		IntMatrix1D pq_types = bus.bus_type.copy().assign(ifunc.equals(PQ));
 		pq_types.assign(bus_gen_status.assign(ifunc.equals(0)), ifunc.or);
-		IntArrayList pq = new IntArrayList(util.nonzero(pq_types));
+		IntMatrix1D pq = IntFactory1D.dense.make(util.nonzero(pq_types));
 
 		/* pick a new reference bus if for some reason there is none (may have been shut down) */
 		if (ref.size() == 0) {
-			ref = new IntArrayList(pv.get(0));					// use the first PV bus
-			pv = (IntArrayList) pv.partFromTo(1, pv.size());	// take it off PV list
+			ref = IntFactory1D.dense.make(1, pv.get(0));		// use the first PV bus
+			pv = pv.viewPart(1, (int) (pv.size() - 1)).copy();	// take it off PV list
 		}
 
-		return new IntArrayList[] {ref, pv, pq};
+		return new IntMatrix1D[] {ref, pv, pq};
 	}
 
 }

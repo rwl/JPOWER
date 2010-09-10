@@ -61,7 +61,7 @@ public class Djp_dcpf {
 
 		DoubleMatrix2D A = B.viewSelection(pvpq, pvpq).copy();
 		DoubleMatrix1D b = B.viewSelection(pvpq, null).copy().viewColumn(ref);
-		b.assign(dfunc.mult(Va.get(ref)));
+		b.assign( dfunc.mult(Va.get(ref)) );
 		b.assign(Pbus.viewSelection(pvpq), dfunc.swapArgs(dfunc.minus));
 		Va.viewSelection(pvpq).assign(SparseDoubleAlgebra.DEFAULT.solve(A, b));
 

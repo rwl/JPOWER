@@ -139,15 +139,15 @@ public class Djp_runpf {
 		/* convert to internal indexing */
 		jpc = Djp_ext2int.jp_ext2int(jpc);
 		double baseMVA = jpc.baseMVA;
-		Djp_bus bus = jpc.bus.copy();
-		Djp_gen gen = jpc.gen.copy();
-		branch = jpc.branch.copy();
+		Djp_bus bus = jpc.bus;
+		Djp_gen gen = jpc.gen;
+		branch = jpc.branch;
 
 		/* get bus index lists of each type of bus */
-		IntArrayList[] bustypes = Djp_bustypes.jp_bustypes(bus, gen);
+		IntMatrix1D[] bustypes = Djp_bustypes.jp_bustypes(bus, gen);
 		int ref = bustypes[0].get(0);
-		int[] pv = bustypes[1].elements();
-		int[] pq = bustypes[2].elements();
+		int[] pv = bustypes[1].toArray();
+		int[] pq = bustypes[2].toArray();
 
 		/* generator info */
 		int[] on = Djp_util.nonzero(gen.gen_status);     // which generators are on?
