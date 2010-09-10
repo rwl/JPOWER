@@ -25,22 +25,36 @@ import java.io.File;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
+import cern.colt.matrix.tint.algo.IntProperty;
+import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_mm;
+import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
 import junit.framework.TestCase;
 
 abstract class Djp_base_test extends TestCase {
 
 	protected static Djp_mm mm = new Djp_mm();
+	protected static Djp_util util = new Djp_util();
+	protected static DoubleProperty dprop;
+	protected static IntProperty iprop = new IntProperty();
 
 	public File data = new File("matrix");
 	public String fname;
 	public String casename;
 	public double precision = 1e-12;
+	protected File fdir;
 
 	public Djp_base_test(String name) {
 		super(name);
 		/* Set 'fname' and 'casename' in subclasses. */
+	}
+
+	protected void setUp() {
+		this.dprop = new DoubleProperty(precision);
+
+		File casedir = new File(data, casename);
+		this.fdir = new File(casedir, fname);
 	}
 
 	protected void test_jpc(Djp_jpc jpc) {
@@ -52,14 +66,11 @@ abstract class Djp_base_test extends TestCase {
 	}
 
 	protected void test_jpc(Djp_jpc jpc, boolean pf, boolean opf) {
-		File casedir = new File(data, casename);
-		File jpcdir = new File(casedir, fname);
-
-		File mm_version = new File(jpcdir, "version.mtx");
-		File mm_baseMVA = new File(jpcdir, "baseMVA.mtx");
-		File mm_bus = new File(jpcdir, "bus.mtx");
-		File mm_gen = new File(jpcdir, "gen.mtx");
-		File mm_branch = new File(jpcdir, "branch.mtx");
+		File mm_version = new File(fdir, "version.mtx");
+		File mm_baseMVA = new File(fdir, "baseMVA.mtx");
+		File mm_bus = new File(fdir, "bus.mtx");
+		File mm_gen = new File(fdir, "gen.mtx");
+		File mm_branch = new File(fdir, "branch.mtx");
 
 		DoubleMatrix1D version = (DoubleMatrix1D) Djp_mm.readMatrix(mm_version);
 		DoubleMatrix1D baseMVA = (DoubleMatrix1D) Djp_mm.readMatrix(mm_baseMVA);
@@ -67,12 +78,17 @@ abstract class Djp_base_test extends TestCase {
 		DoubleMatrix2D gen = (DoubleMatrix2D) Djp_mm.readMatrix(mm_gen);
 		DoubleMatrix2D branch = (DoubleMatrix2D) Djp_mm.readMatrix(mm_branch);
 
-		DoubleProperty prop = new DoubleProperty(precision);
+		/* Matlab indexing starts at 1 */
+		bus.viewColumn(0).assign(DoubleFunctions.minus(1));
+		gen.viewColumn(0).assign(DoubleFunctions.minus(1));
+		branch.viewColumn(0).assign(DoubleFunctions.minus(1));
+		branch.viewColumn(1).assign(DoubleFunctions.minus(1));
+
 		assertEquals(Double.valueOf(jpc.version), version.get(0), precision);
 		assertEquals(jpc.baseMVA, baseMVA.get(0), precision);
-		assertTrue(prop.equals(jpc.bus.toMatrix(opf), bus));
-		assertTrue(prop.equals(jpc.gen.toMatrix(opf), gen));
-		assertTrue(prop.equals(jpc.branch.toMatrix(pf, opf), branch));
+		assertTrue(dprop.equals(jpc.bus.toMatrix(opf), bus));
+		assertTrue(dprop.equals(jpc.gen.toMatrix(opf), gen));
+		assertTrue(dprop.equals(jpc.branch.toMatrix(pf, opf), branch));
 	}
 
 }

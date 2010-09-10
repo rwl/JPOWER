@@ -29,6 +29,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
+import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -93,22 +94,17 @@ public class Djp_makeBdc {
 		b.assign(tap, dfunc.div);
 
 		/* build connection matrix Cft = Cf - Ct for line and from - to buses */
-		int[] f = branch.f_bus.toArray();
-		int[] t = branch.t_bus.toArray();
-		int[] il = util.irange(nl);
-//        SparseRCDoubleMatrix2D Cf = new SparseRCDoubleMatrix2D(nl, nb, irange(nl),
-//                f, 1.0, false, false);
-//        SparseRCDoubleMatrix2D Ct = new SparseRCDoubleMatrix2D(nl, nb, irange(nl),
-//                t, 1.0, false, false);
+		int[] ft = IntFactory1D.dense.make(new IntMatrix1D[] {branch.f_bus, branch.t_bus}).toArray();
+		int[] il = util.cat(util.irange(nl), util.irange(nl));
+		double[] v = DoubleFactory1D.dense.make(new DoubleMatrix1D[] {
+				DoubleFactory1D.dense.make(nl,  1),
+				DoubleFactory1D.dense.make(nl, -1)
+		}).toArray();
 
-		SparseRCDoubleMatrix2D Cft = new SparseRCDoubleMatrix2D(nl, nb, il, f, 1.0, false, false);
-		Cft.viewSelection(il, t).assign(dfunc.minus(1));
+		SparseRCDoubleMatrix2D Cft = new SparseRCDoubleMatrix2D(nl, nb, il, ft, v, false, false, false);
 
 		/* build Bf such that Bf * Va is the vector of real branch powers injected
 		at each branch's "from" bus */
-//        SparseRCDoubleMatrix2D Bf = new SparseRCDoubleMatrix2D(nl, nl,
-//                il, f, b.toArray(), false, false, false);
-//        Bf.viewSelection(il, t).assign(b.copy().assign(dfunc.neg));
 		DoubleMatrix2D Bf = DoubleFactory2D.sparse.diagonal(b).zMult(Cft, null);
 
 		/* build Bbus */

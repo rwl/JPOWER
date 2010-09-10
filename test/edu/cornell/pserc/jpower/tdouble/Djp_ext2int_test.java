@@ -27,22 +27,21 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public abstract class Djp_loadcase_test extends Djp_base_test {
+public abstract class Djp_ext2int_test extends Djp_base_test {
 
 	protected Djp_jpc jpc;
 
-	public Djp_loadcase_test(String name) {
+	public Djp_ext2int_test(String name) {
 		super(name);
-		this.fname = "loadcase";
+		this.fname = "ext2int";
 		/* Set 'jpc' in subclasses. */
 	}
 
-//	public void test_loadcase__string() {
-//		test_jpc(Djp_loadcase.jp_loadcase(casename));
-//	}
-
-	public void test_loadcase__jpc() {
-		test_jpc(Djp_loadcase.jp_loadcase(this.jpc));
+	public void test_ext2int__jpc() {
+		Djp_jpc jpc = Djp_loadcase.jp_loadcase(this.jpc);
+		test_jpc(Djp_ext2int.jp_ext2int(jpc));
 	}
+
+	// TODO: test overloaded methods.
 
 }
