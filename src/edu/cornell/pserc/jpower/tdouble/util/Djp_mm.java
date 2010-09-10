@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 1996-2010 by Power System Engineering Research Center (PSERC)
  * Copyright (C) 2010 Richard Lincoln
  *
  * This program is free software; you can redistribute it and/or

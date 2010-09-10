@@ -18,31 +18,26 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble;
+package edu.cornell.pserc.jpower.tdouble.case4gs;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import junit.textui.TestRunner;
+import edu.cornell.pserc.jpower.tdouble.cases.Djp_case4gs;
 
 /**
  *
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public abstract class Djp_loadcase_test extends Djp_base_test {
+public class Djp_loadcase_test extends edu.cornell.pserc.jpower.tdouble.Djp_loadcase_test {
 
-	protected Djp_jpc jpc;
+	public static void main(String[] args) {
+		TestRunner.run(Djp_loadcase_test.class);
+	}
 
 	public Djp_loadcase_test(String name) {
 		super(name);
-		this.fname = "loadcase";
-		/* Set 'jpc' in subclasses. */
-	}
-
-//	public void test_loadcase_string() {
-//		test_jpc(Djp_loadcase.jp_loadcase(casename));
-//	}
-
-	public void test_loadcase_jpc() {
-		test_jpc(Djp_loadcase.jp_loadcase(this.jpc));
+		this.casename = "case4gs";
+		this.jpc = Djp_case4gs.jp_case4gs();
 	}
 
 }
