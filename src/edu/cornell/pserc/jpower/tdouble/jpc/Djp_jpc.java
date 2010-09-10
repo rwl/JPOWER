@@ -48,6 +48,8 @@ public class Djp_jpc {
 	public double et;	// elapsed time in seconds
 	public boolean success;
 
+	public double f;
+
 	public Djp_order order;
 
 }

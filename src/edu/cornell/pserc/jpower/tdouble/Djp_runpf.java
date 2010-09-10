@@ -231,7 +231,7 @@ public class Djp_runpf {
 		if (fname != "") {
 			// TODO: printpf to file
 		}
-		Djp_printpf.jp_printpf(results, 1, jpopt);
+		Djp_printpf.jp_printpf(results, System.out, jpopt);
 
 		/* save solved case */
 		if (solvedcase != "")
