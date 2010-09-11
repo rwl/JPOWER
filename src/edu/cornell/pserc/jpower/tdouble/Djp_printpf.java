@@ -434,6 +434,130 @@ public class Djp_printpf {
 			pw.printf("\n");
 		}
 
-	}
+		/* generator data */
+		if (OUT_GEN) {
+			DoubleMatrix1D genlamP = null, genlamQ = null;
+			if (isOPF) {
+				genlamP = bus.lam_P.viewSelection((e2i.viewSelection(gen.gen_bus.toArray())).toArray());
+				genlamQ = bus.lam_Q.viewSelection((e2i.viewSelection(gen.gen_bus.toArray())).toArray());
+			}
+			pw.printf("\n================================================================================");
+			pw.printf("\n|     Generator Data                                                           |");
+			pw.printf("\n================================================================================");
+			pw.printf("\n Gen   Bus   Status     Pg        Qg   ");
+			if (isOPF) { pw.printf("   Lambda ($/MVA-hr)"); }
+			pw.printf("\n  #     #              (MW)     (MVAr) ");
+			if (isOPF) { pw.printf("     P         Q    "); }
+			pw.printf("\n----  -----  ------  --------  --------");
+			if (isOPF) { pw.printf("  --------  --------"); }
+			for (int k = 0; k < ong.length; k++) {
+				int i = ong[k];
+				pw.printf("\n%3d %6d     %2d ", i, gen.gen_bus.get(i), gen.gen_status.get(i));
+				if (gen.gen_status.get(i) > 0 && (gen.Pg.get(i) > 0 || gen.Qg.get(i) > 0)) {
+					pw.printf("%10.2f%10.2f", gen.Pg.get(i), gen.Qg.get(i));
+				} else {
+					pw.printf("       -         -  ");
+				}
+				if (isOPF) { pw.printf("%10.2f%10.2f", genlamP.get(i), genlamQ.get(i)); }
+			}
+			pw.printf("\n                     --------  --------");
+			pw.printf("\n            Total: %9.2f%10.2f", gen.Pg.viewSelection(ong).zSum(), gen.Qg.viewSelection(ong).zSum());
+			pw.printf("\n");
+			if (onld.length > 1) {
+				pw.printf("\n================================================================================");
+				pw.printf("\n|     Dispatchable Load Data                                                   |");
+				pw.printf("\n================================================================================");
+				pw.printf("\n Gen   Bus   Status     Pd        Qd   ");
+				if (isOPF) { pw.printf("   Lambda ($/MVA-hr)"); }
+				pw.printf("\n  #     #              (MW)     (MVAr) ");
+				if (isOPF) { pw.printf("     P         Q    "); }
+				pw.printf("\n----  -----  ------  --------  --------");
+				if (isOPF) { pw.printf("  --------  --------"); }
+				for (int k = 0; k < onld.length; k++) {
+					int i = onld[k];
+					pw.printf("\n%3d %6d     %2d ", i, gen.gen_bus.get(i), gen.gen_status.get(i));
+					if (gen.gen_status.get(i) > 0 && (gen.Pg.get(i) > 0 || gen.Qg.get(i) > 0)) {
+						pw.printf("%10.2f%10.2f", -gen.Pg.get(i), -gen.Qg.get(i));
+					} else {
+						pw.printf("       -         -  ");
+					}
+					if (isOPF) { pw.printf("%10.2f%10.2f", genlamP.get(i), genlamQ.get(i)); }
+				}
+				pw.printf("\n                     --------  --------");
+				pw.printf("\n            Total: %9.2f%10.2f", -gen.Pg.viewSelection(onld).zSum(), -gen.Qg.viewSelection(onld).zSum());
+				pw.printf("\n");
+			}
+		}
 
+		/* bus data */
+		if (OUT_BUS) {
+			pw.printf("\n================================================================================");
+			pw.printf("\n|     Bus Data                                                                 |");
+			pw.printf("\n================================================================================");
+			pw.printf("\n Bus      Voltage          Generation             Load        ");
+			if (isOPF) { pw.printf("  Lambda($/MVA-hr)"); }
+			pw.printf("\n  #   Mag(pu) Ang(deg)   P (MW)   Q (MVAr)   P (MW)   Q (MVAr)");
+			if (isOPF) { pw.printf("     P        Q   "); }
+			pw.printf("\n----- ------- --------  --------  --------  --------  --------");
+			if (isOPF) { pw.printf("  -------  -------"); }
+			for (int i = 0; i < nb; i++) {
+				pw.printf("\n%5d%7.3f%9.3f", bus.bus_i.get(i), bus.Vm.get(i), bus.Va.get(i));
+
+				IntMatrix1D _g = gen.gen_bus.copy().assign(ifunc.equals(bus.bus_i.get(i)));
+				int[] g = _g.assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and).toArray();
+				IntMatrix1D _vg = gen.gen_bus.copy().assign(ifunc.equals(bus.bus_i.get(i)));
+				int[] vg = _vg.assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and).toArray();
+
+				if (g.length > 0) {
+					pw.printf("%10.2f%10.2f", gen.Pg.viewSelection(g).zSum(), gen.Qg.viewSelection(g).zSum());
+				} else {
+					pw.printf("       -         -  ");
+				}
+				if (bus.Pd.get(i) > 0 || bus.Qd.get(i) > 0 || vg.length > 0) {
+					if (vg.length > 0) {
+						pw.printf("%10.2f*%9.2f*", bus.Pd.get(i) - gen.Pg.viewSelection(vg).zSum(),
+								bus.Qd.get(i) - gen.Qg.viewSelection(vg).zSum());
+					} else {
+						pw.printf("%10.2f%10.2f ", bus.Pd.get(i), bus.Qd.get(i));
+					}
+				} else {
+					pw.printf("       -         -   ");
+				}
+				if (isOPF) {
+					pw.printf("%9.3f", bus.lam_P.get(i));
+					if (dfunc.abs.apply(bus.lam_Q.get(i)) > ptol) {
+						pw.printf("%8.3f", bus.lam_Q.get(i));
+					} else {
+						pw.printf("     -");
+					}
+				}
+			}
+			pw.printf("\n                        --------  --------  --------  --------");
+			pw.printf("\n               Total: %9.2f %9.2f %9.2f %9.2f",
+				gen.Pg.viewSelection(ong).zSum(), gen.Qg.viewSelection(ong).zSum(),
+				bus.Pd.viewSelection(nzld).zSum() - gen.Pg.viewSelection(onld).zSum(),
+				bus.Qd.viewSelection(nzld).zSum() - gen.Qg.viewSelection(onld).zSum() );
+			pw.printf("\n");
+		}
+
+		/* branch data */
+		if (OUT_BRANCH) {
+			pw.printf("\n================================================================================");
+			pw.printf("\n|     Branch Data                                                              |");
+			pw.printf("\n================================================================================");
+			pw.printf("\nBrnch   From   To    From Bus Injection   To Bus Injection     Loss (I^2 * Z)  ");
+			pw.printf("\n  #     Bus    Bus    P (MW)   Q (MVAr)   P (MW)   Q (MVAr)   P (MW)   Q (MVAr)");
+			pw.printf("\n-----  -----  -----  --------  --------  --------  --------  --------  --------");
+			for (int i = 0; i < nl; i++) {
+				pw.printf("\n%4d%7d%7d%10.2f%10.2f%10.2f%10.2f%10.3f%10.2f",
+						i, branch.f_bus.get(i), branch.t_bus.get(i),
+						branch.Pf.get(i), branch.Qf.get(i), branch.Pt.get(i), branch.Qt.get(i),
+						loss.getRealPart().get(i), loss.getImaginaryPart().get(i) );
+			}
+			pw.printf("\n                                                             --------  --------");
+			pw.printf("\n                                                    Total:%10.3f%10.2f",
+					loss.getRealPart().zSum(), loss.getImaginaryPart().zSum());
+			pw.printf("\n");
+		}
+	}
 }
