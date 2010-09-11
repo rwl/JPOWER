@@ -143,14 +143,7 @@ public class Djp_printpf {
 		DComplexMatrix1D tap = DComplexFactory1D.dense.make(nl, new double[] {1, 0});	// default tap ratio = 1 for lines
 		int[] xfmr = util.nonzero(branch.tap);							// indices of transformers
 		tap.viewSelection(xfmr).assignReal(branch.tap.viewSelection(xfmr));	// include transformer tap ratios
-		DComplexMatrix1D shift = DComplexFactory1D.dense.make(nl);
-		shift.assignReal(branch.shift);
-		shift.assign(cfunc.chain(cfunc.mult(Math.PI), cfunc.div(180)));
-		shift.assignImaginary(shift.getRealPart());
-		shift.getRealPart().assign(0);
-		shift.assign(cfunc.exp);
-		tap.assign(shift, cfunc.mult);					// add phase shifters
-		// FIXME: exp(j * theta) util
+		tap.assign(util.polar(tap.getRealPart(), branch.shift, false));	// add phase shifters
 
 		IntMatrix1D ld = util.intm(bus.Pd);
 		ld.assign(util.intm(bus.Qd), ifunc.or);
@@ -175,7 +168,7 @@ public class Djp_printpf {
 		gs.assign(isload, ifunc.and);
 		int[] onld = util.nonzero(gs);
 
-//		V = bus(:, VM) .* exp(sqrt(-1) * pi/180 * bus(:, VA));
+		DComplexMatrix1D V = util.polar(bus.Vm, bus.Va, false);
 		IntMatrix1D bs = branch.br_status.copy();
 
 		int[] out = util.nonzero( bs.assign(ifunc.equals(0)) );		// out-of-service branches

@@ -23,10 +23,13 @@ package edu.cornell.pserc.jpower.tdouble.util;
 import java.util.concurrent.Future;
 
 import cern.colt.list.tint.IntArrayList;
+import cern.colt.matrix.tdcomplex.DComplexFactory1D;
+import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.jet.math.tdouble.DoubleFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -382,5 +385,44 @@ public class Djp_util {
 		}
 		indexList.trimToSize();
 		return indexList.elements();
+	}
+
+	/**
+	 *
+	 * @param r
+	 * @param theta
+	 * @return
+	 */
+	public static DComplexMatrix1D polar(DoubleMatrix1D r, DoubleMatrix1D theta) {
+		return polar(r, theta, true);
+	}
+
+	/**
+	 *
+	 * @param r polar radius.
+	 * @param theta polar angle.
+	 * @param radians is 'theta' expressed in radians.
+	 * @return complex polar representation.
+	 */
+	@SuppressWarnings("static-access")
+	public static DComplexMatrix1D polar(DoubleMatrix1D r, DoubleMatrix1D theta, boolean radians) {
+		DoubleFunctions func = DoubleFunctions.functions;
+
+		DoubleMatrix1D real = theta.copy();
+		DoubleMatrix1D imag = theta.copy();
+		if (!radians) {
+			real.assign(func.chain(func.mult(Math.PI), func.div(180)));
+			imag.assign(func.chain(func.mult(Math.PI), func.div(180)));
+		}
+		real.assign(func.cos);
+		imag.assign(func.sin);
+		real.assign(r, func.mult);
+		imag.assign(r, func.mult);
+
+		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make((int) r.size());
+		cmplx.assignReal(real);
+		cmplx.assignImaginary(imag);
+
+		return cmplx;
 	}
 }
