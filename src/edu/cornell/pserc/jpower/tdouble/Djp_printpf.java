@@ -159,14 +159,14 @@ public class Djp_printpf {
 		int[] nzsh = util.nonzero(shunt);
 
 		IntMatrix1D isload = Djp_isload.jp_isload(gen);
-		isload.assign(ifunc.equals(0));
-		int[] allg = util.nonzero(isload);
+		IntMatrix1D notload = isload.copy();
+		notload.assign(ifunc.equals(0));
 
+		int[] allg = util.nonzero(notload);
 		IntMatrix1D gs = gen.gen_status.copy();
-		gs.assign(isload, ifunc.and);
+		gs.assign(notload, ifunc.and);
 		int[] ong  = util.nonzero(gs);
 		gs = gen.gen_status.copy();
-		isload.assign(ifunc.equals(0));
 		gs.assign(isload, ifunc.and);
 		int[] onld = util.nonzero(gs);
 
@@ -288,6 +288,151 @@ public class Djp_printpf {
 			pw.printf("\n");
 		}
 
+		if (OUT_AREA_SUM) {
+			pw.printf("\n================================================================================");
+			pw.printf("\n|     Area Summary                                                             |");
+			pw.printf("\n================================================================================");
+			pw.printf("\nArea  # of      # of Gens        # of Loads         # of    # of   # of   # of");
+			pw.printf("\n Num  Buses   Total  Online   Total  Fixed  Disp    Shunt   Brchs  Xfmrs   Ties");
+			pw.printf("\n----  -----   -----  ------   -----  -----  -----   -----   -----  -----  -----");
+			for (int i = 0; i < s_areas.length; i++) {
+				int a = s_areas[i];
+				int[] ib = util.nonzero(bus.bus_area.copy().assign(ifunc.equals(a)));
+
+				IntMatrix1D a_gbus = bus.bus_area.viewSelection( e2i.viewSelection(gen.gen_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				int[] ig = util.nonzero(a_gbus.copy().assign(notload, ifunc.and));
+//				ig = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & ~isload(gen));
+				int[] igon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and));
+//				igon = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & gen(:, GEN_STATUS) > 0 & ~isload(gen));
+				int[] ildon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and));
+//				ildon = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & gen(:, GEN_STATUS) > 0 & isload(gen));
+
+				IntMatrix1D a_bus = bus.bus_area.copy().assign(ifunc.equals(a));
+				IntMatrix1D hasload = util.intm( bus.Pd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasload.assign(util.intm( bus.Qd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzld = util.nonzero(a_bus.copy().assign(hasload, ifunc.and));
+//				inzld = find(bus(:, BUS_AREA) == a & (bus(:, PD) | bus(:, QD)));
+				IntMatrix1D hasshunt = util.intm( bus.Gs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasshunt.assign(util.intm( bus.Bs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzsh = util.nonzero(a_bus.copy().assign(hasshunt, ifunc.and));
+//				inzsh = find(bus(:, BUS_AREA) == a & (bus(:, GS) | bus(:, BS)));
+
+				IntMatrix1D a_fbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.f_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				IntMatrix1D a_tbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.t_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				int[] ibrch = util.nonzero(a_fbus.copy().assign(a_tbus, ifunc.and));
+//				ibrch = find(bus(e2i(branch(:, F_BUS)), BUS_AREA) == a & bus(e2i(branch(:, T_BUS)), BUS_AREA) == a);
+				int[] in_tie = util.nonzero( a_fbus.copy().assign(a_tbus.copy().assign(ifunc.equals(0)), ifunc.and) );
+//				in_tie = find(bus(e2i(branch(:, F_BUS)), BUS_AREA) == a & bus(e2i(branch(:, T_BUS)), BUS_AREA) ~= a);
+				int[] out_tie = util.nonzero( a_fbus.copy().assign(ifunc.equals(0)).assign(a_tbus, ifunc.and) );
+//				out_tie = find(bus(e2i(branch(:, F_BUS)), BUS_AREA) ~= a & bus(e2i(branch(:, T_BUS)), BUS_AREA) == a);
+				int nxfmr;
+				if (xfmr.length == 0) {
+					nxfmr = 0;
+				} else {
+					a_fbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.f_bus.viewSelection(xfmr).toArray()).toArray() ).copy().assign(ifunc.equals(a));
+					a_tbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.t_bus.viewSelection(xfmr).toArray()).toArray() ).copy().assign(ifunc.equals(a));
+					nxfmr = util.nonzero(a_fbus.copy().assign(a_tbus, ifunc.and)).length;
+				}
+				pw.printf("\n%3d  %6d   %5d  %5d   %5d  %5d  %5d   %5d   %5d  %5d  %5d",
+					a, ib.length, ig.length, igon.length,
+					inzld.length + ildon.length, inzld.length, ildon.length,
+					inzsh.length, ibrch.length, nxfmr, in_tie.length + out_tie.length);
+			}
+			pw.printf("\n----  -----   -----  ------   -----  -----  -----   -----   -----  -----  -----");
+			pw.printf("\nTot: %6d   %5d  %5d   %5d  %5d  %5d   %5d   %5d  %5d  %5d",
+				nb, allg.length, ong.length, nzld.length + onld.length,
+				nzld.length, onld.length, nzsh.length, nl, xfmr.length, ties.length);
+			pw.printf("\n");
+
+			pw.printf("\nArea      Total Gen Capacity           On-line Gen Capacity         Generation");
+			pw.printf("\n Num     MW           MVAr            MW           MVAr             MW    MVAr");
+			pw.printf("\n----   ------  ------------------   ------  ------------------    ------  ------");
+			for (int i = 0; i < s_areas.length; i++) {
+				int a = s_areas[i];
+
+				IntMatrix1D a_gbus = bus.bus_area.viewSelection( e2i.viewSelection(gen.gen_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				int[] ig = util.nonzero(a_gbus.copy().assign(notload, ifunc.and));
+				int[] igon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and));
+
+				pw.printf("\n%3d   %7.1f  %7.1f to %-7.1f  %7.1f  %7.1f to %-7.1f   %7.1f %7.1f",
+					a, gen.Pmax.viewSelection(ig).zSum(), gen.Qmin.viewSelection(ig).zSum(), gen.Qmax.viewSelection(ig).zSum(),
+					gen.Pmax.viewSelection(igon).zSum(), gen.Qmin.viewSelection(igon).zSum(), gen.Qmax.viewSelection(igon).zSum(),
+					gen.Pg.viewSelection(igon).zSum(), gen.Qg.viewSelection(igon).zSum() );
+			}
+			pw.printf("\n----   ------  ------------------   ------  ------------------    ------  ------");
+			pw.printf("\nTot:  %7.1f  %7.1f to %-7.1f  %7.1f  %7.1f to %-7.1f   %7.1f %7.1f",
+					gen.Pmax.viewSelection(allg).zSum(), gen.Qmin.viewSelection(allg).zSum(), gen.Qmax.viewSelection(allg).zSum(),
+					gen.Pmax.viewSelection(ong).zSum(), gen.Qmin.viewSelection(ong).zSum(), gen.Qmax.viewSelection(ong).zSum(),
+					gen.Pg.viewSelection(ong).zSum(), gen.Qg.viewSelection(ong).zSum() );
+			pw.printf("\n");
+
+			pw.printf("\nArea    Disp Load Cap       Disp Load         Fixed Load        Total Load");
+			pw.printf("\n Num      MW     MVAr       MW     MVAr       MW     MVAr       MW     MVAr");
+			pw.printf("\n----    ------  ------    ------  ------    ------  ------    ------  ------");
+			DoubleMatrix1D Qlim = gen.Qmin.copy().assign(dfunc.equals(0)).assign(gen.Qmax, dfunc.mult);
+			Qlim.assign(gen.Qmax.copy().assign(dfunc.equals(0)).assign(gen.Qmin, dfunc.mult), dfunc.plus);
+//			Qlim = (gen(:, QMIN) == 0) .* gen(:, QMAX) + (gen(:, QMAX) == 0) .* gen(:, QMIN);
+			for (int i = 0; i < s_areas.length; i++) {
+				int a = s_areas[i];
+
+				IntMatrix1D a_gbus = bus.bus_area.viewSelection( e2i.viewSelection(gen.gen_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				int[] ildon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and));
+				IntMatrix1D a_bus = bus.bus_area.copy().assign(ifunc.equals(a));
+				IntMatrix1D hasload = util.intm( bus.Pd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasload.assign(util.intm( bus.Qd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzld = util.nonzero(a_bus.copy().assign(hasload, ifunc.and));
+
+//				ildon = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & gen(:, GEN_STATUS) > 0 & isload(gen));
+//				inzld = find(bus(:, BUS_AREA) == a & (bus(:, PD) | bus(:, QD)));
+				pw.printf("\n%3d    %7.1f %7.1f   %7.1f %7.1f   %7.1f %7.1f   %7.1f %7.1f",
+					a, -gen.Pmin.viewSelection(ildon).zSum(),
+					-Qlim.viewSelection(ildon).zSum(),
+					-gen.Pg.viewSelection(ildon).zSum(), -gen.Qg.viewSelection(ildon).zSum(),
+					bus.Pd.viewSelection(inzld).zSum(), bus.Qd.viewSelection(inzld).zSum(),
+					-gen.Pg.viewSelection(ildon).zSum() + bus.Pd.viewSelection(inzld).zSum(),
+					-gen.Qg.viewSelection(ildon).zSum() + bus.Qd.viewSelection(inzld).zSum() );
+			}
+			pw.printf("\n----    ------  ------    ------  ------    ------  ------    ------  ------");
+			pw.printf("\nTot:   %7.1f %7.1f   %7.1f %7.1f   %7.1f %7.1f   %7.1f %7.1f",
+					-gen.Pmin.viewSelection(onld).zSum(),
+					-Qlim.viewSelection(onld).zSum(),
+					-gen.Pg.viewSelection(onld).zSum(), -gen.Qg.viewSelection(onld).zSum(),
+					bus.Pd.viewSelection(nzld).zSum(), bus.Qd.viewSelection(nzld).zSum(),
+					-gen.Pg.viewSelection(onld).zSum() + bus.Pd.viewSelection(nzld).zSum(),
+					-gen.Qg.viewSelection(onld).zSum() + bus.Qd.viewSelection(nzld).zSum() );
+			pw.printf("\n");
+			pw.printf("\nArea      Shunt Inj        Branch      Series Losses      Net Export");
+			pw.printf("\n Num      MW     MVAr     Charging      MW     MVAr       MW     MVAr");
+			pw.printf("\n----    ------  ------    --------    ------  ------    ------  ------");
+			for (int i = 0; i < s_areas.length; i++) {
+				int a = s_areas[i];
+				IntMatrix1D a_bus = bus.bus_area.copy().assign(ifunc.equals(a));
+				IntMatrix1D hasshunt = util.intm( bus.Gs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasshunt.assign(util.intm( bus.Bs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzsh = util.nonzero(a_bus.copy().assign(hasshunt, ifunc.and));
+
+				IntMatrix1D a_fbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.f_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				IntMatrix1D a_tbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.t_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
+				int[] ibrch = util.nonzero( a_fbus.copy().assign(a_tbus, ifunc.and).assign(branch.br_status, ifunc.and) );
+				int[] in_tie = util.nonzero( a_fbus.copy().assign(a_tbus.copy().assign(ifunc.equals(0)), ifunc.and).assign(branch.br_status, ifunc.and) );
+				int[] out_tie = util.nonzero( a_fbus.copy().assign(ifunc.equals(0)).assign(a_tbus, ifunc.and).assign(branch.br_status, ifunc.and) );
+
+				pw.printf("\n%3d    %7.1f %7.1f    %7.1f    %7.2f %7.2f   %7.1f %7.1f",
+					a, -bus.Vm.viewSelection(inzsh).copy().assign(dfunc.square).assign(bus.Gs.viewSelection(inzsh), dfunc.mult).zSum(),
+					bus.Vm.viewSelection(inzsh).copy().assign(dfunc.square).assign(bus.Bs.viewSelection(inzsh), dfunc.mult).zSum(),
+					fchg.viewSelection(ibrch).zSum() + tchg.viewSelection(ibrch).zSum() + fchg.viewSelection(out_tie).zSum() + tchg.viewSelection(in_tie).zSum(),
+					loss.viewSelection(ibrch).getRealPart().zSum() + loss.viewSelection(util.cat(in_tie, out_tie)).getRealPart().zSum() / 2,
+					loss.viewSelection(ibrch).getImaginaryPart().zSum() + loss.viewSelection(util.cat(in_tie, out_tie)).getImaginaryPart().zSum() / 2,
+					branch.Pt.viewSelection(in_tie).zSum()+branch.Pf.viewSelection(out_tie).zSum() - loss.viewSelection(util.cat(in_tie, out_tie)).getRealPart().zSum() / 2,
+					branch.Qt.viewSelection(in_tie).zSum()+branch.Qf.viewSelection(out_tie).zSum() - loss.viewSelection(util.cat(in_tie, out_tie)).getImaginaryPart().zSum() / 2 );
+			}
+			pw.printf("\n----    ------  ------    --------    ------  ------    ------  ------");
+			pw.printf("\nTot:   %7.1f %7.1f    %7.1f    %7.2f %7.2f       -       -",
+				-bus.Vm.viewSelection(nzsh).assign(dfunc.square).assign(bus.Gs.viewSelection(nzsh), dfunc.mult).zSum(),
+				bus.Vm.viewSelection(nzsh).assign(dfunc.square).assign(bus.Bs.viewSelection(nzsh), dfunc.mult).zSum(),
+				fchg.zSum() + tchg.zSum(), loss.getRealPart().zSum(), loss.getImaginaryPart().zSum() );
+			pw.printf("\n");
+		}
 
 	}
 
