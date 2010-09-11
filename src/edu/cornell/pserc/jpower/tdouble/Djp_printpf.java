@@ -677,6 +677,148 @@ public class Djp_printpf {
 				pw.printf("\n");
 			}
 
+			/* dispatchable load constraints */
+			boolean anyP_ld = ( util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					util.any( gen.mu_Pmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
+					util.any( gen.mu_Pmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
+
+			boolean anyQ_ld = ( util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					util.any( gen.mu_Qmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
+					util.any( gen.mu_Qmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
+
+			if (OUT_PG_LIM == 2 || OUT_QG_LIM == 2 ||
+					(OUT_PG_LIM == 1 && anyP_ld) ||
+					(OUT_QG_LIM == 1 && (anyQ_ld))) {
+				pw.printf("\n================================================================================");
+				pw.printf("\n|     Dispatchable Load Constraints                                            |");
+				pw.printf("\n================================================================================");
+			}
+			/* dispatchable load P constraints */
+			if (OUT_PG_LIM == 2 || (OUT_PG_LIM == 1 && anyP_ld)) {
+				pw.printf("\nGen  Bus               Active Power Limits");
+				pw.printf("\n #    #   Pmin mu    Pmin       Pg       Pmax    Pmax mu");
+				pw.printf("\n---  ---  -------  --------  --------  --------  -------");
+				for (int k = 0; k < onld.length; k++) {
+					int i = onld[k];
+					if (OUT_PG_LIM == 2 || (OUT_PG_LIM == 1 &&
+								(gen.Pg.get(i) < gen.Pmin.get(i) + ctol ||
+								gen.Pg.get(i) > gen.Pmax.get(i) - ctol ||
+								gen.mu_Pmin.get(i) > ptol || gen.mu_Pmax.get(i) > ptol))) {
+						pw.printf("\n%3d%5d", i, gen.gen_bus.get(i));
+						if (gen.Pg.get(i) < gen.Pmin.get(i) + ctol || gen.mu_Pmin.get(i) > ptol) {
+							pw.printf("%8.3f", gen.mu_Pmin.get(i));
+						} else {
+							pw.printf("     -  ");
+						}
+						if (gen.Pg.get(i) > 0) {
+							pw.printf("%10.2f%10.2f%10.2f", gen.Pmin.get(i), gen.Pg.get(i), gen.Pmax.get(i));
+						} else {
+							pw.printf("%10.2f       -  %10.2f", gen.Pmin.get(i), gen.Pmax.get(i));
+						}
+						if (gen.Pg.get(i) > gen.Pmax.get(i) - ctol || gen.mu_Pmax.get(i) > ptol) {
+							pw.printf("%9.3f", gen.mu_Pmax.get(i));
+						} else {
+							pw.printf("      -  ");
+						}
+					}
+				}
+				pw.printf("\n");
+			}
+
+			/* dispatchable load Q constraints */
+			if (!isDC && (OUT_QG_LIM == 2 || (OUT_QG_LIM == 1 && anyQ_ld))) {
+				pw.printf("\nGen  Bus              Reactive Power Limits");
+				pw.printf("\n #    #   Qmin mu    Qmin       Qg       Qmax    Qmax mu");
+				pw.printf("\n---  ---  -------  --------  --------  --------  -------");
+				for (int k = 0; k < onld.length; k++) {
+					int i = onld[k];
+					if (OUT_QG_LIM == 2 || (OUT_QG_LIM == 1 &&
+								(gen.Qg.get(i) < gen.Qmin.get(i) + ctol ||
+								gen.Qg.get(i) > gen.Qmax.get(i) - ctol ||
+								gen.mu_Qmin.get(i) > ptol || gen.mu_Qmax.get(i) > ptol))) {
+						pw.printf("\n%3d%5d", i, gen.gen_bus.get(i));
+						if (gen.Qg.get(i) < gen.Qmin.get(i) + ctol || gen.mu_Qmin.get(i) > ptol) {
+							pw.printf("%8.3f", gen.mu_Qmin.get(i));
+						} else {
+							pw.printf("     -  ");
+						}
+						if (gen.Qg.get(i) > 0) {
+							pw.printf("%10.2f%10.2f%10.2f", gen.Qmin.get(i), gen.Qg.get(i), gen.Qmax.get(i));
+						} else {
+							pw.printf("%10.2f       -  %10.2f", gen.Qmin.get(i), gen.Qmax.get(i));
+						}
+						if (gen.Qg.get(i) > gen.Qmax.get(i) - ctol || gen.mu_Qmax.get(i) > ptol) {
+							pw.printf("%9.3f", gen.mu_Qmax.get(i));
+						} else {
+							pw.printf("      -  ");
+						}
+					}
+				}
+				pw.printf("\n");
+			}
+
+			/* line flow constraints */
+			DoubleMatrix1D Ff = null, Ft = null;
+			String str;
+			if (jpopt.get("OPF_FLOW_LIM") == 1 || isDC) {  // P limit
+				Ff = branch.Pf.copy();
+				Ft = branch.Pt.copy();
+				str = "\n  #     Bus    Pf  mu     Pf      |Pmax|      Pt      Pt  mu   Bus";
+			} else if (jpopt.get("OPF_FLOW_LIM") == 2) {   // |I| limit
+				DComplexMatrix1D Sf = DComplexFactory1D.dense.make(nl).assignReal(branch.Pf).assignImaginary(branch.Qf);
+				DComplexMatrix1D St = DComplexFactory1D.dense.make(nl).assignReal(branch.Pt).assignImaginary(branch.Qt);
+				Sf.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()), cfunc.div);
+				St.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), cfunc.div);
+				Ff = Sf.assign(cfunc.abs).getRealPart();
+				Ft = St.assign(cfunc.abs).getRealPart();
+				str = "\n  #     Bus   |If| mu    |If|     |Imax|     |It|    |It| mu   Bus";
+			} else {                // |S| limit
+				DComplexMatrix1D Sf = DComplexFactory1D.dense.make(nl).assignReal(branch.Pf).assignImaginary(branch.Qf);
+				DComplexMatrix1D St = DComplexFactory1D.dense.make(nl).assignReal(branch.Pt).assignImaginary(branch.Qt);
+				Ff = Sf.assign(cfunc.abs).getRealPart();
+				Ft = St.assign(cfunc.abs).getRealPart();
+				str = "\n  #     Bus   |Sf| mu    |Sf|     |Smax|     |St|    |St| mu   Bus";
+			}
+			IntMatrix1D rated = util.intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+			DoubleMatrix1D F_tol = branch.rate_a.copy().assign(dfunc.minus(ctol));
+			IntMatrix1D Uf = util.intm(Ff.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained from
+			IntMatrix1D Ut = util.intm(Ft.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained to
+			boolean anyF = (util.any( rated.copy().assign(Uf, ifunc.and) ) ||
+					util.any( rated.copy().assign(Ut, ifunc.and) ) ||
+					util.any( branch.mu_Sf.copy().assign(dfunc.greater(ptol)) ) ||
+					util.any( branch.mu_St.copy().assign(dfunc.greater(ptol)) ));
+			if (OUT_LINE_LIM == 2 || (OUT_LINE_LIM == 1 && anyF)) {
+				pw.printf("\n================================================================================");
+				pw.printf("\n|     Branch Flow Constraints                                                  |");
+				pw.printf("\n================================================================================");
+				pw.printf("\nBrnch   From     \"From\" End        Limit       \"To\" End        To");
+				pw.printf(str);
+				pw.printf("\n-----  -----  -------  --------  --------  --------  -------  -----");
+				for (int i = 0; i < nl; i++) {
+					if (OUT_LINE_LIM == 2 || (OUT_LINE_LIM == 1 &&
+						((branch.rate_a.get(i) != 0 && dfunc.abs.apply(Ff.get(i)) > branch.rate_a.get(i) - ctol) ||
+							(branch.rate_a.get(i) != 0 && dfunc.abs.apply(Ft.get(i)) > branch.rate_a.get(i) - ctol) ||
+							branch.mu_Sf.get(i) > ptol || branch.mu_St.get(i) > ptol))) {
+						pw.printf("\n%4d%7d", i, branch.f_bus.get(i));
+						if (Ff.get(i) > branch.rate_a.get(i) - ctol || branch.mu_Sf.get(i) > ptol) {
+							pw.printf("%10.3f", branch.mu_Sf.get(i));
+						} else {
+							pw.printf("      -   ");
+						}
+						pw.printf("%9.2f%10.2f%10.2f", Ff.get(i), branch.rate_a.get(i), Ft.get(i));
+						if (Ft.get(i) > branch.rate_a.get(i) - ctol || branch.mu_St.get(i) > ptol) {
+							pw.printf("%10.3f", branch.mu_St.get(i));
+						} else {
+							pw.printf("      -   ");
+						}
+						pw.printf("%6d", branch.t_bus.get(i));
+					}
+				}
+				pw.printf("\n");
+			}
 		}
+		// TODO: execute userfcn callbacks for 'printpf' stage
 	}
 }

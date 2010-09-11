@@ -445,7 +445,18 @@ public class Djp_util {
 
 	/**
 	 *
-	 * @param x a vector of double.
+	 * @param x a vector of integers.
+	 * @return true if any element of vector x is a nonzero number.
+	 */
+	public static boolean any(IntMatrix1D x) {
+		IntArrayList indexList = new IntArrayList();
+		x.getNonZeros(indexList, new IntArrayList());
+		return indexList.size() > 0;
+	}
+
+	/**
+	 *
+	 * @param x a vector of doubles.
 	 * @return true if any element of vector x is a nonzero number.
 	 */
 	public static boolean any(DoubleMatrix1D x) {
