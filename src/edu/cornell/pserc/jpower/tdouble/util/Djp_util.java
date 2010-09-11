@@ -30,6 +30,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
+import cern.jet.math.tint.IntFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
@@ -38,6 +39,9 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  *
  */
 public class Djp_util {
+
+	public static IntFunctions ifunc = IntFunctions.intFunctions;
+	public static DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 *
@@ -406,23 +410,35 @@ public class Djp_util {
 	 */
 	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D polar(DoubleMatrix1D r, DoubleMatrix1D theta, boolean radians) {
-		DoubleFunctions func = DoubleFunctions.functions;
-
 		DoubleMatrix1D real = theta.copy();
 		DoubleMatrix1D imag = theta.copy();
 		if (!radians) {
-			real.assign(func.chain(func.mult(Math.PI), func.div(180)));
-			imag.assign(func.chain(func.mult(Math.PI), func.div(180)));
+			real.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
+			imag.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 		}
-		real.assign(func.cos);
-		imag.assign(func.sin);
-		real.assign(r, func.mult);
-		imag.assign(r, func.mult);
+		real.assign(dfunc.cos);
+		imag.assign(dfunc.sin);
+		real.assign(r, dfunc.mult);
+		imag.assign(r, dfunc.mult);
 
 		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make((int) r.size());
 		cmplx.assignReal(real);
 		cmplx.assignImaginary(imag);
 
 		return cmplx;
+	}
+
+	/**
+	 *
+	 * @param x
+	 * @return [x(1)-x(0)  x(2)-x(1) ... x(n)-x(n-1)]
+	 */
+	@SuppressWarnings("static-access")
+	public static IntMatrix1D diff(IntMatrix1D x) {
+		int size = (int) x.size() -1;
+		IntMatrix1D d = IntFactory1D.dense.make(size);
+		for (int i = 0; i < size; i++)
+			d.set(i, ifunc.minus.apply(x.get(i+1), x.get(i)));
+		return d;
 	}
 }

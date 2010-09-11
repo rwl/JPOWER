@@ -136,9 +136,10 @@ public class Djp_printpf {
 		}
 
 		/* parameters */
-		IntMatrix1D ties = bus.bus_area.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray());
-		ties.assign(bus.bus_area.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), IntFunctions.equals);
-		ties.assign(IntFunctions.equals(0));			// area inter-ties
+		IntMatrix1D tiesm = bus.bus_area.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray());
+		tiesm.assign(bus.bus_area.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), IntFunctions.equals);
+		tiesm.assign(IntFunctions.equals(0));
+		int[] ties = tiesm.toArray();	// area inter-ties
 
 		DComplexMatrix1D tap = DComplexFactory1D.dense.make(nl, new double[] {1, 0});	// default tap ratio = 1 for lines
 		int[] xfmr = util.nonzero(branch.tap);							// indices of transformers
@@ -150,7 +151,8 @@ public class Djp_printpf {
 		int[] nzld = util.nonzero(ld);
 
 		IntMatrix1D sorted_areas = IntSorting.quickSort.sort(bus.bus_area);
-//		s_areas = sorted_areas([1; find(diff(sorted_areas))+1]);    // area numbers
+		IntMatrix1D s_areasm = sorted_areas.viewSelection(util.nonzero(util.diff(sorted_areas))).copy();
+		int[] s_areas = s_areasm.toArray();		// area numbers
 
 		IntMatrix1D shunt = util.intm(bus.Gs);
 		shunt.assign(util.intm(bus.Bs), ifunc.or);
@@ -174,18 +176,119 @@ public class Djp_printpf {
 		int[] out = util.nonzero( bs.assign(ifunc.equals(0)) );		// out-of-service branches
 		int nout = out.length;
 
-		DComplexMatrix1D loss;
-		if (isDC) {
-			loss = DComplexFactory1D.dense.make(nl);
-		} else {
-//			loss = baseMVA * abs(V(e2i(branch(:, F_BUS))) ./ tap - V(e2i(branch(:, T_BUS)))) .^ 2 ./ ...
-//						(branch(:, BR_R) - 1j * branch(:, BR_X));
+		DComplexMatrix1D loss = DComplexFactory1D.dense.make(nl);;
+		if (!isDC) {
+			DComplexMatrix1D z = DComplexFactory1D.dense.make(nl);
+			z.assignReal(branch.br_r);
+			z.assignImaginary(branch.br_x);
+			loss.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()));
+			loss.assign(tap, cfunc.div);
+			loss.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), cfunc.minus);
+			loss.assign(cfunc.abs).assign(cfunc.square).assign(z, cfunc.div);
+			loss.assign(cfunc.mult(baseMVA));
 		}
-//		fchg = abs(V(e2i(branch(:, F_BUS))) ./ tap) .^ 2 .* branch(:, BR_B) * baseMVA / 2;
-//		tchg = abs(V(e2i(branch(:, T_BUS)))       ) .^ 2 .* branch(:, BR_B) * baseMVA / 2;
-//		loss.viewSelection(out).assign( DComplexFactory1D.dense.make(nout) );
-//		fchg.viewSelection(out).assign( DComplexFactory1D.dense.make(nout) );
-//		tchg.viewSelection(out).assign( DComplexFactory1D.dense.make(nout) );
+		DComplexMatrix1D br_b = DComplexFactory1D.dense.make(nl);
+		br_b.assignReal(branch.br_b).assign(cfunc.mult(baseMVA)).assign(cfunc.div(2));
+
+		DComplexMatrix1D cfchg = DComplexFactory1D.dense.make(nl);
+		cfchg.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()));
+		cfchg.assign(tap, cfunc.div).assign(cfunc.abs).assign(cfunc.square).assign(br_b, cfunc.mult);
+		DoubleMatrix1D fchg = cfchg.getRealPart();
+
+		DComplexMatrix1D ctchg = DComplexFactory1D.dense.make(nl);
+		ctchg.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()));
+		ctchg.assign(cfunc.abs).assign(cfunc.square).assign(br_b, cfunc.mult);
+		DoubleMatrix1D tchg = ctchg.getRealPart();
+
+		loss.viewSelection(out).assign( DComplexFactory1D.dense.make(nout) );
+		fchg.viewSelection(out).assign( DoubleFactory1D.dense.make(nout) );
+		tchg.viewSelection(out).assign( DoubleFactory1D.dense.make(nout) );
+
+		/* ----- print the stuff ----- */
+		if (OUT_ANY) {
+			/* convergence & elapsed time */
+			if (success) {
+				pw.printf("\nConverged in %.2f seconds", et);
+			} else {
+				pw.printf("\nDid not converge (%.2f seconds)\n", et);
+			}
+
+			/* objective function value */
+			if (isOPF)
+				pw.printf("\nObjective Function Value = %.2f $/hr", f);
+		}
+
+		if (OUT_SYS_SUM) {
+			pw.printf("\n================================================================================");
+			pw.printf("\n|     System Summary                                                           |");
+			pw.printf("\n================================================================================");
+			pw.printf("\n\nHow many?                How much?              P (MW)            Q (MVAr)");
+			pw.printf("\n---------------------    -------------------  -------------  -----------------");
+			pw.printf("\nBuses         %6d     Total Gen Capacity   %7.1f       %7.1f to %.1f", nb, gen.Pmax.viewSelection(allg).zSum(), gen.Qmin.viewSelection(allg).zSum(), gen.Qmax.viewSelection(allg).zSum());
+			pw.printf("\nGenerators     %5d     On-line Capacity     %7.1f       %7.1f to %.1f", allg.length, gen.Pmax.viewSelection(ong).zSum(), gen.Qmin.viewSelection(ong).zSum(), gen.Qmax.viewSelection(ong).zSum());
+			pw.printf("\nCommitted Gens %5d     Generation (actual)  %7.1f           %7.1f", ong.length, gen.Pg.viewSelection(ong).zSum(), gen.Qg.viewSelection(ong).zSum());
+			pw.printf("\nLoads          %5d     Load                 %7.1f           %7.1f", nzld.length+onld.length, bus.Pd.viewSelection(nzld).zSum()-gen.Pg.viewSelection(onld).zSum(), bus.Qd.viewSelection(nzld).zSum()-gen.Qg.viewSelection(onld).zSum());
+			pw.printf("\n  Fixed        %5d       Fixed              %7.1f           %7.1f", nzld.length, bus.Pd.viewSelection(nzld).zSum(), bus.Qd.viewSelection(nzld).zSum());
+			pw.printf("\n  Dispatchable %5d       Dispatchable       %7.1f of %-7.1f%7.1f", onld.length, -gen.Pg.viewSelection(onld).zSum(), -gen.Pmin.viewSelection(onld).zSum(), -gen.Pg.viewSelection(onld).zSum());
+			DoubleMatrix1D Pinj = DoubleFactory1D.dense.make(bus.Vm.viewSelection(nzsh).toArray());
+			Pinj.assign(dfunc.square).assign(bus.Gs.viewSelection(nzsh), dfunc.mult);
+			DoubleMatrix1D Qinj = DoubleFactory1D.dense.make(bus.Vm.viewSelection(nzsh).toArray());
+			Qinj.assign(dfunc.square).assign(bus.Bs.viewSelection(nzsh), dfunc.mult);
+			pw.printf("\nShunts         %5d     Shunt (inj)          %7.1f           %7.1f", nzsh.length, -Pinj.zSum(), Qinj.zSum());
+			pw.printf("\nBranches       %5d     Losses (I^2 * Z)     %8.2f          %8.2f", nl, loss.getRealPart().zSum(), loss.getImaginaryPart().zSum());
+			pw.printf("\nTransformers   %5d     Branch Charging (inj)     -            %7.1f", xfmr.length, fchg.zSum() + tchg.zSum() );
+			DoubleMatrix1D Ptie = DoubleFactory1D.dense.make(branch.Pf.viewSelection(ties).toArray());
+			Ptie.assign(branch.Pt.viewSelection(ties), dfunc.minus).assign(dfunc.abs);
+			DoubleMatrix1D Qtie = DoubleFactory1D.dense.make(branch.Qf.viewSelection(ties).toArray());
+			Qtie.assign(branch.Qt.viewSelection(ties), dfunc.minus).assign(dfunc.abs);
+			pw.printf("\nInter-ties     %5d     Total Inter-tie Flow %7.1f           %7.1f", ties.length, Ptie.zSum() / 2, Qtie.zSum() / 2);
+			pw.printf("\nAreas          %5d", s_areas.length);
+			pw.printf("\n");
+			pw.printf("\n                          Minimum                      Maximum");
+			pw.printf("\n                 -------------------------  --------------------------------");
+
+			double[] min, max;
+			int mini, maxi;
+			min = bus.Vm.getMinLocation();
+			max = bus.Vm.getMaxLocation();
+			mini = new Double(min[1]).intValue();
+			maxi = new Double(max[1]).intValue();
+			pw.printf("\nVoltage Magnitude %7.3f p.u. @ bus %-4d     %7.3f p.u. @ bus %-4d", min[0], bus.bus_i.get(mini), max[0], bus.bus_i.get(maxi));
+
+			min = bus.Va.getMinLocation();
+			max = bus.Va.getMaxLocation();
+			mini = new Double(min[1]).intValue();
+			maxi = new Double(max[1]).intValue();
+			pw.printf("\nVoltage Angle   %8.2f deg   @ bus %-4d   %8.2f deg   @ bus %-4d", min[0], bus.bus_i.get(mini), max[0], bus.bus_i.get(maxi));
+
+			if (!isDC) {
+				min = loss.getRealPart().getMinLocation();
+				max = loss.getRealPart().getMaxLocation();
+				mini = new Double(min[1]).intValue();
+				maxi = new Double(max[1]).intValue();
+				pw.printf("\nP Losses (I^2*R)             -              %8.2f MW    @ line %d-%d", max[0], branch.f_bus.get(maxi), branch.t_bus.get(maxi));
+				min = loss.getImaginaryPart().getMinLocation();
+				max = loss.getImaginaryPart().getMaxLocation();
+				mini = new Double(min[1]).intValue();
+				maxi = new Double(max[1]).intValue();
+				pw.printf("\nQ Losses (I^2*X)             -              %8.2f MVAr  @ line %d-%d", max[0], branch.f_bus.get(maxi), branch.t_bus.get(maxi));
+			}
+			if (isOPF) {
+				min = bus.lam_P.getMinLocation();
+				max = bus.lam_P.getMaxLocation();
+				mini = new Double(min[1]).intValue();
+				maxi = new Double(max[1]).intValue();
+				pw.printf("\nLambda P        %8.2f $/MWh @ bus %-4d   %8.2f $/MWh @ bus %-4d", min[0], bus.bus_i.get(mini), max[0], bus.bus_i.get(maxi));
+				min = bus.lam_Q.getMinLocation();
+				max = bus.lam_Q.getMaxLocation();
+				mini = new Double(min[1]).intValue();
+				maxi = new Double(max[1]).intValue();
+				pw.printf("\nLambda Q        %8.2f $/MWh @ bus %-4d   %8.2f $/MWh @ bus %-4d", min[0], bus.bus_i.get(mini), max[0], bus.bus_i.get(maxi));
+			}
+			pw.printf("\n");
+		}
+
+
 	}
 
 }
