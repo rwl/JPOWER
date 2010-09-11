@@ -96,21 +96,21 @@ public class Djp_printpf {
 		OUT_ANY         = OUT_ANY || OUT_ALL_LIM >= 1;
 
 		int OUT_V_LIM;
-		boolean OUT_LINE_LIM;
-		boolean OUT_PG_LIM;
-		boolean OUT_QG_LIM;
+		int OUT_LINE_LIM;
+		int OUT_PG_LIM;
+		int OUT_QG_LIM;
 		if (OUT_ALL_LIM == -1) {
 			OUT_V_LIM       = jpopt.get("OUT_V_LIM").intValue();
-			OUT_LINE_LIM    = jpopt.get("OUT_LINE_LIM") == 1;
-			OUT_PG_LIM      = jpopt.get("OUT_PG_LIM") == 1;
-			OUT_QG_LIM      = jpopt.get("OUT_QG_LIM") == 1;
+			OUT_LINE_LIM    = jpopt.get("OUT_LINE_LIM").intValue();
+			OUT_PG_LIM      = jpopt.get("OUT_PG_LIM").intValue();
+			OUT_QG_LIM      = jpopt.get("OUT_QG_LIM").intValue();
 		} else {
 			OUT_V_LIM       = OUT_ALL_LIM;
-			OUT_LINE_LIM    = OUT_ALL_LIM == 1;
-			OUT_PG_LIM      = OUT_ALL_LIM == 1;
-			OUT_QG_LIM      = OUT_ALL_LIM == 1;
+			OUT_LINE_LIM    = OUT_ALL_LIM;
+			OUT_PG_LIM      = OUT_ALL_LIM;
+			OUT_QG_LIM      = OUT_ALL_LIM;
 		}
-		OUT_ANY			= OUT_ANY || (OUT_ALL_LIM == -1 && (OUT_V_LIM > 0 || OUT_LINE_LIM || OUT_PG_LIM || OUT_QG_LIM));
+		OUT_ANY			= OUT_ANY || (OUT_ALL_LIM == -1 && (OUT_V_LIM > 0 || OUT_LINE_LIM > 0 || OUT_PG_LIM > 0 || OUT_QG_LIM > 0));
 		boolean OUT_RAW	= jpopt.get("OUT_RAW") == 1;
 		double ptol = 1e-6;		// tolerance for displaying shadow prices
 
@@ -558,6 +558,125 @@ public class Djp_printpf {
 			pw.printf("\n                                                    Total:%10.3f%10.2f",
 					loss.getRealPart().zSum(), loss.getImaginaryPart().zSum());
 			pw.printf("\n");
+		}
+
+		/* -----  constraint data  ----- */
+		if (isOPF) {
+			double ctol = jpopt.get("OPF_VIOLATION");   // constraint violation tolerance
+			// voltage constraints
+			if (!isDC && ( OUT_V_LIM == 2 || (OUT_V_LIM == 1 &&
+					(util.any( bus.Vm.copy().assign(bus.Vmin.assign(dfunc.plus(ctol)), dfunc.less) ) ||
+							util.any( bus.Vm.copy().assign(bus.Vmax.assign(dfunc.minus(ctol)), dfunc.greater) ) ||
+							util.any( bus.mu_Vmin.copy().assign(dfunc.greater(ptol)) ) ||
+							util.any( bus.mu_Vmax.copy().assign(dfunc.greater(ptol)) )))) ) {
+				pw.printf("\n================================================================================");
+				pw.printf("\n|     Voltage Constraints                                                      |");
+				pw.printf("\n================================================================================");
+				pw.printf("\nBus #  Vmin mu    Vmin    |V|   Vmax    Vmax mu");
+				pw.printf("\n-----  --------   -----  -----  -----   --------");
+				for (int i = 0; i < nb; i++) {
+					if (OUT_V_LIM == 2 || (OUT_V_LIM == 1 &&
+							(bus.Vm.get(i) < bus.Vmin.get(i) + ctol ||
+									bus.Vm.get(i) > bus.Vmax.get(i) - ctol ||
+									bus.mu_Vmin.get(i) > ptol || bus.mu_Vmax.get(i) > ptol)) ) {
+						pw.printf("\n%5d", bus.bus_i.get(i));
+						if (bus.Vm.get(i) < bus.Vmin.get(i) + ctol || bus.mu_Vmin.get(i) > ptol) {
+							pw.printf("%10.3f", bus.mu_Vmin.get(i));
+						} else {
+							pw.printf("      -   ");
+						}
+						pw.printf("%8.3f%7.3f%7.3f", bus.Vmin.get(i), bus.Vm.get(i), bus.Vmax.get(i));
+						if (bus.Vm.get(i) > bus.Vmax.get(i) - ctol || bus.mu_Vmax.get(i) > ptol) {
+							pw.printf("%10.3f", bus.mu_Vmax.get(i));
+						} else {
+							pw.printf("      -    ");
+						}
+					}
+				}
+				pw.printf("\n");
+			}
+
+			/* generator constraints */
+			boolean anyP = ( util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					util.any( gen.mu_Pmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
+					util.any( gen.mu_Pmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
+
+			boolean anyQ = ( util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					util.any( gen.mu_Qmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
+					util.any( gen.mu_Qmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
+
+			if (OUT_PG_LIM == 2 ||
+					(OUT_PG_LIM == 1 && anyP) ||
+					( !isDC && (OUT_QG_LIM == 2 || (OUT_QG_LIM == 1 && anyQ))) ) {
+				pw.printf("\n================================================================================");
+				pw.printf("\n|     Generation Constraints                                                   |");
+				pw.printf("\n================================================================================");
+			}
+			/* generator P constraints */
+			if (OUT_PG_LIM == 2 || (OUT_PG_LIM == 1 && anyP)) {
+				pw.printf("\n Gen   Bus                Active Power Limits");
+				pw.printf("\n  #     #    Pmin mu    Pmin       Pg       Pmax    Pmax mu");
+				pw.printf("\n----  -----  -------  --------  --------  --------  -------");
+				for (int k = 0; k < ong.length; k++) {
+					int i = ong[k];
+					if (OUT_PG_LIM == 2 || (OUT_PG_LIM == 1 &&
+								(gen.Pg.get(i) < gen.Pmin.get(i) + ctol ||
+								gen.Pg.get(i) > gen.Pmax.get(i) - ctol ||
+								gen.mu_Pmin.get(i) > ptol || gen.mu_Pmax.get(i) > ptol))) {
+						pw.printf("\n%4d%6d ", i, gen.gen_bus.get(i));
+						if (gen.Pg.get(i) < gen.Pmin.get(i) + ctol || gen.mu_Pmin.get(i) > ptol) {
+							pw.printf("%8.3f", gen.mu_Pmin.get(i));
+						} else {
+							pw.printf("     -  ");
+						}
+						if (gen.Pg.get(i) > 0) {
+							pw.printf("%10.2f%10.2f%10.2f", gen.Pmin.get(i), gen.Pg.get(i), gen.Pmax.get(i));
+						} else {
+							pw.printf("%10.2f       -  %10.2f", gen.Pmin.get(i), gen.Pmax.get(i));
+						}
+						if (gen.Pg.get(i) > gen.Pmax.get(i) - ctol || gen.mu_Pmax.get(i) > ptol) {
+							pw.printf("%9.3f", gen.mu_Pmax.get(i));
+						} else {
+							pw.printf("      -  ");
+						}
+					}
+				}
+				pw.printf("\n");
+			}
+			/* generator Q constraints */
+			if (!isDC && (OUT_QG_LIM == 2 || (OUT_QG_LIM == 1 && anyQ))) {
+				pw.printf("\nGen  Bus              Reactive Power Limits");
+				pw.printf("\n #    #   Qmin mu    Qmin       Qg       Qmax    Qmax mu");
+				pw.printf("\n---  ---  -------  --------  --------  --------  -------");
+				for (int k = 0; k < ong.length; k++) {
+					int i = ong[k];
+					if (OUT_QG_LIM == 2 || (OUT_QG_LIM == 1 &&
+								(gen.Qg.get(i) < gen.Qmin.get(i) + ctol ||
+								gen.Qg.get(i) > gen.Qmax.get(i) - ctol ||
+								gen.mu_Qmin.get(i) > ptol || gen.mu_Qmax.get(i) > ptol))) {
+						pw.printf("\n%3d%5d", i, gen.gen_bus.get(i));
+						if (gen.Qg.get(i) < gen.Qmin.get(i) + ctol || gen.mu_Qmin.get(i) > ptol) {
+							pw.printf("%8.3f", gen.mu_Qmin.get(i));
+						} else {
+							pw.printf("     -  ");
+						}
+						if (gen.Qg.get(i) > 0) {
+							pw.printf("%10.2f%10.2f%10.2f", gen.Qmin.get(i), gen.Qg.get(i), gen.Qmax.get(i));
+						} else {
+							pw.printf("%10.2f       -  %10.2f", gen.Qmin.get(i), gen.Qmax.get(i));
+						}
+						if (gen.Qg.get(i) > gen.Qmax.get(i) - ctol || gen.mu_Qmax.get(i) > ptol) {
+							pw.printf("%9.3f", gen.mu_Qmax.get(i));
+						} else {
+							pw.printf("      -  ");
+						}
+					}
+				}
+				pw.printf("\n");
+			}
+
 		}
 	}
 }

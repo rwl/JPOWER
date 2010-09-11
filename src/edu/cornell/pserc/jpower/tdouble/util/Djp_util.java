@@ -22,6 +22,7 @@ package edu.cornell.pserc.jpower.tdouble.util;
 
 import java.util.concurrent.Future;
 
+import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
@@ -440,5 +441,16 @@ public class Djp_util {
 		for (int i = 0; i < size; i++)
 			d.set(i, ifunc.minus.apply(x.get(i+1), x.get(i)));
 		return d;
+	}
+
+	/**
+	 *
+	 * @param x a vector of double.
+	 * @return true if any element of vector x is a nonzero number.
+	 */
+	public static boolean any(DoubleMatrix1D x) {
+		IntArrayList indexList = new IntArrayList();
+		x.getNonZeros(indexList, new DoubleArrayList());
+		return indexList.size() > 0;
 	}
 }
