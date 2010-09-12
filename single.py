@@ -7,17 +7,46 @@ __author__ = 'Richard Lincoln <r.w.lincoln@gmail.com>'
 import os
 import sys
 import shutil
+import re
 
 SRC_DIR = os.path.join(os.path.dirname(__file__), 'src')
-BASE_PKG = os.path.join('edu', 'cornell', 'pserc', 'jpower')
+BASE_PKG = 'edu.cornell.pserc.jpower'
 D_SUBPKG = 'tdouble'
 S_SUBPKG = 'tfloat'
 D_PREFIX = 'D'
 S_PREFIX = 'S'
-DDIR = os.path.join(SRC_DIR, BASE_PKG, D_SUBPKG)
-SDIR = os.path.join(SRC_DIR, BASE_PKG, S_SUBPKG)
+DDIR = os.path.join(SRC_DIR, BASE_PKG.replace('.', '/'), D_SUBPKG)
+SDIR = os.path.join(SRC_DIR, BASE_PKG.replace('.', '/'), S_SUBPKG)
 
-def overwrite_files():
+DOUBLE = \
+	r"-(\ \ +|-)?((\ \ .[0-9]+)|([0-9]+(\ \ .[0-9]*)?))(e(\ \ +|-)?[0-9]+)?$"
+FLOAT = r"[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?"
+
+
+FIND_REPLACE = {
+	D_SUBPKG: S_SUBPKG,
+	D_PREFIX + "jp": S_PREFIX + "jp",
+	"tdcomplex": "tfcomplex",
+	"DoubleMatrix1D": "FloatMatrix1D",
+	"DoubleMatrix2D": "FloatMatrix2D",
+	"DComplexMatrix1D": "FComplexMatrix1D",
+	"DComplexMatrix2D": "FComplexMatrix2D",
+	"DoubleFactory1D": "FloatFactory1D",
+	"DoubleFactory2D": "FloatFactory2D",
+	"DComplexFactory1D": "FComplexFactory1D",
+	"DComplexFactory2D": "FComplexFactory2D",
+	"DoubleFunctions": "FloatFunctions",
+	"DComplexFunctions": "FComplexFunctions",
+	"DoubleArrayList": "FloatArrayList",
+	"SparseDoubleAlgebra": "SparseFloatAlgebra",
+	"dfunc": "sfunc",
+	"double": "float",
+	"Double": "Float",
+	"Math.PI": "(float) Math.PI",
+	"Math.pow": "(float) Math.pow"
+}
+
+def write_files():
 #	if not os.path.exists(SDIR):
 #		os.makedirs(SDIR)
 	if os.path.exists(SDIR):
@@ -46,13 +75,11 @@ def replace_doubles(dir):
 			s = r.read()
 			r.close()
 
-			s = s.replace(D_SUBPKG, S_SUBPKG)
-			s = s.replace(D_PREFIX + "jp", S_PREFIX + "jp")
-			s = s.replace("DoubleMatrix1D", "FloatMatrix1D")
-			s = s.replace("DoubleMatrix2D", "FloatMatrix2D")
-			s = s.replace("DoubleFunctions", "FloatFunctions")
-			s = s.replace("dfunc", "sfunc")
-			s = s.replace("SparseDoubleAlgebra", "SparseFloatAlgebra")
+			for k, v in FIND_REPLACE.iteritems():
+				s = s.replace(k, v)
+
+			# TODO: append 'f' to all doubles
+#			s = re.sub(DOUBLE, "", s)
 
 			w = open(fpath, "wb")
 			w.write(s)
@@ -62,8 +89,8 @@ def replace_doubles(dir):
 			replace_doubles(fpath)
 
 def main():
-#	overwrite_files()
-#	rename_files(SDIR)
+	write_files()
+	rename_files(SDIR)
 	replace_doubles(SDIR)
 
 if __name__ == '__main__':
