@@ -464,4 +464,17 @@ public class Djp_util {
 		x.getNonZeros(indexList, new DoubleArrayList());
 		return indexList.size() > 0;
 	}
+
+	/**
+	 *
+	 * @param real
+	 * @param imaginary
+	 * @return
+	 */
+	public static DComplexMatrix1D complex(DoubleMatrix1D real, DoubleMatrix1D imaginary) {
+		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make((int) real.size());
+		cmplx.assignReal(real);
+		cmplx.assignImaginary(imaginary);
+		return cmplx;
+	}
 }

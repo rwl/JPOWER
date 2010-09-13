@@ -68,14 +68,8 @@ public class Djp_makeSbus {
 		SparseRCDComplexMatrix2D Cg = new SparseRCDComplexMatrix2D(nb, ngon,
 				gbus, util.irange(ngon), 1, 0, false);
 
-		DComplexMatrix1D Sg = DComplexFactory1D.dense.make(ngon);
-		Sg.assignReal(gen.Pg.viewSelection(on));
-		Sg.assignImaginary(gen.Qg.viewSelection(on));
-
-		DComplexMatrix1D Sd = DComplexFactory1D.dense.make(nb);
-		Sd.assignReal(bus.Pd);
-		Sd.assignImaginary(bus.Qd);
-
+		DComplexMatrix1D Sg = util.complex(gen.Pg.viewSelection(on), gen.Qg.viewSelection(on));
+		DComplexMatrix1D Sd = util.complex(bus.Pd, bus.Qd);
 		DComplexMatrix1D Sbus = Cg.zMult(Sg, null);	// power injected by generators
 		Sbus.assign(Sd, cfunc.minus);				// plus power injected by loads
 		Sbus.assign(cfunc.div(baseMVA));			// converted to p.u.

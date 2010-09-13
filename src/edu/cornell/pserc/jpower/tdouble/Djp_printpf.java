@@ -178,9 +178,7 @@ public class Djp_printpf {
 
 		DComplexMatrix1D loss = DComplexFactory1D.dense.make(nl);;
 		if (!isDC) {
-			DComplexMatrix1D z = DComplexFactory1D.dense.make(nl);
-			z.assignReal(branch.br_r);
-			z.assignImaginary(branch.br_x);
+			DComplexMatrix1D z = util.complex(branch.br_r, branch.br_x);
 			loss.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()));
 			loss.assign(tap, cfunc.div);
 			loss.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), cfunc.minus);
@@ -767,16 +765,16 @@ public class Djp_printpf {
 				Ft = branch.Pt.copy();
 				str = "\n  #     Bus    Pf  mu     Pf      |Pmax|      Pt      Pt  mu   Bus";
 			} else if (jpopt.get("OPF_FLOW_LIM") == 2) {   // |I| limit
-				DComplexMatrix1D Sf = DComplexFactory1D.dense.make(nl).assignReal(branch.Pf).assignImaginary(branch.Qf);
-				DComplexMatrix1D St = DComplexFactory1D.dense.make(nl).assignReal(branch.Pt).assignImaginary(branch.Qt);
+				DComplexMatrix1D Sf = util.complex(branch.Pf, branch.Qf);
+				DComplexMatrix1D St = util.complex(branch.Pt, branch.Qt);
 				Sf.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()), cfunc.div);
 				St.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), cfunc.div);
 				Ff = Sf.assign(cfunc.abs).getRealPart();
 				Ft = St.assign(cfunc.abs).getRealPart();
 				str = "\n  #     Bus   |If| mu    |If|     |Imax|     |It|    |It| mu   Bus";
 			} else {                // |S| limit
-				DComplexMatrix1D Sf = DComplexFactory1D.dense.make(nl).assignReal(branch.Pf).assignImaginary(branch.Qf);
-				DComplexMatrix1D St = DComplexFactory1D.dense.make(nl).assignReal(branch.Pt).assignImaginary(branch.Qt);
+				DComplexMatrix1D Sf = util.complex(branch.Pf, branch.Qf);
+				DComplexMatrix1D St = util.complex(branch.Pt, branch.Qt);
 				Ff = Sf.assign(cfunc.abs).getRealPart();
 				Ft = St.assign(cfunc.abs).getRealPart();
 				str = "\n  #     Bus   |Sf| mu    |Sf|     |Smax|     |St|    |St| mu   Bus";
