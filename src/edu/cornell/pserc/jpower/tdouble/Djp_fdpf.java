@@ -46,7 +46,7 @@ import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
 public class Djp_fdpf {
 
 	private static final Djp_util util = new Djp_util();
-	private static DoubleFunctions dfunc = DoubleFunctions.functions;
+	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	public static Object[] jp_fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,

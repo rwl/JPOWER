@@ -45,6 +45,11 @@ public class Djp_util {
 	public static DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
+	 * Machine epsilon.
+	 */
+	public double EPS = 1e-15;
+
+	/**
 	 *
 	 * @param stop
 	 * @return
