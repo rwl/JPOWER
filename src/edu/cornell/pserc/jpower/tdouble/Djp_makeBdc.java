@@ -32,6 +32,7 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
+import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
@@ -39,6 +40,7 @@ import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
 public class Djp_makeBdc {
 
 	private static final Djp_util util = new Djp_util();
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
@@ -65,24 +67,21 @@ public class Djp_makeBdc {
 		int nl = branch.size();		// number of lines
 
 		/* check that bus numbers are equal to indices to bus (one set of bus numbers) */
-		IntMatrix1D bus_i = bus.bus_i;
-		// TODO: use IntFunction for multi-threading
-		for (int i = 0; i < nb; i++)
-			if (bus_i.getQuick(i) != i)
-				System.err.println("makeBdc: buses must be numbered consecutively in bus matrix");
-				// TODO: throw non consecutive bus numbers exception.
+		if ( util.any( bus.bus_i.copy().assign(IntFactory1D.dense.make(util.irange(nb)), ifunc.equals).assign(ifunc.equals(0))) )
+			System.err.println("makeBdc: buses must be numbered consecutively in bus matrix");
+			// TODO: throw non consecutive bus numbers exception.
 
 		/* for each branch, compute the elements of the branch B matrix and the phase
-		shift "quiescent" injections, where
-
-			| Pf |   | Bff  Bft |   | Vaf |   | Pfinj |
-			|    | = |          | * |     | + |       |
-			| Pt |   | Btf  Btt |   | Vat |   | Ptinj | */
-
+		 * shift "quiescent" injections, where
+		 *
+		 * 	| Pf |   | Bff  Bft |   | Vaf |   | Pfinj |
+		 * 	|    | = |          | * |     | + |       |
+		 * 	| Pt |   | Btf  Btt |   | Vat |   | Ptinj |
+		 */
 		// ones at in-service branches
 		DoubleMatrix1D stat = util.dblm(branch.br_status);
 		// series susceptance
-		DoubleMatrix1D b = stat.copy().assign(branch.br_x, dfunc.div);
+		DoubleMatrix1D b = stat.assign(branch.br_x, dfunc.div);
 		// default tap ratio = 1
 		DoubleMatrix1D tap = DoubleFactory1D.dense.make(nl, 1);
 		// indices of non-zero tap ratios

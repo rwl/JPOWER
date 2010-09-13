@@ -467,14 +467,16 @@ public class Djp_util {
 
 	/**
 	 *
-	 * @param real
-	 * @param imaginary
-	 * @return
+	 * @param real real component, may be null
+	 * @param imaginary, imaginary component, may be null
+	 * @return a complex vector
 	 */
 	public static DComplexMatrix1D complex(DoubleMatrix1D real, DoubleMatrix1D imaginary) {
 		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make((int) real.size());
-		cmplx.assignReal(real);
-		cmplx.assignImaginary(imaginary);
+		if (real != null)
+			cmplx.assignReal(real);
+		if (imaginary != null)
+			cmplx.assignImaginary(imaginary);
 		return cmplx;
 	}
 }
