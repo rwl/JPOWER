@@ -472,6 +472,28 @@ public class Djp_util {
 
 	/**
 	 *
+	 * @param x a vector of integers.
+	 * @return true if all elements of 'x' are nonzero.
+	 */
+	public static boolean all(IntMatrix1D x) {
+		IntArrayList indexList = new IntArrayList();
+		x.getNonZeros(indexList, null);
+		return x.size() == indexList.size();
+	}
+
+	/**
+	 *
+	 * @param x a vector of doubles.
+	 * @return true if all elements of 'x' are nonzero.
+	 */
+	public static boolean all(DoubleMatrix1D x) {
+		IntArrayList indexList = new IntArrayList();
+		x.getNonZeros(indexList, null);
+		return x.size() == indexList.size();
+	}
+
+	/**
+	 *
 	 * @param real real component, may be null
 	 * @param imaginary, imaginary component, may be null
 	 * @return a complex vector
