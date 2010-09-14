@@ -424,9 +424,163 @@ public class Dips_jips {
 				dmu.assign(dfunc.mult(alpha));
 			}
 
+			/* do the update */
+			k = util.nonzero(dz.copy().assign(dfunc.less(0)));
+			DoubleMatrix1D zk = z.viewSelection(k).copy();
+			zk.assign(dz.viewSelection(k).copy().assign(dfunc.neg), dfunc.div);
+			double alphap = dfunc.min.apply(xi * zk.aggregate(dfunc.min, dfunc.identity), 1);
+
+			k = util.nonzero(dmu.copy().assign(dfunc.less(0)));
+			DoubleMatrix1D muk = mu.viewSelection(k).copy();
+			muk.assign(dmu.viewSelection(k).copy().assign(dfunc.neg), dfunc.div);
+			double alphad = dfunc.min.apply(xi * muk.aggregate(dfunc.min, dfunc.identity), 1);
+
+			x.assign(dx.assign(dfunc.mult(alphap)), dfunc.plus);
+			z.assign(dz.assign(dfunc.mult(alphap)), dfunc.plus);
+			lam.assign(dlam.assign(dfunc.mult(alphad)), dfunc.plus);
+			mu.assign(dmu.assign(dfunc.mult(alphad)), dfunc.plus);
+			if (niq > 0)
+				gamma = sigma * z.zDotProduct(mu) / niq;
+
+			/* evaluate cost, constraints, derivatives */
+			f = f_fcn.f(x);					// cost
+			df = f_fcn.df(x);
+			f *= opt.get("cost_mult");
+			df.assign(dfunc.mult(opt.get("cost_mult")));
+
+			if (nonlinear) {
+				// non-linear constraints
+				DoubleMatrix1D[] gh = gh_fcn.gh(x);
+				DoubleMatrix2D[] dgh = gh_fcn.dgh(x);
+				hn = gh[0]; gn = gh[1];
+				DoubleMatrix2D dhn = dgh[0], dgn = dgh[1];
+				// inequality constraints
+				h = DoubleFactory1D.dense.append(hn, Ai.zMult(x, null).assign(bi, dfunc.minus));
+				// equality constraints
+				g = DoubleFactory1D.dense.append(gn, Ae.zMult(x, null).assign(be, dfunc.minus));
+				// 1st derivative of inequalities
+				dh = DoubleFactory2D.sparse.appendColumns(dhn, Ai.viewDice());
+				// 1st derivative of equalities
+				dg = DoubleFactory2D.sparse.appendColumns(dgn, Ae.viewDice());
+			} else {
+				h = Ai.zMult(x, null).assign(bi, dfunc.minus);	// inequality constraints
+				g = Ae.zMult(x, null).assign(be, dfunc.minus);	// equality constraints
+				// 1st derivatives are constant, still dh = Ai', dg = Ae'
+			}
+
+			/* check tolerance */
+			Lx = df.assign(dg.zMult(lam, null), dfunc.plus).assign(dh.zMult(mu, null), dfunc.plus);
+
+			normG = DenseDoubleAlgebra.DEFAULT.norm(g, Norm.Infinity);
+			maxH = h.aggregate(dfunc.plus, dfunc.identity);
+			normX = DenseDoubleAlgebra.DEFAULT.norm(x, Norm.Infinity);
+			normZ = DenseDoubleAlgebra.DEFAULT.norm(z, Norm.Infinity);
+			feascond = dfunc.max.apply(normG, maxH) / (1 + dfunc.max.apply(normX, normZ));
+
+			normLx = DenseDoubleAlgebra.DEFAULT.norm(Lx, Norm.Infinity);
+			normLam = DenseDoubleAlgebra.DEFAULT.norm(lam, Norm.Infinity);
+			normMu = DenseDoubleAlgebra.DEFAULT.norm(mu, Norm.Infinity);
+			gradcond = normLx / (1 + dfunc.max.apply(normLam, normMu));
+
+			compcond = z.zDotProduct(mu) / (1 + normX);
+
+			costcond = Math.abs(f - f0) / (1 + Math.abs(f0));
+
+			/* save history */
+			history = new HashMap<String, Double>();
+			history.put("feascond", feascond);
+			history.put("gradcond", gradcond);
+			history.put("compcond", compcond);
+			history.put("costcond", costcond);
+			history.put("gamma", gamma);
+			double norm_dx = DenseDoubleAlgebra.DEFAULT.norm(dx, Norm.Infinity);
+			history.put("stepsize", norm_dx);
+			history.put("obj", f / opt.get("cost_mult"));
+			history.put("alphap", alphap);
+			history.put("alphad", alphad);
+			hist.put(i, history);
+
+			if (opt.get("verbose") > 1)
+				System.out.printf("\n%3d  %12.8g %10.5g %12g %12g %12g %12g",
+					i, f / opt.get("cost_mult"), norm_dx, feascond, gradcond, compcond, costcond);
+
+			if (feascond < opt.get("feastol") && gradcond < opt.get("gradtol") &&
+							compcond < opt.get("comptol") && costcond < opt.get("costtol")) {
+				converged = true;
+				if (opt.get("verbose") > 0)
+						System.out.printf("\nConverged!\n");
+			} else {
+				if (util.any(x.copy().assign(dfunc.equals(Double.NaN))) || alphap < alpha_min || alphad < alpha_min ||
+						gamma < util.EPS || gamma > 1 / util.EPS) {
+					if (opt.get("verbose") > 0)
+						System.out.printf("\nNumerically Failed\n");
+					eflag = -1;
+					break;
+				}
+				f0 = f;
+				if (opt.get("step_control") > 0)
+					L = f + lam.zDotProduct(g) + mu.zDotProduct(h.copy().assign(z, dfunc.plus)) - gamma * z.aggregate(dfunc.plus, dfunc.log);
+			}
 		}
 
-		return null;
-	}
+		if (opt.get("verbose") > 0)
+			if (!converged)
+				System.out.printf("\nDid not converge in %d iterations.\n", i);
 
+		/* -----  package up results  ----- */
+		if (eflag != -1)
+			eflag = converged ? 1 : 0;
+		Map<String, Object> output = new HashMap<String, Object>();
+		output.put("iterations", i);
+		output.put("hist", hist);
+		if (eflag == 0) {
+			output.put("message", "Did not converge");
+		} else if (eflag == 1) {
+			output.put("message", "Converged");
+		} else if (eflag == -1) {
+			output.put("message", "Numerically failed");
+		} else {
+			output.put("message", "Please hang up and dial again");
+		}
+
+		/* zero out multipliers on non-binding constraints */
+		IntMatrix1D non = util.intm( h.copy().assign(dfunc.less(-opt.get("feastol"))) ).assign(
+				util.intm( mu.copy().assign(dfunc.less(mu_threshold)) ), ifunc.and);
+		mu.viewSelection(non.toArray()).assign(0);
+
+		/* un-scale cost and prices */
+		f /= opt.get("cost_mult");
+		lam.assign(dfunc.div(opt.get("cost_mult")));
+		mu.assign(dfunc.div(opt.get("cost_mult")));
+
+		/* re-package multipliers into struct */
+		DoubleMatrix1D lam_lin = lam.viewSelection(util.irange(neqnln, neq));	// lambda for linear constraints
+		DoubleMatrix1D mu_lin = mu.viewSelection(util.irange(niqnln, niq));		// mu for linear constraints
+		int[] kl = util.nonzero(lam_lin.copy().assign(dfunc.less(0)));			// lower bound binding
+		int[] ku = util.nonzero(mu_lin.copy().assign(dfunc.less(0)));			// upper bound binding
+
+		DoubleMatrix1D mu_l = DoubleFactory1D.dense.make(nx + nA);
+		mu_l.viewSelection(ieq).viewSelection(kl).assign(lam_lin.copy().viewSelection(kl).assign(dfunc.neg));
+		mu_l.viewSelection(igt).assign(mu_lin.viewPart(nlt, ngt));
+		mu_l.viewSelection(ibx).assign(mu_lin.viewPart(nlt+ngt+nbx, ngt));
+
+		DoubleMatrix1D mu_u = DoubleFactory1D.dense.make(nx + nA);
+		mu_u.viewSelection(ieq).viewSelection(ku).assign(lam_lin.viewSelection(ku));
+		mu_u.viewSelection(ilt).assign(mu_lin.viewPart(0, nlt));
+		mu_u.viewSelection(ibx).assign(mu_lin.viewPart(nlt+ngt, ngt));
+
+		Map<String, DoubleMatrix1D> lambda = new HashMap<String, DoubleMatrix1D>();
+		lambda.put("mu_l", mu_l.viewPart(nx, (int) (mu_l.size() - nx)));
+		lambda.put("mu_u", mu_u.viewPart(nx, (int) (mu_u.size() - nx)));
+		lambda.put("lower", mu_l.viewPart(0, nx));
+		lambda.put("upper", mu_u.viewPart(0, nx));
+
+		if (niqnln > 0)
+			lambda.put("ineqnonlin", mu.viewPart(0, niqnln));
+
+		if (neqnln > 0)
+			lambda.put("neqnln", lam.viewPart(0, neqnln));
+
+		return new Object[] {x, f, eflag, output, lambda};
+	}
 }
