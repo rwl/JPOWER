@@ -28,6 +28,7 @@ import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
@@ -468,6 +469,21 @@ public class Djp_util {
 		IntArrayList indexList = new IntArrayList();
 		x.getNonZeros(indexList, new DoubleArrayList());
 		return indexList.size() > 0;
+	}
+
+	/**
+	 *
+	 * @param x
+	 * @return
+	 */
+	public static IntMatrix1D any(DoubleMatrix2D x) {
+		int cols = x.columns();
+		IntMatrix1D y = IntFactory1D.dense.make(cols);
+		for (int i = 0; i < cols; i++) {
+			int a = any(x.viewColumn(i)) ? 1 : 0;
+			y.set(i, a);
+		}
+		return y;
 	}
 
 	/**
