@@ -22,7 +22,7 @@ package edu.cornell.pserc.jpower.tdouble.jpc;
 
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
+import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  *

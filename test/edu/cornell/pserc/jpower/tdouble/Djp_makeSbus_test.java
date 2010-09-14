@@ -24,7 +24,7 @@ import java.io.File;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.jpower.tdouble.util.Djp_mm;
+import edu.cornell.pserc.util.tdouble.Djp_mm;
 
 /**
  *

@@ -30,7 +30,7 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
+import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Solves the power flow using a Gauss-Seidel method.

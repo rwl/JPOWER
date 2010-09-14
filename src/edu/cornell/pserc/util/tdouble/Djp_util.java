@@ -18,7 +18,7 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble.util;
+package edu.cornell.pserc.util.tdouble;
 
 import java.util.concurrent.Future;
 

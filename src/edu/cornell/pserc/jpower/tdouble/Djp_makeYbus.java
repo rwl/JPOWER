@@ -33,7 +33,7 @@ import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
+import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Builds the bus admittance matrix and branch admittance matrices.

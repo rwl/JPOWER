@@ -28,7 +28,7 @@ import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
+import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Builds the vector of complex bus power injections.
