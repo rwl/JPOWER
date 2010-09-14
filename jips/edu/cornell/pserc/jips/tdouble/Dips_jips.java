@@ -24,10 +24,14 @@ package edu.cornell.pserc.jips.tdouble;
 import java.util.HashMap;
 import java.util.Map;
 
+import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
+import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
+import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
@@ -40,7 +44,7 @@ import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class Djs_jips {
+public class Dips_jips {
 
 	private static final Djp_util util = new Djp_util();
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
@@ -237,6 +241,103 @@ public class Djs_jips {
 		DoubleMatrix1D e = DoubleFactory1D.dense.make(niq, 1.0);
 
 		/* check tolerance */
+		double f0 = f;
+		double L = 0.0;
+		if (opt.get("step_control") > 0)
+			L = f + lam.zDotProduct(g) + mu.zDotProduct(h.copy().assign(z, dfunc.plus)) - gamma * z.aggregate(dfunc.plus, dfunc.log);
+		DoubleMatrix1D Lx = df.copy().assign(dg.zMult(lam, null), dfunc.plus).assign(dh.zMult(mu, null), dfunc.plus);
+
+		double normG = DenseDoubleAlgebra.DEFAULT.norm(g, Norm.Infinity);
+		double maxH = h.aggregate(dfunc.plus, dfunc.identity);
+		double normX = DenseDoubleAlgebra.DEFAULT.norm(x, Norm.Infinity);
+		double normZ = DenseDoubleAlgebra.DEFAULT.norm(z, Norm.Infinity);
+		double feascond = dfunc.max.apply(normG, maxH) / (1 + dfunc.max.apply(normX, normZ));
+
+		double normLx = DenseDoubleAlgebra.DEFAULT.norm(Lx, Norm.Infinity);
+		double normLam = DenseDoubleAlgebra.DEFAULT.norm(lam, Norm.Infinity);
+		double normMu = DenseDoubleAlgebra.DEFAULT.norm(mu, Norm.Infinity);
+		double gradcond = normLx / (1 + dfunc.max.apply(normLam, normMu));
+
+		double compcond = z.zDotProduct(mu) / (1 + normX);
+
+		double costcond = Math.abs(f - f0) / (1 + Math.abs(f0));
+
+		/* save history */
+		Map<String, Double> history = new HashMap<String, Double>();
+		history.put("feascond", feascond);
+		history.put("gradcond", gradcond);
+		history.put("compcond", compcond);
+		history.put("costcond", costcond);
+		history.put("gamma", gamma);
+		history.put("stepsize", 0.0);
+		history.put("obj", f / opt.get("cost_mult"));
+		history.put("alphap", 0.0);
+		history.put("alphad", 0.0);
+		hist.put(i, history);
+
+		if (opt.get("verbose") > 0) {
+			String s = opt.get("step_control") > 0 ? "-sc" : "";
+			Map<String, String> v = Dips_jipsver.ips_jipsver("all");
+			System.out.printf("Java Interior Point Solver -- JIPS%s, Version %s, %s",
+				s, v.get("Version"), v.get("Date"));
+			if (opt.get("verbose") > 1) {
+				System.out.printf("\n it    objective   step size   feascond     gradcond     compcond     costcond  ");
+				System.out.printf("\n----  ------------ --------- ------------ ------------ ------------ ------------");
+				System.out.printf("\n%3d  %12.8g %10s %12g %12g %12g %12g",
+					i, f / opt.get("cost_mult"), "", feascond, gradcond, compcond, costcond);
+			}
+		}
+		if (feascond < opt.get("feastol") && gradcond < opt.get("gradtol") &&
+				compcond < opt.get("comptol") && costcond < opt.get("costtol")) {
+			converged = true;
+			if (opt.get("verbose") > 0)
+				System.out.printf("\nConverged!\n");
+		}
+
+		/* -----  do Newton iterations  ----- */
+		while (!converged && i < opt.get("max_it")) {
+			i += 1;
+
+			/* compute update step */
+			Map<String, DoubleMatrix1D> lambda = new HashMap<String, DoubleMatrix1D>();
+			lambda.put("eqnonlin", lam.viewSelection(IntFactory1D.dense.ascending(neqnln).toArray()));
+			lambda.put("ineqnonlin", lam.viewSelection(IntFactory1D.dense.ascending(niqnln).toArray()));
+
+			DoubleMatrix2D Lxx;
+			if (nonlinear) {
+				if (hess_fcn == null)
+					System.out.printf("jips: Hessian evaluation via finite differences not yet implemented.\n       Please provide your own hessian evaluation function.");
+				Lxx = hess_fcn.h(x, lambda);
+			} else {
+				DoubleMatrix2D d2f = f_fcn.d2f(x);		// cost
+				Lxx = d2f.assign(dfunc.mult(opt.get("cost_mult")));
+			}
+
+			DoubleMatrix2D zinvdiag = DoubleFactory2D.sparse.diagonal(z.copy().assign(dfunc.inv));
+			DoubleMatrix2D mudiag = DoubleFactory2D.sparse.diagonal(mu);
+			DoubleMatrix2D dh_zinv = dh.zMult(zinvdiag, null);
+			DoubleMatrix2D M = Lxx.copy().assign(dh_zinv.zMult(mudiag, null).zMult(dh.viewDice(), null), dfunc.plus);
+			DoubleMatrix1D egamma = e.copy().assign(dfunc.mult(gamma));
+			DoubleMatrix1D rhs = mudiag.zMult(h, null).assign(egamma, dfunc.plus);
+			DoubleMatrix1D N = Lx.copy().assign(dh_zinv.zMult(rhs, null), dfunc.plus);
+
+			DoubleMatrix2D[][] AAA_p = new DoubleMatrix2D[][] {
+					{M, dg}, {dg.viewDice().copy(), DoubleFactory2D.sparse.make(neq, neq)} };
+			DoubleMatrix2D AAA = DoubleFactory2D.sparse.compose(AAA_p);
+			DoubleMatrix1D bbb = DoubleFactory1D.dense.append(N, g).assign(dfunc.mult(-1.0));
+			DoubleMatrix1D dxdlam = SparseDoubleAlgebra.DEFAULT.solve(AAA, bbb);
+
+			DoubleMatrix1D dx = dxdlam.viewPart(0, nx);
+			DoubleMatrix1D dlam = dxdlam.viewPart(nx, neq);
+			DoubleMatrix1D dz = h.copy().assign(dfunc.neg);
+			dz.assign(z, dfunc.minus).assign(dh.zMult(dx, null), dfunc.minus);
+			DoubleMatrix1D dmu = mu.copy().assign(dfunc.neg);
+			egamma.assign(mudiag.zMult(dz, null), dfunc.minus);
+			dmu.assign(zinvdiag.zMult(egamma, null), dfunc.plus);
+
+			/* optional step-size control */
+
+		}
 
 		return null;
 	}
