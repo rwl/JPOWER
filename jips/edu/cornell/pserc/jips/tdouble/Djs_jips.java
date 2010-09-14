@@ -28,6 +28,7 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.util.Djp_util;
@@ -103,7 +104,6 @@ public class Djs_jips {
 			xmax = DoubleFactory1D.dense.make(nA, Double.NEGATIVE_INFINITY);	// ... unbounded above.
 		if (gh_fcn == null) {
 			nonlinear = false;						// no non-linear constraints present
-			DoubleMatrix1D gn, hn;
 		} else {
 			nonlinear = true;						// we have some non-linear constraints
 		}
@@ -153,6 +153,90 @@ public class Djs_jips {
 		DoubleMatrix1D uu = DoubleFactory1D.dense.append(xmax, u);
 
 		/* split up linear constraints */
+		// equality
+		DoubleMatrix1D diff = uu.copy().assign(ll, dfunc.chain(dfunc.abs, dfunc.minus));
+		int[] ieq = util.nonzero( diff.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.greater(util.EPS))) );
+		// greater than, unbounded above
+		IntMatrix1D igt_u = util.intm( uu.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.less(1e10))) );
+		IntMatrix1D igt_l = util.intm( ll.copy().assign(dfunc.greater(-1e10)) );
+		int[] igt = util.nonzero( igt_u.assign(igt_l, ifunc.and) );
+		// less than, unbounded below
+		IntMatrix1D ilt_l = util.intm( ll.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.greater(-1e10))) );
+		IntMatrix1D ilt_u = util.intm( uu.copy().assign(dfunc.less(1e10)) );
+		int[] ilt = util.nonzero( ilt_l.assign(ilt_u, ifunc.and) );
+		// box constraints
+		int[] ibx = util.nonzero( util.intm(diff.assign(dfunc.greater(util.EPS))).assign(ilt_u, ifunc.and).assign(igt_l, ifunc.and) );
+
+		DoubleMatrix2D Ae = AA.viewSelection(ieq, null).copy();
+		DoubleMatrix1D be = uu.viewSelection(ieq).copy();
+		DoubleMatrix2D[][] Ai_p = new DoubleMatrix2D[][] {
+				{AA.viewSelection(ilt, null)},
+				{AA.viewSelection(igt, null).copy().assign(dfunc.neg)},
+				{AA.viewSelection(ibx, null)},
+				{AA.viewSelection(ibx, null).copy().assign(dfunc.neg)} };
+		DoubleMatrix2D Ai = DoubleFactory2D.sparse.compose(Ai_p);
+
+		DoubleMatrix1D[] bi_p = new DoubleMatrix1D[] {
+				uu.viewSelection(ilt),
+				ll.viewSelection(igt).copy().assign(dfunc.neg),
+				uu.viewSelection(ibx),
+				ll.viewSelection(ibx).copy().assign(dfunc.neg) };
+		DoubleMatrix1D bi = DoubleFactory1D.dense.make(bi_p);
+
+		/* evaluate cost f(x0) and constraints g(x0), h(x0) */
+		DoubleMatrix1D x = x0.copy();
+		double f = f_fcn.f(x);
+		DoubleMatrix1D df = f_fcn.df(x);
+		f *= opt.get("cost_mult");
+		df.assign(dfunc.mult(opt.get("cost_mult")));
+
+		DoubleMatrix1D gn = null, hn = null, h, g;
+		DoubleMatrix2D dh, dg;
+
+		if (nonlinear) {
+			// non-linear constraints
+			DoubleMatrix1D[] gh = gh_fcn.gh(x);
+			DoubleMatrix2D[] dgh = gh_fcn.dgh(x);
+			gn = gh[0]; hn = gh[1];
+			DoubleMatrix2D dgn = dgh[0], dhn = dgh[1];
+			// inequality constraints
+			h = DoubleFactory1D.dense.append(hn, Ai.zMult(x, null).assign(bi, dfunc.minus));
+			// equality constraints
+			g = DoubleFactory1D.dense.append(gn, Ae.zMult(x, null).assign(be, dfunc.minus));
+			// 1st derivative of inequalities
+			dh = DoubleFactory2D.sparse.appendColumns(dhn, Ai.viewDice());
+			// 1st derivative of equalities
+			dg = DoubleFactory2D.sparse.appendColumns(dgn, Ae.viewDice());
+		} else {
+			h = Ai.zMult(x, null).assign(bi, dfunc.minus);	// inequality constraints
+			g = Ae.zMult(x, null).assign(be, dfunc.minus);	// equality constraints
+			dh = Ai.viewDice().copy();						// 1st derivative of inequalities
+			dg = Ae.viewDice().copy();						// 1st derivative of equalities
+		}
+
+		/* grab some dimensions */
+		int neq = (int) g.size();			// number of equality constraints
+		int niq = (int) h.size();			// number of inequality constraints
+		int neqnln = gn == null ? 0 : (int) gn.size();		// number of non-linear equality constraints
+		int niqnln = (hn == null) ? 0 : (int) hn.size(); // number of non-linear inequality constraints
+		int nlt = ilt.length; // number of upper bounded linear inequalities
+		int ngt = igt.length; // number of lower bounded linear inequalities
+		int nbx = ibx.length; // number of doubly bounded linear inequalities
+
+		/* initialize gamma, lam, mu, z, e */
+		double gamma = 1.0;  // barrier coefficient
+		DoubleMatrix1D lam = DoubleFactory1D.dense.make(neq);
+		DoubleMatrix1D z = DoubleFactory1D.dense.make(niq, z0);
+		DoubleMatrix1D mu = z.copy();
+		int[] k = util.nonzero(h.copy().assign(dfunc.less(-z0)));
+		z.viewSelection(k).assign(h.viewSelection(k).copy().assign(dfunc.neg));
+		k = util.nonzero( z.copy().assign(dfunc.chain(dfunc.inv, dfunc.div(gamma))).assign(dfunc.greater(z0)) );
+		// (seems k is always empty if gamma = z0 = 1)
+		if (k.length > 0)
+			mu.viewSelection(k).assign( z.viewSelection(k).copy().assign(dfunc.chain(dfunc.inv, dfunc.div(gamma))) );
+		DoubleMatrix1D e = DoubleFactory1D.dense.make(niq, 1.0);
+
+		/* check tolerance */
 
 		return null;
 	}
