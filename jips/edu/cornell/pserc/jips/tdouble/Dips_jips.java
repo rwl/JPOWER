@@ -201,8 +201,8 @@ public class Dips_jips {
 			// non-linear constraints
 			DoubleMatrix1D[] gh = gh_fcn.gh(x);
 			DoubleMatrix2D[] dgh = gh_fcn.dgh(x);
-			gn = gh[0]; hn = gh[1];
-			DoubleMatrix2D dgn = dgh[0], dhn = dgh[1];
+			hn = gh[0]; gn = gh[1];
+			DoubleMatrix2D dhn = dgh[0], dgn = dgh[1];
 			// inequality constraints
 			h = DoubleFactory1D.dense.append(hn, Ai.zMult(x, null).assign(bi, dfunc.minus));
 			// equality constraints
@@ -336,6 +336,93 @@ public class Dips_jips {
 			dmu.assign(zinvdiag.zMult(egamma, null), dfunc.plus);
 
 			/* optional step-size control */
+			boolean sc = false;
+			DoubleMatrix1D gn1 = null, hn1 = null, h1, g1;
+			DoubleMatrix1D[] gh1;
+			if (opt.get("step_control") > 0) {
+				DoubleMatrix1D x1 = x.copy().assign(dx, dfunc.plus);
+
+				/* evaluate cost, constraints, derivatives at x1 */
+				double f1 = f_fcn.f(x1);
+				DoubleMatrix1D df1 = f_fcn.df(x1);
+				f1 *= opt.get("cost_mult");
+				df1.assign(dfunc.mult(opt.get("cost_mult")));
+
+				DoubleMatrix2D dh1, dg1;
+				if (nonlinear) {
+					// non-linear constraints
+					gh1 = gh_fcn.gh(x1);
+					DoubleMatrix2D[] dgh1 = gh_fcn.dgh(x1);
+					hn1 = gh1[0]; gn1 = gh1[1];
+					DoubleMatrix2D dhn1 = dgh1[0], dgn1 = dgh1[1];
+					// inequality constraints
+					h1 = DoubleFactory1D.dense.append(hn1, Ai.zMult(x1, null).assign(bi, dfunc.minus));
+					// equality constraints
+					g1 = DoubleFactory1D.dense.append(gn1, Ae.zMult(x1, null).assign(be, dfunc.minus));
+					// 1st derivative of inequalities
+					dh1 = DoubleFactory2D.sparse.appendColumns(dhn1, Ai.viewDice());
+					// 1st derivative of equalities
+					dg1 = DoubleFactory2D.sparse.appendColumns(dgn1, Ae.viewDice());
+				} else {
+					h1 = Ai.zMult(x1, null).assign(bi, dfunc.minus);	// inequality constraints
+					g1 = Ae.zMult(x1, null).assign(be, dfunc.minus);	// equality constraints
+					dh1 = Ai.viewDice().copy();						// 1st derivative of inequalities
+					dg1 = Ae.viewDice().copy();						// 1st derivative of equalities
+				}
+
+				/* check tolerance */
+				DoubleMatrix1D Lx1 = df1.assign(dg1.zMult(lam, null), dfunc.plus).assign(dh1.zMult(mu, null), dfunc.plus);
+
+				normG = DenseDoubleAlgebra.DEFAULT.norm(g1, Norm.Infinity);
+				maxH = h1.aggregate(dfunc.plus, dfunc.identity);
+				normX = DenseDoubleAlgebra.DEFAULT.norm(x1, Norm.Infinity);
+				normZ = DenseDoubleAlgebra.DEFAULT.norm(z, Norm.Infinity);
+				double feascond1 = dfunc.max.apply(normG, maxH) / (1 + dfunc.max.apply(normX, normZ));
+
+				normLx = DenseDoubleAlgebra.DEFAULT.norm(Lx1, Norm.Infinity);
+				normLam = DenseDoubleAlgebra.DEFAULT.norm(lam, Norm.Infinity);
+				normMu = DenseDoubleAlgebra.DEFAULT.norm(mu, Norm.Infinity);
+				double gradcond1 = normLx / (1 + dfunc.max.apply(normLam, normMu));
+
+				if (feascond1 > feascond && gradcond1 > gradcond)
+					sc = true;
+			}
+			if (sc) {
+				double alpha = 1.0;
+				for (int j = 0; j < opt.get("max_red"); j++) {
+					DoubleMatrix1D dx1 = dx.copy().assign(dfunc.mult(alpha));
+					DoubleMatrix1D x1 = x.copy().assign(dx1, dfunc.plus);
+					double f1 = f_fcn.f(x1);			// cost
+					f1 *= opt.get("cost_mult");
+					if (nonlinear) {
+						gh1 = gh_fcn.gh(x1);			// non-linear constraints
+						gn1 = gh1[0];
+						hn1 = gh1[1];
+						// inequality constraints
+						h1 = DoubleFactory1D.dense.append(hn1, Ai.zMult(x1, null).assign(bi, dfunc.minus));
+						// equality constraints
+						g1 = DoubleFactory1D.dense.append(gn1, Ae.zMult(x1, null).assign(be, dfunc.minus));
+					} else {
+						h1 = Ai.zMult(x1, null).assign(bi, dfunc.minus);	// inequality constraints
+						g1 = Ae.zMult(x1, null).assign(be, dfunc.minus);	// equality constraints
+					}
+
+					DoubleMatrix1D hz = h1.copy().assign(z, dfunc.plus);
+					double L1 = f + lam.zDotProduct(g1) + mu.zDotProduct(hz) - gamma * z.aggregate(dfunc.plus, dfunc.log);
+					if (opt.get("verbose") > 2)
+						System.out.printf("\n   %3d            %10g", -j, DenseDoubleAlgebra.DEFAULT.norm(dx1, Norm.Infinity));
+					double rho = (L1 - L) / (Lx.zDotProduct(dx1) + 0.5 * dx1.zDotProduct(Lxx.zMult(dx1, null)));
+					if (rho > rho_min && rho < rho_max) {
+						break;
+					} else {
+						alpha = alpha / 2.0;
+					}
+				}
+				dx.assign(dfunc.mult(alpha));
+				dz.assign(dfunc.mult(alpha));
+				dlam.assign(dfunc.mult(alpha));
+				dmu.assign(dfunc.mult(alpha));
+			}
 
 		}
 
