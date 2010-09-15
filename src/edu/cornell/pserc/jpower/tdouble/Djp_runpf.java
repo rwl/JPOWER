@@ -25,11 +25,16 @@ import java.util.Map;
 
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix;
+import cern.colt.matrix.tdcomplex.DComplexFactory1D;
+import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
+import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
+import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
@@ -71,7 +76,10 @@ import edu.cornell.pserc.util.tdouble.Djp_util;
  */
 public class Djp_runpf {
 
+	private static final Djp_util util = new Djp_util();
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
+	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	public static Djp_jpc jp_runpf() {
 		return jp_runpf("case9");
@@ -120,7 +128,7 @@ public class Djp_runpf {
 
 		/* options */
 		int verbose = jpopt.get("VERBOSE").intValue();
-		boolean qlim = jpopt.get("ENFORCE_Q_LIMS") != 0.0;	/* enforce Q limits on gens? */
+		int qlim = jpopt.get("ENFORCE_Q_LIMS").intValue();	/* enforce Q limits on gens? */
 		boolean dc = jpopt.get("PF_DC") != 0.0;				/* use DC formulation? */
 
 		/* read data */
@@ -203,7 +211,87 @@ public class Djp_runpf {
 
 			success = true;
 		} else {                                  // AC formulation
+			if (verbose > 0)
+				System.out.printf(" -- AC Power Flow ");    // solver name and \n added later
 
+			/* initial state */
+			//DComplexMatrix1D V0 = DComplexFactory1D.dense.make(bus.size(), new double[] {1, 0});	// flat start
+			DComplexMatrix1D V0 = util.polar(bus.Vm, bus.Va, false);
+			DComplexMatrix1D normV0g = V0.viewSelection(gbus).copy().assign(cfunc.abs).assign(V0.viewSelection(gbus), cfunc.mult);
+			DComplexMatrix1D cVg = util.complex(gen.Vg.viewSelection(on), null);
+			V0.viewSelection(gbus).assign(cVg.assign(normV0g, cfunc.div));
+
+			int[] limited = null;					// list of indices of gens @ Q lims
+			if (qlim > 0) {
+				int ref0 = ref;						// save index and angle of
+				double Varef0 = bus.Va.get(ref0);	//   original reference bus
+				DoubleMatrix1D fixedQg = DoubleFactory1D.dense.make(gen.size());	// Qg of gens at Q limits
+			}
+			boolean repeat = true;
+			while (repeat) {
+				/* build admittance matrices */
+				DComplexMatrix2D[] Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
+				DComplexMatrix2D Ybus = Y[0], Yf = Y[1], Yt = Y[2];
+
+				/* compute complex bus power injections (generation - load) */
+				DComplexMatrix1D Sbus = Djp_makeSbus.jp_makeSbus(baseMVA, bus, gen);
+
+				/* run the power flow */
+				int alg = jpopt.get("PF_ALG").intValue();
+				Object[] soln = null;
+				if (alg == 1) {
+					soln = Djp_newtonpf.jp_newtonpf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
+				} else if (alg == 2 || alg == 3) {
+					DoubleMatrix2D[] B = Djp_makeB.jp_makeB(baseMVA, bus, branch, alg);
+					soln = Djp_fdpf.jp_fdpf(Ybus, Sbus, V0, B[0], B[1], ref, pv, pq, jpopt);
+				} else if (alg == 4) {
+					soln = Djp_gausspf.jp_gausspf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
+				} else {
+					System.err.println("Only Newton''s method, fast-decoupled, and Gauss-Seidel power flow algorithms currently implemented.");
+					// TODO: throw unsupported algorithm exception.
+				}
+				DComplexMatrix1D V = (DComplexMatrix1D) soln[0];
+				success = (Boolean) soln[1];
+				int iterations = (Integer) soln[2];
+
+				/* update data matrices with solution */
+				Object[] data = Djp_pfsoln.jp_pfsoln(baseMVA, bus, gen, branch, Ybus, Yf, Yt, V, ref, pv, pq);
+				bus = (Djp_bus) data[0];
+				gen = (Djp_gen) data[1];
+				branch = (Djp_branch) data[2];
+
+				if (qlim > 0) {		// enforce generator Q limits
+					/* find gens with violated Q constraints */
+					int[] mx = util.nonzero( gen.gen_status.copy().assign(util.intm( gen.Qg.copy().assign(gen.Qmax, dfunc.greater) ), ifunc.and) );
+					int[] mn = util.nonzero( gen.gen_status.copy().assign(util.intm( gen.Qg.copy().assign(gen.Qmin, dfunc.less) ), ifunc.and) );
+
+					if (mx.length > 0 || mn.length > 0) {	// we have some Q limit violations
+						if (pv.length == 0) {
+							if (verbose > 0) {
+								if (mx.length > 0) {
+									System.out.printf("Gen %d (only one left) exceeds upper Q limit : INFEASIBLE PROBLEM\n", mx);
+								} else {
+									System.out.printf("Gen %d (only one left) exceeds lower Q limit : INFEASIBLE PROBLEM\n", mn);
+								}
+							}
+							success = false;
+							break;
+						}
+
+						// one at a time?
+						if (qlim == 2) {	// fix largest violation, ignore the rest
+							// TODO: enforce Q limits
+						}
+					} else {
+						repeat = false;
+					}
+				} else {
+					repeat = false;
+				}
+				if (qlim > 0 && limited.length > 0) {
+					// TODO: restore injections from limited gens (those at Q limits)
+				}
+			}
 		}
 		jpc.et = (System.currentTimeMillis() - t0) / 1000F;
 		jpc.success = success;
@@ -239,5 +327,4 @@ public class Djp_runpf {
 
 		return results;
 	}
-
 }

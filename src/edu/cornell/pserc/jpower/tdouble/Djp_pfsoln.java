@@ -67,7 +67,7 @@ public class Djp_pfsoln {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_printpf(double baseMVA, Djp_bus bus0, Djp_gen gen0, Djp_branch branch0,
+	public static Object[] jp_pfsoln(double baseMVA, Djp_bus bus0, Djp_gen gen0, Djp_branch branch0,
 			DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V, int ref, int[] pv, int[] pq) {
 
 		/* initialize return values */
