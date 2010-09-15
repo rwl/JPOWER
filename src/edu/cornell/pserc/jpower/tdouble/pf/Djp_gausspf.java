@@ -19,7 +19,7 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble;
+package edu.cornell.pserc.jpower.tdouble.pf;
 
 import java.util.Map;
 
@@ -27,32 +27,28 @@ import cern.colt.matrix.Norm;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
-import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
-import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
 import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
- * Solves the power flow using a full Newton's method.
+ * Solves the power flow using a Gauss-Seidel method.
  *
  * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Alberto Borghetti, University of Bologna, Italy
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class Djp_newtonpf {
+public class Djp_gausspf {
 
 	private static final Djp_util util = new Djp_util();
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static Object[] jp_newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
-		return jp_newtonpf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jp_jpoption());
+		return jp_gausspf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jp_jpoption());
 	}
 
 	/**
@@ -65,10 +61,10 @@ public class Djp_newtonpf {
 	 * swing bus, as well as an initial guess for remaining magnitudes and
 	 * angles. JPOPT is a JPOWER options vector which can be used to
 	 * set the termination tolerance, maximum number of iterations, and
-	 * output options (see JPOPTION for details). Uses default options if
-	 * this parameter is not given. Returns the final complex voltages, a
-	 * flag which indicates whether it converged or not, and the number of
-	 * iterations performed.
+	 * output options (see MPOPTION for details). Uses default options
+	 * if this parameter is not given. Returns the final complex voltages,
+	 * a flag which indicates whether it converged or not, and the number
+	 * of iterations performed.
 	 *
 	 * @param Ybus
 	 * @param Sbus
@@ -80,7 +76,7 @@ public class Djp_newtonpf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
 
 		/* options */
@@ -93,15 +89,11 @@ public class Djp_newtonpf {
 		boolean converged = false;
 		int i = 0;
 		DComplexMatrix1D V = V0;
-		DComplexMatrix1D Va = V.copy().assign(cfunc.arg);
+//		DComplexMatrix1D Va = V.copy().assign(cfunc.arg);
 		DComplexMatrix1D Vm = V.copy().assign(cfunc.abs);
 
 		/* set up indexing for updating V */
 		int npv = pv.length;
-		int npq = pq.length;
-//		int j1 = 0,			j2 = npv;			// j1:j2 - V angle of pv buses
-//		int j3 = j2 + 1,	j4 = j2 + npq;		// j3:j4 - V angle of pq buses
-//		int j5 = j4 + 1,	j6 = j4 + npq;		// j5:j6 - V mag of pq buses
 
 		/* evaluate F(x0) */
 		DComplexMatrix1D mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -113,7 +105,7 @@ public class Djp_newtonpf {
 		/* check tolerance */
 		double normF = DenseDoubleAlgebra.DEFAULT.norm(F, Norm.Infinity);
 		if (verbose > 0)
-			System.out.print("(Newton)\n");
+			System.out.printf("(Gauss-Seidel)\n");
 		if (verbose > 1) {
 			System.out.printf("\n it    max P & Q mismatch (p.u.)");
 			System.out.printf("\n----  ---------------------------");
@@ -125,41 +117,28 @@ public class Djp_newtonpf {
 				System.out.printf("\nConverged!\n");
 		}
 
-		/* do Newton iterations */
+		/* do Gauss-Seidel iterations */
 		while (!converged && i < max_it) {
 			/* update iteration counter */
 			i += 1;
 
-			/* evaluate Jacobian */
-			DComplexMatrix2D[] dSbus_dV = Djp_dSbus_dV.jp_dSbus_dV(Ybus, V);
-			DComplexMatrix2D dSbus_dVm = dSbus_dV[0];
-			DComplexMatrix2D dSbus_dVa = dSbus_dV[1];
+			/* update voltage at PQ buses */
+			DComplexMatrix1D dVpq = Sbus.viewSelection(pq).copy().assign(V.viewSelection(pq), cfunc.div).assign(cfunc.conj);
+			dVpq.assign(Ybus.viewSelection(pq, null).zMult(V, null), cfunc.minus);
+			for (int k : pq)
+				V.set(k, cfunc.plus.apply(V.get(k), cfunc.div.apply(dVpq.get(k), Ybus.get(k, k))));
 
-			DoubleMatrix2D J11 = dSbus_dVa.getRealPart().viewSelection(pvpq, pvpq).copy();
-			DoubleMatrix2D J12 = dSbus_dVm.getRealPart().viewSelection(pvpq, pq).copy();
-			DoubleMatrix2D J21 = dSbus_dVa.getImaginaryPart().viewSelection(pq, pvpq).copy();
-			DoubleMatrix2D J22 = dSbus_dVm.getImaginaryPart().viewSelection(pq, pq).copy();
-			DoubleMatrix2D J1 = DoubleFactory2D.sparse.appendColumns(J11, J12);
-			DoubleMatrix2D J2 = DoubleFactory2D.sparse.appendColumns(J21, J22);
-			DoubleMatrix2D J = DoubleFactory2D.sparse.appendRows(J1, J2);
-			SparseRCDoubleMatrix2D JJ = new SparseRCDoubleMatrix2D(J.rows(), J.columns());
-			JJ.assign(J);
-
-			DoubleMatrix1D dx = SparseDoubleAlgebra.DEFAULT.solve(JJ, F).assign(dfunc.neg);
-			DComplexMatrix1D dxz = util.complex(dx, null);
-
-			/* update voltage */
-			if (npv > 0)
-				Va.viewSelection(pv).assign(dxz.viewPart(0, npv), DComplexFunctions.plus);
-			if (npq > 0) {
-				Va.viewSelection(pq).assign(dxz.viewPart(npv, npq), cfunc.plus);
-				Vm.viewSelection(pq).assign(dxz.viewPart(npv + npq, npq), cfunc.plus);
+			/* update voltage at PV buses */
+			if (npv > 0) {
+				Sbus.viewSelection(pv).assignImaginary( Ybus.viewSelection(pv, null).zMult(V, null).assign(cfunc.conj).assign(V.viewSelection(pv), cfunc.mult).getImaginaryPart() );
+				DComplexMatrix1D dVpv = Sbus.viewSelection(pv).copy().assign(V.viewSelection(pv), cfunc.div).assign(cfunc.conj);
+				dVpv.assign(Ybus.viewSelection(pv, null).zMult(V, null), cfunc.minus);
+				for (int k : pv)
+					V.set(k, cfunc.plus.apply(V.get(k), cfunc.div.apply(dVpv.get(k), Ybus.get(k, k))));
+				DComplexMatrix1D absV = V.viewSelection(pv).copy().assign(cfunc.abs);
+				absV.assign(V.viewSelection(pv), cfunc.swapArgs(cfunc.div));
+				V.viewSelection(pv).assign(Vm).assign(absV, cfunc.mult);
 			}
-
-			V = util.complex(Vm.getRealPart(), Va.getRealPart());
-			/* update Vm and Va again in case we wrapped around with a negative Vm */
-			Va = V.copy().assign(cfunc.arg);
-			Vm = V.copy().assign(cfunc.abs);
 
 			/* evalute F(x) */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj).assign(V, cfunc.mult).assign(Sbus, cfunc.minus);
@@ -174,12 +153,12 @@ public class Djp_newtonpf {
 			if (normF < tol) {
 				converged = true;
 				if (verbose > 0)
-					System.out.printf("\nNewton's method power flow converged in %d iterations.\n", i);
+					System.out.printf("\nGauss-Seidel power flow converged in %d iterations.\n", i);
 			}
 		}
 		if (verbose > 0)
 			if (!converged)
-				System.out.printf("\nNewton''s method power did not converge in %d iterations.\n", i);
+				System.out.printf("\nGauss-Seidel power did not converge in %d iterations.\n", i);
 
 		return new Object[] {V, converged, i};
 	}

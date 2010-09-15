@@ -19,11 +19,13 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble;
+package edu.cornell.pserc.jpower.tdouble.pf;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**

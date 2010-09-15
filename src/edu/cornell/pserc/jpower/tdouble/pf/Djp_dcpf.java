@@ -19,7 +19,7 @@
  *
  */
 
-package edu.cornell.pserc.jpower.tdouble;
+package edu.cornell.pserc.jpower.tdouble.pf;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;

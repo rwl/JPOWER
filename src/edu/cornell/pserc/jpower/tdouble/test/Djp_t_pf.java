@@ -28,9 +28,9 @@ import java.util.Map;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.jpower.tdouble.Djp_rundcpf;
-import edu.cornell.pserc.jpower.tdouble.Djp_runpf;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.pf.Djp_rundcpf;
+import edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf;
 import edu.cornell.pserc.util.tdouble.Djp_mm;
 
 /**
