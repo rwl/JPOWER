@@ -21,6 +21,8 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Map;
 
 import cern.colt.list.tint.IntArrayList;
@@ -221,11 +223,14 @@ public class Djp_runpf {
 			DComplexMatrix1D cVg = util.complex(gen.Vg.viewSelection(on), null);
 			V0.viewSelection(gbus).assign(cVg.assign(normV0g, cfunc.div));
 
+			int ref0 = 0;
+			double Varef0 = 0;
 			int[] limited = null;					// list of indices of gens @ Q lims
+			DoubleMatrix1D fixedQg = null;
 			if (qlim > 0) {
-				int ref0 = ref;						// save index and angle of
-				double Varef0 = bus.Va.get(ref0);	//   original reference bus
-				DoubleMatrix1D fixedQg = DoubleFactory1D.dense.make(gen.size());	// Qg of gens at Q limits
+				ref0 = ref;							// save index and angle of
+				Varef0 = bus.Va.get(ref0);			//   original reference bus
+				fixedQg = DoubleFactory1D.dense.make(gen.size());	// Qg of gens at Q limits
 			}
 			boolean repeat = true;
 			while (repeat) {
@@ -280,16 +285,69 @@ public class Djp_runpf {
 
 						// one at a time?
 						if (qlim == 2) {	// fix largest violation, ignore the rest
-							// TODO: enforce Q limits
+							double[] maxloc = DoubleFactory1D.dense.append(
+									gen.Qg.viewSelection(mx).copy().assign(gen.Qmax.viewSelection(mx), dfunc.minus),
+									gen.Qmin.viewSelection(mn).copy().assign(gen.Qg.viewSelection(mn), dfunc.minus)
+							).getMaxLocation();
+							int k = new Double(maxloc[1]).intValue();
+							if (k > mx.length) {
+								mn = new int[] {mn[k - mn.length]};
+								mx = new int[0];
+							} else {
+								mx = new int[] {mx[k]};
+								mn = new int[0];
+							}
 						}
+
+						if (verbose > 0 && mx.length > 0)
+							System.out.printf("Gen %d at upper Q limit, converting to PQ bus\n", mx);
+						if (verbose > 0 && mn.length > 0)
+							System.out.printf("Gen %d at lower Q limit, converting to PQ bus\n", mn);
+
+						/* save corresponding limit values */
+						fixedQg.viewSelection(mx).assign(gen.Qmax.viewSelection(mx));
+						fixedQg.viewSelection(mn).assign(gen.Qmin.viewSelection(mn));
+						mx = util.cat(mx, mn);
+
+						/* convert to PQ bus */
+						gen.Qg.viewSelection(mx).assign(fixedQg.viewSelection(mx));	// set Qg to binding limit
+						gen.gen_status.viewSelection(mx).assign(0);					// temporarily turn off gen
+						for (int i = 0; i < mx.length; i++) {						// (one at a time, since
+							int bi = gen.gen_bus.get(mx[i]);						//  they may be at same bus)
+							bus.Pd.set(bi, bus.Pd.get(bi) - gen.Pg.get(mx[i]));		// adjust load accordingly,
+							bus.Qd.set(bi, bus.Qd.get(bi) - gen.Qg.get(mx[i]));
+							bus.bus_type.set(gen.gen_bus.get(mx[i]), Djp_jpc.PQ);	// & set bus type to PQ
+						}
+
+						/* update bus index lists of each type of bus */
+						int ref_temp = ref;
+						bustypes = Djp_bustypes.jp_bustypes(bus, gen);
+						ref = bustypes[0].get(0);
+						pv = bustypes[1].toArray();
+						pq = bustypes[2].toArray();
+						if (verbose > 0 && ref != ref_temp)
+							System.out.printf("Bus %d is new slack bus\n", ref);
+						limited = util.cat(limited, mx);
+
 					} else {
-						repeat = false;
+						repeat = false;	// no more generator Q limits violated
 					}
 				} else {
-					repeat = false;
+					repeat = false;		// don't enforce generator Q limits, once is enough
 				}
 				if (qlim > 0 && limited.length > 0) {
-					// TODO: restore injections from limited gens (those at Q limits)
+					// restore injections from limited gens (those at Q limits)
+					gen.Qg.viewSelection(limited).assign(fixedQg.viewSelection(limited));	// restore Qg value,
+					for (int i = 0; i < limited.length; i++) {								// (one at a time, since
+						int bi = gen.gen_bus.get(limited[i]);								//  they may be at same bus)
+						bus.Pd.set(bi, bus.Pd.get(bi) + gen.Pg.get(limited[i]));			// re-adjust load,
+						bus.Qd.set(bi, bus.Qd.get(bi) + gen.Qg.get(limited[i]));
+					}
+					gen.gen_status.viewSelection(limited).assign(1);						// and turn gen back on
+					if (ref != ref0) {
+						/* adjust voltage angles to make original ref bus correct */
+						bus.Va.assign(dfunc.minus(bus.Va.get(ref0) + Varef0));
+					}
 				}
 			}
 		}
@@ -316,9 +374,9 @@ public class Djp_runpf {
 			results.branch.Qt.viewSelection(results.order.branch.status.off).assign(0);
 		}
 
-		if (fname != "") {
-			// TODO: printpf to file
-		}
+		if (fname != "")
+			Djp_printpf.jp_printpf(results, fname, jpopt);
+
 		Djp_printpf.jp_printpf(results, System.out, jpopt);
 
 		/* save solved case */

@@ -21,6 +21,9 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -51,6 +54,25 @@ public class Djp_printpf {
 
 	public static void jp_printpf(Djp_jpc results) {
 		jp_printpf(results, System.out);
+	}
+
+	public static void jp_printpf(Djp_jpc results, String fname) {
+		jp_printpf(results, fname, Djp_jpoption.jp_jpoption());
+	}
+
+	public static void jp_printpf(Djp_jpc results, String fname, Map<String, Double> jpopt) {
+		FileOutputStream output = null;
+		try {
+			output = new FileOutputStream(fname);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		jp_printpf(results, output, Djp_jpoption.jp_jpoption());
+		try {
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void jp_printpf(Djp_jpc results, OutputStream output) {
