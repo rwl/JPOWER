@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JPOWER
+Bundle-SymbolicName: jpower
+Bundle-Version: 0.1.1
+Bundle-ClassPath: jpower.jar,
+ lib/arpack-combo.jar,
+ lib/csparsej.jar,
+ lib/jplasma.jar,
+ lib/jtransforms.jar,
+ lib/junit.jar,
+ lib/netlib-java.jar,
+ lib/optimization.jar,
+ lib/parallelcolt-0.9.4.jar
+Class-Path: lib/junit.jar lib/arpack-combo.jar lib/netlib-java.jar lib/jplasma.jar lib/jtransforms.jar lib/csparsej.jar lib/optimization.jar
+Main-Class: cern.colt.AllTests
+Export-Package: edu.cornell.pserc.jips.tdouble,
+ edu.cornell.pserc.jpower.tdouble,
+ edu.cornell.pserc.jpower.tdouble.case4gs,
+ edu.cornell.pserc.jpower.tdouble.cases,
+ edu.cornell.pserc.jpower.tdouble.exceptions,
+ edu.cornell.pserc.jpower.tdouble.jpc,
+ edu.cornell.pserc.jpower.tdouble.opf,
+ edu.cornell.pserc.jpower.tdouble.pf,
+ edu.cornell.pserc.jpower.tdouble.test,
+ edu.cornell.pserc.util.tdouble
+Bundle-Vendor: Richard Lincoln
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
