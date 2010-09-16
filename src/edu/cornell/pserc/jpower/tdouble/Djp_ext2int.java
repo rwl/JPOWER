@@ -23,7 +23,6 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.lang.reflect.Field;
 
-import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -403,32 +402,17 @@ public class Djp_ext2int {
 			int n;
 			for (int k = 0; k < ordering.length; k++) {
 				String ordr = ordering[k];
-				n = (int) val.size();
-				try {
-					Field fld = o.external.getClass().getField(ordr);
-					DoubleMatrix1D v;
-					if (ordr.equals("gen")) {
-						Djp_gen ref = (Djp_gen) fld.get(o.external);
-						v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + ref.size()));
-					} else if (ordr.equals("bus")) {
-						Djp_bus ref = (Djp_bus) fld.get(o.external);
-						v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + ref.size()));
-					} else {				// TODO: enum
-						Djp_branch ref = (Djp_branch) fld.get(o.external);
-						v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + ref.size()));
-					}
-					DoubleMatrix1D new_v = jp_ext2int(jpc, v, ordering[k], dim);
-					int_val = DoubleFactory1D.dense.append(int_val, new_v);
-					b += n;
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (SecurityException e1) {
-					e1.printStackTrace();
-				} catch (NoSuchFieldException e1) {
-					e1.printStackTrace();
+				DoubleMatrix1D v;
+				if (ordr.equals("gen")) {
+					n = o.external.gen.size();
+				} else if (ordr.equals("bus")) {
+					n = o.external.bus.size();
+				} else {				// TODO: enum
+					n= o.external.branch.size();
 				}
+				v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + n));
+				DoubleMatrix1D new_v = jp_ext2int(jpc, v, ordering[k], dim);
+				int_val = DoubleFactory1D.dense.append(int_val, new_v);
 				b += n;
 			}
 			n = (int) val.size();
@@ -493,37 +477,22 @@ public class Djp_ext2int {
 			int n;
 			for (int k = 0; k < ordering.length; k++) {
 				String ordr = ordering[k];
-				n = (int) val.size();
-				try {
-					Field fld = o.external.getClass().getField(ordr);
-					DoubleMatrix2D v;
-					if (ordr.equals("gen")) {
-						Djp_gen ref = (Djp_gen) fld.get(o.external);
-						v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + ref.size()), dim);
-					} else if (ordr.equals("bus")) {
-						Djp_bus ref = (Djp_bus) fld.get(o.external);
-						v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + ref.size()), dim);
-					} else {				// TODO: enum
-						Djp_branch ref = (Djp_branch) fld.get(o.external);
-						v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + ref.size()), dim);
-					}
-					DoubleMatrix2D new_v = jp_ext2int(jpc, v, ordering[k], dim);
-					if (dim == 1) {
-						int_val = DoubleFactory2D.dense.appendRows(int_val, new_v);
-					} else if (dim == 2) {
-						int_val = DoubleFactory2D.dense.appendColumns(int_val, new_v);
-					} else {
-						throw new UnsupportedOperationException();
-					}
-					b += n;
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (SecurityException e1) {
-					e1.printStackTrace();
-				} catch (NoSuchFieldException e1) {
-					e1.printStackTrace();
+				DoubleMatrix2D v;
+				if (ordr.equals("gen")) {
+					n = o.external.gen.size();
+				} else if (ordr.equals("bus")) {
+					n = o.external.bus.size();
+				} else {				// TODO: enum
+					n = o.external.branch.size();
+				}
+				v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + n), dim);
+				DoubleMatrix2D new_v = jp_ext2int(jpc, v, ordering[k], dim);
+				if (dim == 1) {
+					int_val = DoubleFactory2D.dense.appendRows(int_val, new_v);
+				} else if (dim == 2) {
+					int_val = DoubleFactory2D.dense.appendColumns(int_val, new_v);
+				} else {
+					throw new UnsupportedOperationException();
 				}
 				b += n;
 			}

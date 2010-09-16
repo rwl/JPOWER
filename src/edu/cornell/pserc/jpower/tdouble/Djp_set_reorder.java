@@ -25,40 +25,38 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 /**
- * Returns A with one of its dimensions indexed.
+ * Assigns B to A with one of the dimensions of A indexed.
  *
  * @author Ray Zimmerman (rz10@cornell.edu)
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class Djp_get_reorder {
+public class Djp_set_reorder {
 
 	/**
-	 * Returns A(:, ..., :, IDX, :, ..., :), where DIM determines
-	 * in which dimension to place the IDX.
 	 *
 	 * @param A
 	 * @param idx
 	 * @return an indexed copy of A.
 	 */
-	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx) {
-		return A.viewSelection(idx).copy();
+	public static DoubleMatrix1D jp_set_reorder(DoubleMatrix1D A, DoubleMatrix1D B, int[] idx) {
+		return A.viewSelection(idx).assign(B);
 	}
 
 	/**
-	 * Returns A(:, ..., :, IDX, :, ..., :), where DIM determines
-	 * in which dimension to place the IDX.
+	 * Returns A after doing A(:, ..., :, IDX, :, ..., :) = B
+	 * where DIM determines in which dimension to place the IDX.
 	 *
 	 * @param A
 	 * @param idx
-	 * @param dim 1 - index rows, 2 - index columns.
-	 * @return a copy of A indexed in dimension dim.
+	 * @param dim 1 - index rows, 2 - index columns
+	 * @return
 	 */
-	public static DoubleMatrix2D jp_get_reorder(DoubleMatrix2D A, int[] idx, int dim) {
+	public static DoubleMatrix2D jp_set_reorder(DoubleMatrix2D A, DoubleMatrix2D B, int[] idx, int dim) {
 		if (dim == 1) {
-			return A.viewSelection(idx, null).copy();
+			return A.viewSelection(idx, null).assign(B);
 		} else if (dim == 2) {
-			return A.viewSelection(null, idx).copy();
+			return A.viewSelection(null, idx).assign(B);
 		} else {
 			throw new UnsupportedOperationException();
 		}
