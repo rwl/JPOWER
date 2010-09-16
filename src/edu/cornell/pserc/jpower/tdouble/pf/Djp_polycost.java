@@ -75,7 +75,7 @@ public class Djp_polycost {
 		}
 
 		/* do derivatives */
-		for (int d : util.irange(der)) {
+		for (int d = 0; d < der; d++) {
 			if (c.columns() >= 2) {
 				c.assign( c.viewSelection(null, util.irange(1, maxN - d + 1)) );
 			} else {

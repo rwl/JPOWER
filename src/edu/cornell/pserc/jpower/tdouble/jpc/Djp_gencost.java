@@ -78,16 +78,24 @@ public class Djp_gencost {
 
 	/**
 	 *
-	 * @return a copy of the gencost data.
+	 * @return
 	 */
 	public Djp_gencost copy() {
+		return copy(null);
+	}
+
+	/**
+	 *
+	 * @return a copy of the gencost data.
+	 */
+	public Djp_gencost copy(int[] indexes) {
 		Djp_gencost other = new Djp_gencost();
 
-		other.model = this.model.copy();
-		other.startup = this.startup.copy();
-		other.shutdown = this.shutdown.copy();
-		other.ncost = this.ncost.copy();
-		other.cost = this.cost.copy();
+		other.model = this.model.viewSelection(indexes).copy();
+		other.startup = this.startup.viewSelection(indexes).copy();
+		other.shutdown = this.shutdown.viewSelection(indexes).copy();
+		other.ncost = this.ncost.viewSelection(indexes).copy();
+		other.cost = this.cost.viewSelection(indexes, null).copy();
 
 		return other;
 	}
