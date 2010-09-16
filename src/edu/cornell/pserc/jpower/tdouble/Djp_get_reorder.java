@@ -25,6 +25,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 /**
+ * Returns A with one of its dimensions indexed.
  *
  * @author Ray Zimmerman (rz10@cornell.edu)
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
@@ -33,25 +34,33 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 public class Djp_get_reorder {
 
 	/**
+	 * Returns A(:, ..., :, IDX, :, ..., :), where DIM determines
+	 * in which dimension to place the IDX.
 	 *
 	 * @param A
 	 * @param idx
-	 * @param dim
-	 * @return
+	 * @return an indexed copy of A.
 	 */
-	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx, int dim) {
-		return null;
+	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx) {
+		return A.viewSelection(idx).copy();
 	}
 
 	/**
+	 * Returns A(:, ..., :, IDX, :, ..., :), where DIM determines
+	 * in which dimension to place the IDX.
 	 *
 	 * @param A
-	 * @param idx
-	 * @param dim
+	 * @param idx 1 - index rows, 2 - index columns
+	 * @param dim a copy of A indexed in dimension dim.
 	 * @return
 	 */
 	public static DoubleMatrix2D jp_get_reorder(DoubleMatrix2D A, int[] idx, int dim) {
-		return null;
+		if (dim == 1) {
+			return A.viewSelection(idx, null).copy();
+		} else if (dim == 2) {
+			return A.viewSelection(null, idx).copy();
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
-
 }
