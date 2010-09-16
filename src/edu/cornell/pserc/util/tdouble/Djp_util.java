@@ -124,6 +124,42 @@ public class Djp_util {
 
 	/**
 	 *
+	 * @param stop
+	 * @return an arithmetic progression.
+	 */
+	public static double[] drange(double stop) {
+		return drange(0, stop, 1);
+	}
+
+	/**
+	 *
+	 * @param start
+	 * @param stop an arithmetic progression.
+	 * @return
+	 */
+	public static double[] drange(double start, double stop) {
+		return drange(start, stop, 1);
+	}
+
+	/**
+	 *
+	 * @param start
+	 * @param stop
+	 * @param step increment (or decrement)
+	 * @return an arithmetic progression.
+	 */
+	public static double[] drange(double start, double stop, double step) {
+		double[] r = new double[(int) ((stop - start) / step)];
+		double v = start;
+		for (int i = 0; i < r.length; i++) {
+			r[i] = v;
+			v += step;
+		}
+		return r;
+	}
+
+	/**
+	 *
 	 * @param n
 	 * @return
 	 */
@@ -337,8 +373,21 @@ public class Djp_util {
 	 * @param b
 	 * @return
 	 */
-	public static int[] cat(int[] a, int[] b) {
+	public static int[] icat(int[] a, int[] b) {
 		int[] c = new int[a.length + b.length];
+		System.arraycopy(a, 0, c, 0, a.length);
+		System.arraycopy(b, 0, c, a.length, b.length);
+		return c;
+	}
+
+	/**
+	 *
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static double[] dcat(double[] a, double[] b) {
+		double[] c = new double[a.length + b.length];
 		System.arraycopy(a, 0, c, 0, a.length);
 		System.arraycopy(b, 0, c, a.length, b.length);
 		return c;

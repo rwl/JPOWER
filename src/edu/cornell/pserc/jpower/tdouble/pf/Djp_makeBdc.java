@@ -21,8 +21,6 @@
 
 package edu.cornell.pserc.jpower.tdouble.pf;
 
-import cern.colt.list.tdouble.DoubleArrayList;
-import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
@@ -92,7 +90,7 @@ public class Djp_makeBdc {
 
 		/* build connection matrix Cft = Cf - Ct for line and from - to buses */
 		int[] ft = IntFactory1D.dense.make(new IntMatrix1D[] {branch.f_bus, branch.t_bus}).toArray();
-		int[] il = util.cat(util.irange(nl), util.irange(nl));
+		int[] il = util.icat(util.irange(nl), util.irange(nl));
 		double[] v = DoubleFactory1D.dense.make(new DoubleMatrix1D[] {
 				DoubleFactory1D.dense.make(nl,  1),
 				DoubleFactory1D.dense.make(nl, -1)

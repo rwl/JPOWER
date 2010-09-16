@@ -90,7 +90,7 @@ public class Djp_newtonpf {
 		int verbose	= jpopt.get("VERBOSE").intValue();
 
 		/* initialize */
-		int[] pvpq = util.cat(pv, pq);
+		int[] pvpq = util.icat(pv, pq);
 		boolean converged = false;
 		int i = 0;
 		DComplexMatrix1D V = V0;

@@ -315,7 +315,7 @@ public class Djp_runpf {
 						/* save corresponding limit values */
 						fixedQg.viewSelection(mx).assign(gen.Qmax.viewSelection(mx));
 						fixedQg.viewSelection(mn).assign(gen.Qmin.viewSelection(mn));
-						mx = util.cat(mx, mn);
+						mx = util.icat(mx, mn);
 
 						/* convert to PQ bus */
 						gen.Qg.viewSelection(mx).assign(fixedQg.viewSelection(mx));	// set Qg to binding limit
@@ -335,7 +335,7 @@ public class Djp_runpf {
 						pq = bustypes[2].toArray();
 						if (verbose > 0 && ref != ref_temp)
 							System.out.printf("Bus %d is new slack bus\n", ref);
-						limited = util.cat(limited, mx);
+						limited = util.icat(limited, mx);
 
 					} else {
 						repeat = false;	// no more generator Q limits violated

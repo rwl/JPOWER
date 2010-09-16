@@ -441,10 +441,10 @@ public class Djp_printpf {
 					a, -bus.Vm.viewSelection(inzsh).copy().assign(dfunc.square).assign(bus.Gs.viewSelection(inzsh), dfunc.mult).zSum(),
 					bus.Vm.viewSelection(inzsh).copy().assign(dfunc.square).assign(bus.Bs.viewSelection(inzsh), dfunc.mult).zSum(),
 					fchg.viewSelection(ibrch).zSum() + tchg.viewSelection(ibrch).zSum() + fchg.viewSelection(out_tie).zSum() + tchg.viewSelection(in_tie).zSum(),
-					loss.viewSelection(ibrch).getRealPart().zSum() + loss.viewSelection(util.cat(in_tie, out_tie)).getRealPart().zSum() / 2,
-					loss.viewSelection(ibrch).getImaginaryPart().zSum() + loss.viewSelection(util.cat(in_tie, out_tie)).getImaginaryPart().zSum() / 2,
-					branch.Pt.viewSelection(in_tie).zSum()+branch.Pf.viewSelection(out_tie).zSum() - loss.viewSelection(util.cat(in_tie, out_tie)).getRealPart().zSum() / 2,
-					branch.Qt.viewSelection(in_tie).zSum()+branch.Qf.viewSelection(out_tie).zSum() - loss.viewSelection(util.cat(in_tie, out_tie)).getImaginaryPart().zSum() / 2 );
+					loss.viewSelection(ibrch).getRealPart().zSum() + loss.viewSelection(util.icat(in_tie, out_tie)).getRealPart().zSum() / 2,
+					loss.viewSelection(ibrch).getImaginaryPart().zSum() + loss.viewSelection(util.icat(in_tie, out_tie)).getImaginaryPart().zSum() / 2,
+					branch.Pt.viewSelection(in_tie).zSum()+branch.Pf.viewSelection(out_tie).zSum() - loss.viewSelection(util.icat(in_tie, out_tie)).getRealPart().zSum() / 2,
+					branch.Qt.viewSelection(in_tie).zSum()+branch.Qf.viewSelection(out_tie).zSum() - loss.viewSelection(util.icat(in_tie, out_tie)).getImaginaryPart().zSum() / 2 );
 			}
 			pw.printf("\n----    ------  ------    --------    ------  ------    ------  ------");
 			pw.printf("\nTot:   %7.1f %7.1f    %7.1f    %7.2f %7.2f       -       -",

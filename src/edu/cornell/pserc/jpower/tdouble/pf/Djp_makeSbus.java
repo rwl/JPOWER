@@ -21,8 +21,6 @@
 
 package edu.cornell.pserc.jpower.tdouble.pf;
 
-import cern.colt.list.tint.IntArrayList;
-import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.jet.math.tdcomplex.DComplexFunctions;

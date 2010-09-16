@@ -57,7 +57,7 @@ public class Djp_dcpf {
 		DoubleMatrix1D Va = Va0.copy();
 
 		/* update angles for non-reference buses */
-		int[] pvpq = Djp_util.cat(pv, pq);
+		int[] pvpq = Djp_util.icat(pv, pq);
 
 		DoubleMatrix2D A = B.viewSelection(pvpq, pvpq).copy();
 		DoubleMatrix1D b = B.viewSelection(pvpq, null).copy().viewColumn(ref);
