@@ -23,14 +23,17 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 
 import java.util.Map;
 
+import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
+import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
+import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -50,23 +53,23 @@ public class Djp_opf_hessfcn {
 
 	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 
-	public static DoubleMatrix1D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
+	public static DoubleMatrix2D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
 			Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
 			Map<String, Double> mpopt) {
 		int nl = om.get_jpc().branch.size();	// all lines have limits by default
 		return jp_opf_hessfcn(x, lambda, om, Ybus, Yf, Yt, mpopt, Djp_util.irange(nl));
 	}
 
-	public static DoubleMatrix1D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
+	public static DoubleMatrix2D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
 			Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
 			Map<String, Double> mpopt, int[] il) {
 		return jp_opf_hessfcn(x, lambda, om, Ybus, Yf, Yt, mpopt, il, 1);
 	}
 
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
+	public static DoubleMatrix2D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
 			Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
-			Map<String, Double> mpopt, int[] il, double cost_mult) {
+			Map<String, Double> jpopt, int[] il, double cost_mult) {
 
 		/* unpack data */
 		Djp_jpc jpc = om.get_jpc();
@@ -82,7 +85,6 @@ public class Djp_opf_hessfcn {
 
 		/* unpack needed parameters */
 		int nb = bus.size();		// number of buses
-		int nl = branch.size();		// number of branches
 		int ng = gen.size();		// number of dispatchable injections
 		int nxyz = (int) x.size();	// total number of control vars of all types
 
@@ -170,7 +172,73 @@ public class Djp_opf_hessfcn {
 		DoubleMatrix2D d2G = DoubleFactory2D.sparse.compose(d2G_parts);
 
 		/* ----- evaluate Hessian of flow constraints ----- */
+		int nmu = (int) lambda.get("ineqnonlin").size() / 2;
+		DComplexMatrix1D muF = util.complex(lambda.get("ineqnonlin").viewPart(0, nmu), null);
+		DComplexMatrix1D muT = util.complex(lambda.get("ineqnonlin").viewPart(nmu, nmu), null);
+		DoubleMatrix2D[] Hf, Ht;
+		DoubleMatrix2D Hfaa, Hfav, Hfva, Hfvv, Htaa, Htav, Htva, Htvv;
+		if (jpopt.get("OPF_FLOW_LIM") == 2) {	// current
+			AbstractMatrix[] dIbr_dV = Djp_dIbr_dV.jp_dIbr_dV(branch.copy(il), Yf, Yt, V);
+			DComplexMatrix2D dIf_dVa = (DComplexMatrix2D) dIbr_dV[0];
+			DComplexMatrix2D dIf_dVm = (DComplexMatrix2D) dIbr_dV[1];
+			DComplexMatrix2D dIt_dVa = (DComplexMatrix2D) dIbr_dV[2];
+			DComplexMatrix2D dIt_dVm = (DComplexMatrix2D) dIbr_dV[3];
+			DComplexMatrix1D If = (DComplexMatrix1D) dIbr_dV[4];
+			DComplexMatrix1D It = (DComplexMatrix1D) dIbr_dV[5];
+			Hf = Djp_d2AIbr_dV2.jp_d2AIbr_dV2(dIf_dVa, dIf_dVm, If, Yf, V, muF);
+			Ht = Djp_d2AIbr_dV2.jp_d2AIbr_dV2(dIt_dVa, dIt_dVm, It, Yt, V, muT);
+		} else {
+			IntMatrix1D f = branch.f_bus.viewSelection(il);	// list of "from" buses
+			IntMatrix1D t = branch.t_bus.viewSelection(il);	// list of "to" buses
+			DComplexMatrix2D Cf = new SparseRCDComplexMatrix2D(nl2, nb, util.irange(nl2), f.toArray(), new double[] {1, 0}, false, false);
+			DComplexMatrix2D Ct = new SparseRCDComplexMatrix2D(nl2, nb, util.irange(nl2), t.toArray(), new double[] {1, 0}, false, false);
+			AbstractMatrix[] dSbr_dV = Djp_dSbr_dV.jp_dSbr_dV(branch.copy(il), Yf, Yt, V);
+			DComplexMatrix2D dSf_dVa = (DComplexMatrix2D) dSbr_dV[0];
+			DComplexMatrix2D dSf_dVm = (DComplexMatrix2D) dSbr_dV[1];
+			DComplexMatrix2D dSt_dVa = (DComplexMatrix2D) dSbr_dV[2];
+			DComplexMatrix2D dSt_dVm = (DComplexMatrix2D) dSbr_dV[3];
+			DComplexMatrix1D Sf = (DComplexMatrix1D) dSbr_dV[4];
+			DComplexMatrix1D St = (DComplexMatrix1D) dSbr_dV[5];
+			if (jpopt.get("OPF_FLOW_LIM") == 1) {	// real power
+				Hf = Djp_d2ASbr_dV2.jp_d2ASbr_dV2(util.complex(dSf_dVa.getRealPart(), null),
+						util.complex(dSf_dVm.getRealPart(), null), util.complex(Sf.getRealPart(), null), Cf, Yf, V, muF);
+				Ht = Djp_d2ASbr_dV2.jp_d2ASbr_dV2(util.complex(dSt_dVa.getRealPart(), null),
+						util.complex(dSt_dVm.getRealPart(), null), util.complex(St.getRealPart(), null), Ct, Yt, V, muT);
+			} else {	// apparent power
+				Hf = Djp_d2ASbr_dV2.jp_d2ASbr_dV2(dSf_dVa, dSf_dVm, Sf, Cf, Yf, V, muF);
+				Ht = Djp_d2ASbr_dV2.jp_d2ASbr_dV2(dSt_dVa, dSt_dVm, St, Ct, Yt, V, muT);
+			}
+		}
+		Hfaa = Hf[0]; Hfav = Hf[1]; Hfva = Hf[2]; Hfvv = Hf[3];
+		Htaa = Ht[0]; Htav = Ht[1]; Htva = Ht[2]; Htvv = Ht[3];
+		DoubleMatrix2D d2H_f = DoubleFactory2D.sparse.compose(new DoubleMatrix2D[][] {{Hfaa, Hfav}, {Hfva, Hfvv}});
+		DoubleMatrix2D d2H_t = DoubleFactory2D.sparse.compose(new DoubleMatrix2D[][] {{Htaa, Htav}, {Htva, Htvv}});
+		DoubleMatrix2D[][] d2H_parts = new DoubleMatrix2D[][] {
+				{d2H_f.assign(d2H_t, dfunc.plus), DoubleFactory2D.sparse.make(2*nb, nxtra)},
+				{DoubleFactory2D.sparse.make(nxtra, 2*nb + nxtra)} };
+		DoubleMatrix2D d2H = DoubleFactory2D.sparse.compose(d2H_parts);
 
-		return null;
+		/* -----  do numerical check using (central) finite differences  ----- */
+//		if (false) {
+//			int nx = (int) x.size();
+//			double step = 1e-05;
+//			DoubleMatrix2D num_d2f = DoubleFactory2D.sparse.make(nx, nx);
+//			DoubleMatrix2D num_d2G = DoubleFactory2D.sparse.make(nx, nx);
+//			DoubleMatrix2D num_d2H = DoubleFactory2D.sparse.make(nx, nx);
+//			for (int ii = 0; ii < nx; ii++) {
+//				DoubleMatrix1D xp = x.copy();
+//				DoubleMatrix1D xm = x.copy();
+//				xp.set(ii, x.get(ii) + step/2);
+//				xm.set(ii, x.get(ii) - step/2);
+//				/* evaluate cost & gradients */
+////				fp, dfp = Djp_opf_costfcn.jp_opf_costfcn(xp, om);
+////				fm, dfm = Djp_opf_costfcn.jp_opf_costfcn(xm, om);
+//				/* evaluate constraints & gradients */
+//
+//				// FIXME
+//			}
+//		}
+
+		return d2f.assign(d2G, dfunc.plus).assign(d2H, dfunc.plus);
 	}
 }

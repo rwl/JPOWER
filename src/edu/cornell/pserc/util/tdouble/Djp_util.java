@@ -25,7 +25,9 @@ import java.util.concurrent.Future;
 import cern.colt.list.tdouble.DoubleArrayList;
 import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
+import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
+import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
@@ -560,11 +562,26 @@ public class Djp_util {
 	/**
 	 *
 	 * @param real real component, may be null
-	 * @param imaginary, imaginary component, may be null
+	 * @param imaginary imaginary component, may be null
 	 * @return a complex vector
 	 */
 	public static DComplexMatrix1D complex(DoubleMatrix1D real, DoubleMatrix1D imaginary) {
 		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make((int) real.size());
+		if (real != null)
+			cmplx.assignReal(real);
+		if (imaginary != null)
+			cmplx.assignImaginary(imaginary);
+		return cmplx;
+	}
+
+	/**
+	 *
+	 * @param real real component, may be null
+	 * @param imaginary imaginary component, may be null
+	 * @return a complex matrix
+	 */
+	public static DComplexMatrix2D complex(DoubleMatrix2D real, DoubleMatrix2D imaginary) {
+		DComplexMatrix2D cmplx = DComplexFactory2D.dense.make(real.rows(), real.columns());
 		if (real != null)
 			cmplx.assignReal(real);
 		if (imaginary != null)
