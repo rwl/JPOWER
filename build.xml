@@ -191,7 +191,7 @@ Further individual targets used internally by above targets:
 		<junit printsummary="yes" fork="yes" haltonfailure="yes" showoutput="yes">
 			<classpath path="${classpath}:${jar.dir}/${jar.filename}"/>
 		<formatter type="plain"/>
-		<test name="edu.cornell.pserc.AllTests"/>
+		<test name="edu.cornell.pserc.jpower.tdouble.Djp_all_tests"/>
 		</junit>
 	</target>
 
