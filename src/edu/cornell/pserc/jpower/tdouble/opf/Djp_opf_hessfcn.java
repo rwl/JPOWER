@@ -95,7 +95,6 @@ public class Djp_opf_hessfcn {
 		int ng = gen.size();		// number of dispatchable injections
 		int nxyz = (int) x.size();	// total number of control vars of all types
 
-		/* set default constrained lines */
 		int nl2 = il.length;		// number of constrained lines
 
 		/* grab Pg & Qg */
