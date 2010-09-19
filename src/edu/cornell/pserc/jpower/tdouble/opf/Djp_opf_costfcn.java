@@ -75,6 +75,7 @@ public class Djp_opf_costfcn {
 		DoubleMatrix1D Qg = x.viewPart(vv.get("Qg").i0, vv.get("Qg").N);	// reactive generation in p.u.
 
 		/* ----- evaluate objective function ----- */
+
 		/* polynomial cost of P and Q */
 		// use totcost only on polynomial cost; in the minimization problem
 		// formulation, pwl cost is the sum of the y variables.
@@ -126,6 +127,7 @@ public class Djp_opf_costfcn {
 		}
 
 		/* ----- evaluate cost gradient ----- */
+
 		/* index ranges */
 		int[] iPg = util.irange(vv.get("Pg").i0, vv.get("Pg").iN);
 		int[] iQg = util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
@@ -175,6 +177,7 @@ public class Djp_opf_costfcn {
 		}
 
 		/* ----- evaluate cost Hessian ----- */
+
 		Djp_gencost pcost = gencost.copy(util.irange(ng));
 		Djp_gencost qcost = null;
 		if (gencost.size() > ng)

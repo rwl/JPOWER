@@ -117,6 +117,7 @@ public class Djp_opf_hessfcn {
 			qcost = gencost.copy(util.irange(ng, 2*ng));
 
 		/* ----- evaluate d2f ----- */
+
 		DoubleMatrix1D d2f_dPg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Pg
 		DoubleMatrix1D d2f_dQg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Qg
 		int[] ipolp = util.nonzero(pcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
@@ -162,6 +163,7 @@ public class Djp_opf_hessfcn {
 		d2f.assign(dfunc.mult(cost_mult));
 
 		/* ----- evaluate Hessian of power balance constraints ----- */
+
 		int nlam = (int) (lambda.get("eqnonlin").size() / 2);
 		DoubleMatrix1D lamP = lambda.get("eqnonlin").viewPart(0, nlam);
 		DoubleMatrix1D lamQ = lambda.get("eqnonlin").viewPart(nlam, nlam);
@@ -178,6 +180,7 @@ public class Djp_opf_hessfcn {
 		DoubleMatrix2D d2G = DoubleFactory2D.sparse.compose(d2G_parts);
 
 		/* ----- evaluate Hessian of flow constraints ----- */
+
 		int nmu = (int) lambda.get("ineqnonlin").size() / 2;
 		DComplexMatrix1D muF = util.complex(lambda.get("ineqnonlin").viewPart(0, nmu), null);
 		DComplexMatrix1D muT = util.complex(lambda.get("ineqnonlin").viewPart(nmu, nmu), null);
@@ -225,6 +228,7 @@ public class Djp_opf_hessfcn {
 		DoubleMatrix2D d2H = DoubleFactory2D.sparse.compose(d2H_parts);
 
 		/* -----  do numerical check using (central) finite differences  ----- */
+
 //		if (false) {
 //			int nx = (int) x.size();
 //			double step = 1e-05;
