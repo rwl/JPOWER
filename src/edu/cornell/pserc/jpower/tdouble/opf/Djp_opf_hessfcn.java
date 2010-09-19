@@ -45,6 +45,13 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 import edu.cornell.pserc.util.tdouble.Djp_util;
 
+/**
+ * Evaluates Hessian of Lagrangian for AC OPF.
+ *
+ * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ *
+ */
 public class Djp_opf_hessfcn {
 
 	private static final Djp_util util = new Djp_util();

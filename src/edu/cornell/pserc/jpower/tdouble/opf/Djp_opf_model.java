@@ -85,4 +85,8 @@ public class Djp_opf_model {
 		return null;
 	}
 
+	public int getN(String selector, String name) {
+		return 0;
+	}
+
 }
