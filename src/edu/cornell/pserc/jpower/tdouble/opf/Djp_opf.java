@@ -252,7 +252,7 @@ public class Djp_opf {
 			uvl = (DoubleMatrix1D) Alu_vl[2];
 
 			/* generator PQ capability curve constraints */
-			AbstractMatrix[] Alu_pq = Djp_makeApq.jp_makeApq(baseMVA, gen);
+			Object[] Alu_pq = Djp_makeApq.jp_makeApq(baseMVA, gen);
 			Apqh = (DoubleMatrix2D) Alu_pq[0];
 			ubpqh = (DoubleMatrix1D) Alu_pq[1];
 			Apql = (DoubleMatrix2D) Alu_pq[2];
