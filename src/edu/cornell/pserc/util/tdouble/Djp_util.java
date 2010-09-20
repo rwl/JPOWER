@@ -529,6 +529,18 @@ public class Djp_util {
 
 	/**
 	 *
+	 * @param x an array of integers.
+	 * @return true if any element of vector x is a nonzero number.
+	 */
+	public static boolean any(int[] x) {
+		for (int i : x)
+			if (i != 0)
+				return true;
+		return false;
+	}
+
+	/**
+	 *
 	 * @param x a vector of integers.
 	 * @return true if any element of vector x is a nonzero number.
 	 */
@@ -614,5 +626,37 @@ public class Djp_util {
 		if (imaginary != null)
 			cmplx.assignImaginary(imaginary);
 		return cmplx;
+	}
+
+	/**
+	 *
+	 * @param rows
+	 * @param cols
+	 * @param I
+	 * @param J
+	 * @return
+	 */
+	public static IntMatrix1D sub2ind(int rows, int cols, IntMatrix1D I, IntMatrix1D J) {
+		return sub2ind(rows, cols, I, J, true);
+	}
+
+	/**
+	 *
+	 * @param rows
+	 * @param cols
+	 * @param I
+	 * @param J
+	 * @param row_major
+	 * @return
+	 */
+	@SuppressWarnings("static-access")
+	public static IntMatrix1D sub2ind(int rows, int cols, IntMatrix1D I, IntMatrix1D J, boolean row_major) {
+		IntMatrix1D ind;
+		if (row_major) {
+			ind = I.copy().assign(ifunc.mod(rows)).assign(ifunc.mult(cols)).assign(J.copy().assign(ifunc.mod(cols)), ifunc.plus);
+		} else {
+			ind = J.copy().assign(ifunc.mod(cols)).assign(ifunc.max(rows)).assign(I.copy().assign(ifunc.mod(rows)), ifunc.plus);
+		}
+		return ind;
 	}
 }

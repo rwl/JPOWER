@@ -23,6 +23,7 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 
 import java.util.Map;
 
+import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
@@ -132,6 +133,26 @@ public class Djp_opf_model {
 		return null;
 		// TODO Auto-generated method stub
 
+	}
+
+	public AbstractMatrix userdata(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getN(String string) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public AbstractMatrix[] linear_constraints() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public DoubleMatrix1D[] getv() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

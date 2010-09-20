@@ -46,7 +46,7 @@ public class Djp_makeAy {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
-	private static final int PW_INEAR = Djp_jpc.PW_LINEAR;
+	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
 
 	/**
 	 * Constructs the parameters for linear "basin constraints" on Pg, Qg
@@ -78,7 +78,7 @@ public class Djp_makeAy {
 			int pgbas, int qgbas, int ybas) {
 
 		/* find all pwl cost rows in gencost, either real or reactive */
-		int[] iycost = util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_INEAR)) );
+		int[] iycost = util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
 
 		/* this is the number of extra "y" variables needed to model those costs */
 		int ny = iycost.length;
