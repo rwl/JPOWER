@@ -87,7 +87,7 @@ public class Djp_opf_consfcn {
 		Djp_bus bus = jpc.bus;
 		Djp_gen gen = jpc.gen;
 		Djp_branch branch = jpc.branch;
-		Map<String, Set> vv = om.get_idx();
+		Map<String, Set> vv = om.get_idx()[0];
 
 		/* problem dimensions */
 		int nb = bus.size();		// number of buses

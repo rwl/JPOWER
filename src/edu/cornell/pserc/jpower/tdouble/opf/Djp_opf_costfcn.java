@@ -63,7 +63,7 @@ public class Djp_opf_costfcn {
 		Cost cp = om.get_cost_params();
 		DoubleMatrix2D N = cp.N, H = cp.H;
 		DoubleMatrix1D Cw = cp.Cw, dd = cp.dd, rh = cp.rh, kk = cp.kk, mm = cp.mm;
-		Map<String, Set> vv = om.get_idx();
+		Map<String, Set> vv = om.get_idx()[0];
 
 		/* problem dimensions */
 		int ng = gen.size();			// number of dispatchable injections

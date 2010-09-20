@@ -73,11 +73,15 @@ public class Djp_opf_model {
 		public DoubleMatrix1D params;
 	}
 
+	public Djp_opf_model(Djp_jpc jpc) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public Djp_jpc get_jpc() {
 		return null;
 	}
 
-	public Map<String, Set> get_idx() {
+	public Map<String, Set>[] get_idx() {
 		return null;
 	}
 
@@ -87,6 +91,47 @@ public class Djp_opf_model {
 
 	public int getN(String selector, String name) {
 		return 0;
+	}
+
+	public void add_vars(String string, int nb, DoubleMatrix1D va, DoubleMatrix1D val, DoubleMatrix1D vau) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void add_constraints(String string, DoubleMatrix2D aang, DoubleMatrix1D lang, DoubleMatrix1D uang, String[] strings) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void userdata(String string, DoubleMatrix1D pfinj) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void userdata(String string, DoubleMatrix2D bf) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void add_constraints(String string, int nb, String string2) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void add_vars(String string, int ny) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void add_costs(String string, Cost user_cost, String[] user_vars) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public Djp_opf_model build_cost_params() {
+		return null;
+		// TODO Auto-generated method stub
+
 	}
 
 }

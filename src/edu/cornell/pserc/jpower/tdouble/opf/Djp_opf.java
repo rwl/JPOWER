@@ -21,6 +21,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.opf;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import cern.colt.matrix.AbstractMatrix;
@@ -33,12 +34,16 @@ import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 
 import edu.cornell.pserc.jpower.tdouble.Djp_ext2int;
+import edu.cornell.pserc.jpower.tdouble.Djp_jpver;
+import edu.cornell.pserc.jpower.tdouble.Djp_run_userfcn;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
+import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
+import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
@@ -125,13 +130,13 @@ public class Djp_opf {
 			if (nusr > 0 || nw > 0) {
 				int[] acc = util.icat(util.irange(nb, 2*nb), util.irange(2*nb+ng, 2*nb+2*ng));
 				if (nusr > 0 && jpc.A.columns() >= 2*nb + 2*ng) {
-					/* make sure there aren't any constraints on Vm or Qg */
+					/* make sure there aren"t any constraints on Vm or Qg */
 					if (util.any(util.any(jpc.A.viewSelection(null, acc))))
 						System.err.println("opf: attempting to solve DC OPF with user constraints on Vm or Qg");
 //					jpc.A = jpc.A.viewSelection(null, acc);	// delete Vm and Qg columns
 				}
 				if (nw > 0 && jpc.N.columns() >= 2*nb + 2*ng) {
-					/* make sure there aren't any costs on Vm or Qg */
+					/* make sure there aren"t any costs on Vm or Qg */
 					if (util.any(util.any(jpc.N.viewSelection(null, acc))))
 						System.err.println("opf: attempting to solve DC OPF with user costs on Vm or Qg");
 //					jpc.N = jpc.N.viewSelection(null, acc);	// delete Vm and Qg columns
@@ -173,7 +178,7 @@ public class Djp_opf {
 		DoubleMatrix2D Au = (DoubleMatrix2D) opf_args[5];
 		DoubleMatrix1D lbu = (DoubleMatrix1D) opf_args[6];
 		DoubleMatrix1D ubu = (DoubleMatrix1D) opf_args[7];
-		Map<String, Double> mpopt = (Map<String, Double>) opf_args[8];
+		jpopt = (Map<String, Double>) opf_args[8];
 		N = (DoubleMatrix2D) opf_args[9];
 		fparm = (DoubleMatrix2D) opf_args[10];
 		H = (DoubleMatrix2D) opf_args[11];
@@ -203,23 +208,201 @@ public class Djp_opf {
 		DoubleMatrix1D Qmax = gen.Qmax.copy().assign(dfunc.div(baseMVA));
 
 		int nv, nq, q1;
+		int[] il = null;
+		DoubleMatrix2D B, Bf = null, Amis = null;
+		DoubleMatrix1D Pbusinj, Pfinj = null, bmis = null, lpf = null, upf = null, upt = null;
+		DoubleMatrix2D Avl = null, Apqh = null, Apql = null;
+		DoubleMatrix1D lvl = null, uvl = null, ubpqh = null, ubpql = null, Apqdata;
+		String[] user_vars, ycon_vars;
 		if (dc) {		// DC model
 			/* more problem dimensions */
 			nv = 0;		// number of voltage magnitude vars
 			nq = 0;		// number of Qg vars
-//			q1 = null;	// index of 1st Qg column in Ay
+			q1 = -1;	// index of 1st Qg column in Ay
 
 			/* power mismatch constraints */
 			AbstractMatrix[] Bdc = Djp_makeBdc.jp_makeBdc(baseMVA, bus, branch);
-			DoubleMatrix2D B = (DoubleMatrix2D) Bdc[0];
-			DoubleMatrix2D Bf = (DoubleMatrix2D) Bdc[1];
-			DoubleMatrix1D Pbusinj = (DoubleMatrix1D) Bdc[2];
-			DoubleMatrix1D Pfinj = (DoubleMatrix1D) Bdc[3];
+			B = (DoubleMatrix2D) Bdc[0];
+			Bf = (DoubleMatrix2D) Bdc[1];
+			Pbusinj = (DoubleMatrix1D) Bdc[2];
+			Pfinj = (DoubleMatrix1D) Bdc[3];
 			DoubleMatrix2D neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), util.irange(ng), -1, false, false);
-			DoubleMatrix2D Amis = DoubleFactory2D.sparse.appendColumns(B, neg_Cg);
-			DoubleMatrix1D bmis = bus.Pd.copy().assign(bus.Gs, dfunc.plus).assign(dfunc.neg).assign(dfunc.div(baseMVA)).assign(Pbusinj, dfunc.minus);
+			Amis = DoubleFactory2D.sparse.appendColumns(B, neg_Cg);
+			bmis = bus.Pd.copy().assign(bus.Gs, dfunc.plus).assign(dfunc.neg).assign(dfunc.div(baseMVA)).assign(Pbusinj, dfunc.minus);
 
 			/* branch flow constraints */
+			il = util.nonzero( util.intm(branch.rate_a.assign(dfunc.greater(0))).assign(util.intm(branch.rate_a.assign(dfunc.less(1e10))), ifunc.and) );
+			int nl2 = il.length;	// number of constrained lines
+			lpf = DoubleFactory1D.dense.make(nl2, Double.NEGATIVE_INFINITY);
+			upf = branch.rate_a.viewSelection(il).copy().assign(dfunc.div(baseMVA)).assign(Pfinj.viewSelection(il), dfunc.minus);
+			upt = branch.rate_a.viewSelection(il).copy().assign(dfunc.div(baseMVA)).assign(Pfinj.viewSelection(il), dfunc.plus);
+
+			user_vars = new String[] {"Va", "Pg"};
+			ycon_vars = new String[] {"Pg", "y"};
+		} else {		// AC model
+			/* more problem dimensions */
+			nv = nb;	// number of voltage magnitude vars
+			nq = ng;	// number of Qg vars
+			q1 = ng;	// index of 1st Qg column in Ay
+
+			/* dispatchable load, constant power factor constraints */
+			AbstractMatrix[] Alu_vl = Djp_makeAvl.jp_makeAvl(baseMVA, gen);
+			Avl = (DoubleMatrix2D) Alu_vl[0];
+			lvl = (DoubleMatrix1D) Alu_vl[1];
+			uvl = (DoubleMatrix1D) Alu_vl[2];
+
+			/* generator PQ capability curve constraints */
+			AbstractMatrix[] Alu_pq = Djp_makeApq.jp_makeApq(baseMVA, gen);
+			Apqh = (DoubleMatrix2D) Alu_pq[0];
+			ubpqh = (DoubleMatrix1D) Alu_pq[1];
+			Apql = (DoubleMatrix2D) Alu_pq[2];
+			ubpql = (DoubleMatrix1D) Alu_pq[3];
+			Apqdata = (DoubleMatrix1D) Alu_pq[4];
+
+			user_vars = new String[] {"Va", "Vm", "Pg", "Qg"};
+			ycon_vars = new String[] {"Pg", "Qg", "y"};
+		}
+
+		/* voltage angle reference constraints */
+		DoubleMatrix1D Vau = DoubleFactory1D.dense.make(nb, Double.POSITIVE_INFINITY);
+		DoubleMatrix1D Val = DoubleFactory1D.dense.make(nb, Double.NEGATIVE_INFINITY);
+		Vau.viewSelection(refs).assign(Va.viewSelection(refs));
+		Val.viewSelection(refs).assign(Va.viewSelection(refs));
+
+		/* branch voltage angle difference limits */
+		AbstractMatrix[] Alu_ang = Djp_makeAang.jp_makeAang(baseMVA, branch, nb, jpopt);
+		DoubleMatrix2D Aang = (DoubleMatrix2D) Alu_ang[0];
+		DoubleMatrix1D lang = (DoubleMatrix1D) Alu_ang[1];
+		DoubleMatrix1D uang = (DoubleMatrix1D) Alu_ang[2];
+		DoubleMatrix1D iang = (DoubleMatrix1D) Alu_ang[3];
+
+		/* basin constraints for piece-wise linear gen cost variables */
+		int ny;
+		DoubleMatrix2D Ay;
+		DoubleMatrix1D by;
+		if (alg == 545 || alg == 550) {		// SC-PDIPM or TRALM, no CCV cost vars
+			ny = 0;
+			Ay = DoubleFactory2D.sparse.make(0, ng+nq);
+			by = DoubleFactory1D.dense.make(0);
+		} else {
+			int[] ipwl = util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
+			ny = ipwl.length;	// number of piece-wise linear cost vars
+			AbstractMatrix[] Ab_y = Djp_makeAy.jp_makeAy(baseMVA, ng, gencost, 1, q1, ng+nq);
+			Ay = (DoubleMatrix2D) Ab_y[0];
+			by = (DoubleMatrix1D) Ab_y[1];
+		}
+
+		/* more problem dimensions */
+		int nx = nb+nv + ng+nq;	// number of standard OPF control variables
+		int nz;					// number of user z variables
+		if (nusr > 0) {
+			nz = jpc.A.columns() - nx;
+			if (nz < 0)
+				System.err.println("opf: user supplied A matrix must have at least "+nx+" columns.");
+				// TODO: throw invalid constraint exception
+		} else {
+			nz = 0;
+			if (nw > 0) {	// still need to check number of columns of N
+				if (jpc.N.columns() != nx)
+					System.err.println("opf: user supplied N matrix must have "+nx+" columns.");
+			}
+		}
+
+		/* construct OPF model object */
+		Djp_opf_model om = new Djp_opf_model(jpc);
+		if (dc) {
+			om.userdata("Bf", Bf);
+			om.userdata("Pfinj", Pfinj);
+			om.add_vars("Va", nb, Va, Val, Vau);
+			om.add_vars("Pg", ng, Pg, Pmin, Pmax);
+			om.add_constraints("Pmis", Amis, bmis, bmis, new String[] {"Va", "Pg"});										// nb
+			om.add_constraints("Pf",  Bf.viewSelection(il, null), lpf, upf, new String[] {"Va"});							// nl
+			om.add_constraints("Pt", Bf.viewSelection(il, null).copy().assign(dfunc.neg), lpf, upt, new String[] {"Va"});	// nl
+			om.add_constraints("ang", Aang, lang, uang, new String[] {"Va"});												// nang
+		} else {
+			om.add_vars("Va", nb, Va, Val, Vau);
+			om.add_vars("Vm", nb, Vm, bus.Vmin, bus.Vmax);
+			om.add_vars("Pg", ng, Pg, Pmin, Pmax);
+			om.add_vars("Qg", ng, Qg, Qmin, Qmax);
+			om.add_constraints("Pmis", nb, "non-linear");
+			om.add_constraints("Qmis", nb, "non-linear");
+			om.add_constraints("Sf", nl, "non-linear");
+			om.add_constraints("St", nl, "non-linear");
+			om.add_constraints("PQh", Apqh, null, ubpqh, new String[] {"Pg", "Qg"});	// npqh
+			om.add_constraints("PQl", Apql, null, ubpql, new String[] {"Pg", "Qg"});	// npql
+			om.add_constraints("vl",  Avl, lvl, uvl,   new String[] {"Pg", "Qg"});		// nvl
+			om.add_constraints("ang", Aang, lang, uang, new String[] {"Va"});			// nang
+		}
+
+		/* y vars, constraints for piece-wise linear gen costs */
+		if (ny > 0) {
+			om.add_vars("y", ny);
+			om.add_constraints("ycon", Ay, null, by, ycon_vars);	// ncony
+		}
+
+		/* add user vars, constraints and costs (as specified via A, ..., N, ...) */
+		if (nz > 0) {
+			om.add_vars("z", nz, z0, zl, zu);
+			user_vars = util.scat(user_vars, new String[] {"z"});
+		}
+		if (nusr > 0)
+			om.add_constraints("usr", jpc.A, lbu, ubu, user_vars);	// nusr
+		if (nw > 0) {
+			Cost user_cost = om.new Cost();
+			user_cost.N = jpc.N;
+			user_cost.Cw = Cw;
+			if (fparm.size() > 0) {
+				user_cost.dd = fparm.viewColumn(0);
+				user_cost.rh = fparm.viewColumn(1);
+				user_cost.kk = fparm.viewColumn(2);
+				user_cost.mm = fparm.viewColumn(3);
+			}
+			if (H.size() > 0)
+				user_cost.H = H;
+			om.add_costs("usr", user_cost, user_vars);
+		}
+
+		/* execute userfcn callbacks for 'formulation' stage */
+		om = Djp_run_userfcn.jp_run_userfcn(userfcn, "formulation", om);
+
+		/* build user-defined costs */
+		om = om.build_cost_params();
+
+		/* get indexing */
+		Map<String, Set>[] idx = om.get_idx();
+		Map<String, Set> vv = idx[0], ll = idx[1], nn = idx[2];
+
+		/* select optional solver output args */
+		Map<String, AbstractMatrix> output = new HashMap<String, AbstractMatrix>();
+
+		/* call the specific solver */
+		if (verbose > 0) {
+			Map<String, String> v = Djp_jpver.jp_jpver("all");
+			System.out.printf("\nMATPOWER Version %s, %s", v.get("Version"), v.get("Date"));
+		}
+		Map<String, AbstractMatrix> results, raw;
+		boolean success;
+		if (dc) {
+			if (verbose > 0)
+				System.out.printf(" -- DC Optimal Power Flow\n");
+			Object[] r = Djp_dcopf_solver.jp_dcopf_solver(om, jpopt, output);
+			results = (Map<String, AbstractMatrix>) r[0];
+			success = (Boolean) r[1];
+			raw = (Map<String, AbstractMatrix>) r[2];
+		} else {
+			/* -----  call specific AC OPF solver  ----- */
+			if (verbose > 0)
+				System.out.printf(" -- AC Optimal Power Flow\n");
+			if (alg != 560 || alg != 565)
+				System.err.println("Unsupported algorithm, using JIPS.");
+
+			Object[] r = Djp_jipsopf_solver.jp_jipsopf_solver(om, jpopt, output);
+			results = (Map<String, AbstractMatrix>) r[0];
+			success = (Boolean) r[1];
+			raw = (Map<String, AbstractMatrix>) r[2];
+		}
+		if (!raw.containsKey("output")) {
+
 		}
 
 		return null;
