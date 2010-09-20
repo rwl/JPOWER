@@ -515,6 +515,20 @@ public class Djp_util {
 
 	/**
 	 *
+	 * @param x
+	 * @return [x(1)-x(0)  x(2)-x(1) ... x(n)-x(n-1)]
+	 */
+	@SuppressWarnings("static-access")
+	public static DoubleMatrix1D diff(DoubleMatrix1D x) {
+		int size = (int) x.size() -1;
+		DoubleMatrix1D d = DoubleFactory1D.dense.make(size);
+		for (int i = 0; i < size; i++)
+			d.set(i, dfunc.minus.apply(x.get(i+1), x.get(i)));
+		return d;
+	}
+
+	/**
+	 *
 	 * @param x a vector of integers.
 	 * @return true if any element of vector x is a nonzero number.
 	 */
