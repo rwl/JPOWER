@@ -20,7 +20,11 @@
 
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
+import java.util.Map;
+
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model;
 
 public class Djp_jpc {
 
@@ -48,7 +52,13 @@ public class Djp_jpc {
 	public double et;	// elapsed time in seconds
 	public boolean success;
 
+	public Djp_opf_model om;
+	public DoubleMatrix1D x;
+	public Map<String, Map<String, DoubleMatrix1D>> mu;
 	public double f;
+
+	public DoubleMatrix1D g, df;
+	public DoubleMatrix2D dg, d2f;
 
 	public Djp_order order;
 
