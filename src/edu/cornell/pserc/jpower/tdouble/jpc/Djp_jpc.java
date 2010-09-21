@@ -52,4 +52,28 @@ public class Djp_jpc {
 
 	public Djp_order order;
 
+	public Djp_jpc copy() {
+		Djp_jpc cpy = new Djp_jpc();
+
+		cpy.baseMVA = this.baseMVA;
+		cpy.bus = this.bus.copy();
+		cpy.gen = this.gen.copy();
+		cpy.branch = this.branch.copy();
+		cpy.areas = this.areas.copy();
+		cpy.gencost = this.gencost.copy();
+		cpy.A = this.A.copy();
+		cpy.N = this.N.copy();
+		cpy.userfcn = this.userfcn;
+
+		cpy.version = this.version;
+		cpy.et = this.et;
+		cpy.success = this.success;
+
+		cpy.f = this.f;
+
+		cpy.order = this.order.copy();
+
+		return cpy;
+	}
+
 }

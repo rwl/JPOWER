@@ -20,7 +20,6 @@
 
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
 public class Djp_order {
@@ -38,16 +37,47 @@ public class Djp_order {
 	public class Status {
 		public int[] on = new int[0];
 		public int[] off = new int[0];
+
+		public Status copy() {
+			Status cpy = new Status();
+
+			int[] on = new int[this.on.length];
+			int[] off = new int[this.off.length];
+			System.arraycopy(this.on, 0, on, 0, this.on.length);
+			System.arraycopy(this.off, 0, off, 0, this.off.length);
+			cpy.on = on;
+			cpy.off = off;
+
+			return cpy;
+		}
 	}
 
 	public class BusGen {
 		public IntMatrix1D e2i;
 		public IntMatrix1D i2e;
 		public Status status = new Status();
+
+		public BusGen copy() {
+			BusGen cpy = new BusGen();
+
+			cpy.e2i = this.e2i.copy();
+			cpy.i2e = this.i2e.copy();
+			cpy.status = this.status.copy();
+
+			return cpy;
+		}
 	}
 
 	public class BranchAreas {
 		public Status status = new Status();
+
+		public BranchAreas copy() {
+			BranchAreas cpy = new BranchAreas();
+
+			cpy.status = this.status.copy();
+
+			return cpy;
+		}
 	}
 
 	public String state;		// 'i' or 'e'
@@ -57,5 +87,15 @@ public class Djp_order {
 	public BusGen gen = new BusGen();
 	public BranchAreas branch = new BranchAreas();
 	public BranchAreas areas = new BranchAreas();
+
+	public Djp_order copy() {
+		Djp_order cpy = new Djp_order();
+
+		cpy.state = this.state;
+		cpy.internal = this.internal.copy();
+		cpy.external = this.external.copy();
+
+		return cpy;
+	}
 
 }

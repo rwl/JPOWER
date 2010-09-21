@@ -185,7 +185,7 @@ public class Djp_dcopf_solver {
 		double C0 = 1/2 * MR.zDotProduct(HMR) + polycf.viewColumn(2).aggregate(dfunc.plus, dfunc.identity);
 
 		/* set up input for QP solver */
-		Map<String, Double> opt = new HashMap<String, Double>();
+		Map<String, Object> opt = new HashMap<String, Object>();
 		opt.put("alg", (double) alg);
 		opt.put("verbose", (double) verbose);
 		if (alg == 200 || alg == 250) {
@@ -199,11 +199,124 @@ public class Djp_dcopf_solver {
 			x0.viewSelection(util.irange(vv.get("Va").i0, vv.get("Va").iN)).assign(Varefs.get(0));	// angles set to first reference angle
 			if (ny > 0) {
 				ipwl = util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
-//				c = gencost(sub2ind(size(gencost), ipwl, NCOST+2*gencost(ipwl, NCOST)));    %% largest y-value in CCV data
-
+				double c = gencost.cost.viewSelection(ipwl, null).getMaxLocation()[0];		// largest y-value in CCV data
+				// TODO: compute c using sub2ind
+				x0.viewPart(vv.get("y").i0, vv.get("y").N).assign(c + 0.1 * Math.abs(c));
 			}
+
+			/* set up options */
+			double feastol = jpopt.get("PDIPM_FEASTOL");
+			double gradtol = jpopt.get("PDIPM_GRADTOL");
+			double comptol = jpopt.get("PDIPM_COMPTOL");
+			double costtol = jpopt.get("PDIPM_COSTTOL");
+			int max_it = jpopt.get("PDIPM_MAX_IT").intValue();
+			int max_red = jpopt.get("SCPDIPM_RED_IT").intValue();
+			if (feastol == 0)
+				feastol = jpopt.get("OPF_VIOLATION");	// = OPF_VIOLATION by default
+			Map<String, Object> jips_opt = new HashMap<String, Object>();
+			jips_opt.put("feastol", feastol);
+			jips_opt.put("gradtol", gradtol);
+			jips_opt.put("comptol", comptol);
+			jips_opt.put("costtol", costtol);
+			jips_opt.put("max_it", max_it);
+			jips_opt.put("max_red", max_red);
+			opt.put("jips_opt", jips_opt);
 		}
 
-		return null;
+		/* -----  run opf  ----- */
+
+		Object[] qps = Djp_qps_jpower.jp_qps_jpower(HH, CC, A, l, u, xmin, xmax, x0, opt);
+		DoubleMatrix1D x = (DoubleMatrix1D) qps[0];
+		double f = (Double) qps[1];
+		int info = (Integer) qps[2];
+		Map<String, Object> output = (Map<String, Object>) qps[3];
+		Map<String, DoubleMatrix1D> lambda = (Map<String, DoubleMatrix1D>) qps[4];
+
+		boolean success = (info == 1);
+
+		/* update solution data */
+		DoubleMatrix1D Va = x.viewPart(vv.get("Va").i0, vv.get("Va").N).copy();
+		DoubleMatrix1D Pg = x.viewPart(vv.get("Pg").i0, vv.get("Pg").N).copy();
+		f += C0;
+
+		/* -----  calculate return values  ----- */
+
+		/* update voltages & generator outputs */
+		bus.Va = Va.assign(dfunc.mult(180)).assign(dfunc.div(Math.PI));
+		gen.Pg = Pg.assign(dfunc.mult(baseMVA));
+
+		/* compute branch flows */
+		branch.Qf = DoubleFactory1D.dense.make(nl);
+		branch.Qt = DoubleFactory1D.dense.make(nl);
+		branch.Pf = Bf.zMult(Va, null).assign(Pfinj, dfunc.plus).assign(dfunc.mult(baseMVA));
+		branch.Pt = branch.Pf.copy().assign(dfunc.neg);
+
+		/* package up results */
+		DoubleMatrix1D mu_l = lambda.get("mu_l");
+		DoubleMatrix1D mu_u = lambda.get("mu_u");
+		DoubleMatrix1D muLB = lambda.get("lower");
+		DoubleMatrix1D muUB = lambda.get("upper");
+
+		/* update Lagrange multipliers */
+		int[] il = util.nonzero( util.intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(util.intm( branch.rate_a.assign(dfunc.less(1e10)) ), ifunc.and) );
+		bus.lam_P = DoubleFactory1D.dense.make(nb);
+		bus.lam_Q = DoubleFactory1D.dense.make(nb);
+		bus.mu_Vmin = DoubleFactory1D.dense.make(nb);
+		bus.mu_Vmax = DoubleFactory1D.dense.make(nb);
+		gen.mu_Pmin = DoubleFactory1D.dense.make(gen.size());
+		gen.mu_Pmax = DoubleFactory1D.dense.make(gen.size());
+		gen.mu_Qmin = DoubleFactory1D.dense.make(gen.size());
+		gen.mu_Qmax = DoubleFactory1D.dense.make(gen.size());
+		branch.mu_Sf = DoubleFactory1D.dense.make(nl);
+		branch.mu_St = DoubleFactory1D.dense.make(nl);
+
+		bus.lam_P = mu_u.viewPart(ll.get("Pmis").i0, ll.get("Pmis").N).copy().assign(mu_l.viewPart(ll.get("Pmis").i0, ll.get("Pmis").N), dfunc.minus).assign(dfunc.div(baseMVA));
+		branch.mu_Sf.viewSelection(il).assign( mu_u.viewPart(ll.get("Pf").i0, ll.get("Pf").N).copy().assign(dfunc.div(baseMVA) ));
+		branch.mu_St.viewSelection(il).assign( mu_u.viewPart(ll.get("Pt").i0, ll.get("Pt").N).copy().assign(dfunc.div(baseMVA) ));
+		gen.mu_Pmin = muLB.viewPart(vv.get("Pg").i0, vv.get("Pg").N).copy().assign(dfunc.div(baseMVA));
+		gen.mu_Pmax = muUB.viewPart(vv.get("Pg").i0, vv.get("Pg").N).copy().assign(dfunc.div(baseMVA));
+
+		Map<String, Map<String, DoubleMatrix1D>> mu = new HashMap<String, Map<String,DoubleMatrix1D>>();
+		Map<String, DoubleMatrix1D> var = new HashMap<String, DoubleMatrix1D>();
+		var.put("l", muLB);
+		var.put("u", muUB);
+		mu.put("var", var);
+		Map<String, DoubleMatrix1D> lin = new HashMap<String, DoubleMatrix1D>();
+		lin.put("l", mu_l);
+		lin.put("u", mu_u);
+		mu.put("lin", lin);
+
+		Djp_jpc results = jpc.copy();
+		results.bus = bus.copy();
+		results.branch = branch.copy();
+		results.gen = gen.copy();
+//		results.om = om;
+//		results.x = x.copy();
+//		results.mu = mu;
+//		results.f = f;
+
+		/* optional fields */
+		/* 1st one is always computed anyway, just include it */
+//		if (out_opt.containsKey("g"))
+//			results.g = A.zMult(x, null);
+//		results.dg = A;
+//		if (out_opt.containsKey("df"))
+//			results.df = null;
+//		if (out_opt.containsKey("d2f"))
+//			results.d2f = null;
+
+		DoubleMatrix1D pimul = DoubleFactory1D.dense.make(new DoubleMatrix1D[] {
+				mu_l.copy().assign(mu_u, dfunc.minus),
+				DoubleFactory1D.dense.make((ny>0) ? 1:0, -1),	// dummy entry corresponding to linear cost row in A (in MINOS)
+				muLB.copy().assign(muUB, dfunc.minus)
+		});
+
+		Map<String, Object> raw = new HashMap<String, Object>();
+		raw.put("xr", x);
+		raw.put("pimul", pimul);
+		raw.put("info", info);
+		raw.put("output", output);
+
+		return new Object[] {results, success, raw};
 	}
 }
