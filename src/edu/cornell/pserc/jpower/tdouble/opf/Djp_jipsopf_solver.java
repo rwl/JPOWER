@@ -61,7 +61,6 @@ public class Djp_jipsopf_solver {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
 	private static final int REF = Djp_jpc.REF;
 
@@ -151,9 +150,9 @@ public class Djp_jipsopf_solver {
 		int nl2 = il.length;	// number of constrained lines
 
 		/* -----  run opf  ----- */
-		ObjectiveEvaluator f_fcn;
-		HessianEvaluator hess_fcn;
-		ConstraintEvaluator gh_fcn;
+		ObjectiveEvaluator f_fcn = new Djp_opf_costfcn(om);
+		HessianEvaluator hess_fcn = new Djp_opf_hessfcn(om, Ybus, Yf.viewSelection(il, null), Yt.viewSelection(il, null), jpopt, il, opt.get("cost_mult"));
+		ConstraintEvaluator gh_fcn = new Djp_opf_consfcn(om, Ybus, Yf.viewSelection(il, null), Yt.viewSelection(il, null), jpopt, il);
 		Object[] jips = Dips_jips.ips_jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, hess_fcn, opt);
 		DoubleMatrix1D x = (DoubleMatrix1D) jips[0];
 		double f = (Double) jips[1];
@@ -243,14 +242,14 @@ public class Djp_jipsopf_solver {
 
 		/* optional fields */
 		if (out_opt.containsKey("dg")) {
-			ConstraintEvaluator geq_fcn;
+			ConstraintEvaluator geq_fcn = new Djp_opf_consfcn(om, Ybus, Yf, Yt, jpopt);
 			DoubleMatrix1D[] geq = geq_fcn.gh(x);
 			results.g  = DoubleFactory1D.dense.append(geq[1], geq[0]);	// include this since we computed it anyway
 			DoubleMatrix2D[] dgeq = geq_fcn.dgh(x);
 			results.dg = DoubleFactory2D.sparse.appendRows(dgeq[1].viewDice(), dgeq[0].viewDice());	// true Jacobian organization
 		}
 		if (out_opt.containsKey("g") && !out_opt.containsKey("dg")) {
-			ConstraintEvaluator geq_fcn;
+			ConstraintEvaluator geq_fcn = new Djp_opf_consfcn(om, Ybus, Yf, Yt, jpopt);
 			DoubleMatrix1D[] geq = geq_fcn.gh(x);
 			results.g = DoubleFactory1D.dense.append(geq[1], geq[0]);
 		}

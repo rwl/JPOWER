@@ -34,6 +34,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
+import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
@@ -50,17 +51,38 @@ import edu.cornell.pserc.util.tdouble.Djp_util;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class Djp_opf_consfcn {
+public class Djp_opf_consfcn implements ConstraintEvaluator {
 
 	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static Object[] jp_opf_consfcn(DoubleMatrix1D x, Djp_opf_model om, DComplexMatrix2D Ybus,
-			DComplexMatrix2D Yf, DComplexMatrix2D Yt, Map<String, Double> jpopt) {
-		/* set default constrained lines */
+	private Djp_opf_model om;
+	private DComplexMatrix2D Ybus;
+	private DComplexMatrix2D Yf;
+	private DComplexMatrix2D Yt;
+	private Map<String, Double> jpopt;
+	private int[] il;
+
+	/**
+	 *
+	 * @param x optimization vector
+	 * @param om OPF model object
+	 * @param Ybus bus admittance matrix
+	 * @param Yf admittance matrix for "from" end of constrained branches
+	 * @param Yt admittance matrix for "to" end of constrained branches
+	 * @param jpopt JPOWER options vector
+	 */
+	public Djp_opf_consfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
+			Map<String, Double> jpopt) {
+		super();
+		this.om = om;
+		this.Ybus = Ybus;
+		this.Yf = Yf;
+		this.Yt = Yt;
+		this.jpopt = jpopt;
 		int nl = om.get_jpc().branch.size();	// all lines have limits by default
-		return jp_opf_consfcn(x, om, Ybus, Yf, Yt, jpopt, Djp_util.irange(nl));
+		this.il = Djp_util.irange(nl);
 	}
 
 	/**
@@ -75,11 +97,20 @@ public class Djp_opf_consfcn {
 	 * branches with flow limits (all others are assumed to be
 	 * unconstrained). The default is [1:nl] (all branches).
 	 * YF and YT contain only the rows corresponding to IL.
-	 * @return
 	 */
+	public Djp_opf_consfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
+			Map<String, Double> jpopt, int[] il) {
+		super();
+		this.om = om;
+		this.Ybus = Ybus;
+		this.Yf = Yf;
+		this.Yt = Yt;
+		this.jpopt = jpopt;
+		this.il = il;
+	}
+
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_opf_consfcn(DoubleMatrix1D x, Djp_opf_model om, DComplexMatrix2D Ybus,
-			DComplexMatrix2D Yf, DComplexMatrix2D Yt, Map<String, Double> jpopt, int[] il) {
+	public DoubleMatrix1D[] gh(DoubleMatrix1D x) {
 
 		/* unpack data */
 		Djp_jpc jpc = om.get_jpc();
@@ -92,10 +123,6 @@ public class Djp_opf_consfcn {
 		/* problem dimensions */
 		int nb = bus.size();		// number of buses
 		int nl = branch.size();		// number of branches
-		int ng = gen.size();		// number of dispatchable injections
-		int nxyz = (int) x.size();	// total number of control vars of all types
-
-		int nl2 = il.length;		// number of constrained lines
 
 		/* grab Pg & Qg */
 		DoubleMatrix1D Pg = x.viewPart(vv.get("Pg").i0, vv.get("Pg").N);	// active generation in p.u.
@@ -161,6 +188,33 @@ public class Djp_opf_consfcn {
 		} else {
 			h = DoubleFactory1D.dense.make(0);
 		}
+
+		return new DoubleMatrix1D[] {g, h};
+	}
+
+
+	@SuppressWarnings("static-access")
+	public DoubleMatrix2D[] dgh(DoubleMatrix1D x) {
+
+		/* unpack data */
+		Djp_jpc jpc = om.get_jpc();
+		Djp_bus bus = jpc.bus;
+		Djp_gen gen = jpc.gen;
+		Djp_branch branch = jpc.branch;
+		Map<String, Set> vv = om.get_idx()[0];
+
+		/* problem dimensions */
+		int nb = bus.size();		// number of buses
+		int ng = gen.size();		// number of dispatchable injections
+		int nxyz = (int) x.size();	// total number of control vars of all types
+
+		int nl2 = il.length;		// number of constrained lines
+
+		DoubleMatrix1D Va = DoubleFactory1D.dense.make(nb);
+		Va.assign(x.viewPart(vv.get("Va").i0, vv.get("Va").N));
+		DoubleMatrix1D Vm = x.viewPart(vv.get("Vm").i0, vv.get("Vm").N).copy();
+		DComplexMatrix1D V = util.polar(Vm, Va);
+
 
 		/* ----- evaluate partials of constraints ----- */
 
@@ -231,6 +285,7 @@ public class Djp_opf_consfcn {
 			dh = DoubleFactory2D.sparse.make(nxyz, 0);
 		}
 
-		return new AbstractMatrix[] {h, g, dh, dg};
+		return new DoubleMatrix2D[] {dh, dg};
 	}
+
 }

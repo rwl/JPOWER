@@ -36,6 +36,7 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+import edu.cornell.pserc.jips.tdouble.HessianEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
@@ -52,7 +53,7 @@ import edu.cornell.pserc.util.tdouble.Djp_util;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class Djp_opf_hessfcn {
+public class Djp_opf_hessfcn implements HessianEvaluator {
 
 	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
@@ -60,23 +61,53 @@ public class Djp_opf_hessfcn {
 
 	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 
-	public static DoubleMatrix2D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
-			Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
-			Map<String, Double> mpopt) {
+	private Djp_opf_model om;
+	private DComplexMatrix2D Ybus;
+	private DComplexMatrix2D Yf;
+	private DComplexMatrix2D Yt;
+	private Map<String, Double> jpopt;
+	private int[] il;
+	private double cost_mult;
+
+	public Djp_opf_hessfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
+			Map<String, Double> jpopt) {
+		super();
+		this.om = om;
+		this.Ybus = Ybus;
+		this.Yf = Yf;
+		this.Yt = Yt;
+		this.jpopt = jpopt;
 		int nl = om.get_jpc().branch.size();	// all lines have limits by default
-		return jp_opf_hessfcn(x, lambda, om, Ybus, Yf, Yt, mpopt, Djp_util.irange(nl));
+		this.il = Djp_util.irange(nl);
+		this.cost_mult = 1;
 	}
 
-	public static DoubleMatrix2D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
-			Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
-			Map<String, Double> mpopt, int[] il) {
-		return jp_opf_hessfcn(x, lambda, om, Ybus, Yf, Yt, mpopt, il, 1);
+	public Djp_opf_hessfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
+			Map<String, Double> jpopt, int[] il) {
+		super();
+		this.om = om;
+		this.Ybus = Ybus;
+		this.Yf = Yf;
+		this.Yt = Yt;
+		this.jpopt = jpopt;
+		this.il = il;
+		this.cost_mult = 1;
+	}
+
+	public Djp_opf_hessfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
+			Map<String, Double> jpopt, int[] il, double cost_mult) {
+		super();
+		this.om = om;
+		this.Ybus = Ybus;
+		this.Yf = Yf;
+		this.Yt = Yt;
+		this.jpopt = jpopt;
+		this.il = il;
+		this.cost_mult = cost_mult;
 	}
 
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix2D jp_opf_hessfcn(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda,
-			Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
-			Map<String, Double> jpopt, int[] il, double cost_mult) {
+	public DoubleMatrix2D h(DoubleMatrix1D x, Map<String, DoubleMatrix1D> lambda) {
 
 		/* unpack data */
 		Djp_jpc jpc = om.get_jpc();

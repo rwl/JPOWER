@@ -30,6 +30,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+import edu.cornell.pserc.jips.tdouble.ObjectiveEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
@@ -44,7 +45,7 @@ import edu.cornell.pserc.util.tdouble.Djp_util;
  * @author Richard Lincoln (r.w.lincoln@gmail.com)
  *
  */
-public class Djp_opf_costfcn {
+public class Djp_opf_costfcn implements ObjectiveEvaluator {
 
 	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
@@ -52,13 +53,22 @@ public class Djp_opf_costfcn {
 
 	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 
-	@SuppressWarnings({ "static-access", "unused" })
-	public static Object[] jp_opf_costfcn(DoubleMatrix1D x, Djp_opf_model om) {
+	private Djp_opf_model om;
+
+	private DoubleMatrix1D ccost, w, HwC;
+	private DoubleMatrix2D diagrr, LL, QQ, M, AA;
+
+	public Djp_opf_costfcn(Djp_opf_model om) {
+		super();
+		this.om = om;
+	}
+
+	@SuppressWarnings("static-access")
+	public double f(DoubleMatrix1D x) {
 
 		/* unpack data */
 		Djp_jpc jpc = om.get_jpc();
 		double baseMVA = jpc.baseMVA;
-		Djp_gen gen = jpc.gen;
 		Djp_gencost gencost = jpc.gencost;
 		Cost cp = om.get_cost_params();
 		DoubleMatrix2D N = cp.N, H = cp.H;
@@ -66,7 +76,6 @@ public class Djp_opf_costfcn {
 		Map<String, Set> vv = om.get_idx()[0];
 
 		/* problem dimensions */
-		int ng = gen.size();			// number of dispatchable injections
 		int ny = om.getN("var", "y");	// number of piece-wise linear costs
 		int nxyz = (int) x.size();		// total number of control vars of all types
 
@@ -86,7 +95,7 @@ public class Djp_opf_costfcn {
 			f = Djp_totcost.jp_totcost(gencost.copy(ipol), xx.viewSelection(ipol)).aggregate(dfunc.plus, dfunc.identity);
 
 		/* piecewise linear cost of P and Q */
-		DoubleMatrix1D ccost;
+//		DoubleMatrix1D ccost;
 		if (ny > 0) {
 			ccost = DoubleFactory1D.dense.make(new SparseRCDoubleMatrix2D(1, nxyz, util.ones(ny),
 					util.irange(vv.get("y").i0, vv.get("y").iN), 1, false, false).viewRow(0).toArray());
@@ -96,8 +105,8 @@ public class Djp_opf_costfcn {
 		}
 
 		/* generalized cost term */
-		DoubleMatrix1D w = null;
-		DoubleMatrix2D diagrr = null, LL = null, QQ = null, M = null;
+//		DoubleMatrix1D w = null;
+//		DoubleMatrix2D diagrr = null, LL = null, QQ = null, M = null;
 		if (N != null) {
 			int nw = N.rows();
 			DoubleMatrix1D r = N.zMult(x, null).assign(rh, dfunc.minus);	// generalized cost
@@ -125,6 +134,30 @@ public class Djp_opf_costfcn {
 
 			f += w.zDotProduct(H.zMult(w, null)) / 2 + Cw.zDotProduct(w);
 		}
+		return f;
+	}
+
+	@SuppressWarnings({ "static-access", "unused" })
+	public DoubleMatrix1D df(DoubleMatrix1D x) {
+
+		/* unpack data */
+		Djp_jpc jpc = om.get_jpc();
+		double baseMVA = jpc.baseMVA;
+		Djp_gen gen = jpc.gen;
+		Djp_gencost gencost = jpc.gencost;
+		Cost cp = om.get_cost_params();
+		DoubleMatrix2D N = cp.N, H = cp.H;
+		DoubleMatrix1D Cw = cp.Cw, dd = cp.dd, rh = cp.rh, kk = cp.kk, mm = cp.mm;
+		Map<String, Set> vv = om.get_idx()[0];
+
+		/* problem dimensions */
+		int ng = gen.size();			// number of dispatchable injections
+		int ny = om.getN("var", "y");	// number of piece-wise linear costs
+		int nxyz = (int) x.size();		// total number of control vars of all types
+
+		/* grab Pg & Qg */
+		DoubleMatrix1D Pg = x.viewPart(vv.get("Pg").i0, vv.get("Pg").N);	// active generation in p.u.
+		DoubleMatrix1D Qg = x.viewPart(vv.get("Qg").i0, vv.get("Qg").N);	// reactive generation in p.u.
 
 		/* ----- evaluate cost gradient ----- */
 
@@ -134,6 +167,8 @@ public class Djp_opf_costfcn {
 
 		/* polynomial cost of P and Q */
 		DoubleMatrix1D df_dPgQg = DoubleFactory1D.dense.make(2 * ng);
+		int[] ipol = util.nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
+		DoubleMatrix1D xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
 		df_dPgQg.viewSelection(ipol).assign( Djp_polycost.jp_polycost(gencost.copy(ipol), xx.viewSelection(ipol), 1).assign(dfunc.mult(baseMVA)) );
 		DoubleMatrix1D df = DoubleFactory1D.dense.make(nxyz);
 		df.viewSelection(iPg).assign( df_dPgQg.viewPart(0, ng) );
@@ -144,8 +179,8 @@ public class Djp_opf_costfcn {
 										// any nonlinear cost.
 
 		/* generalized cost term */
-		DoubleMatrix1D HwC = null;
-		DoubleMatrix2D AA = null;
+//		DoubleMatrix1D HwC = null;
+//		DoubleMatrix2D AA = null;
 		if (N != null) {
 			HwC = H.zMult(w, null).assign(Cw, dfunc.plus);
 			AA = QQ.zMult(diagrr, null).assign(dfunc.mult(2)).assign(LL, dfunc.plus).zMult(M, null).zMult(N.viewDice(), null);
@@ -175,6 +210,32 @@ public class Djp_opf_costfcn {
 				}
 			}
 		}
+		return df;
+	}
+
+	@SuppressWarnings("static-access")
+	public DoubleMatrix2D d2f(DoubleMatrix1D x) {
+
+		/* unpack data */
+		Djp_jpc jpc = om.get_jpc();
+		double baseMVA = jpc.baseMVA;
+		Djp_gen gen = jpc.gen;
+		Djp_gencost gencost = jpc.gencost;
+		Cost cp = om.get_cost_params();
+		DoubleMatrix2D N = cp.N, H = cp.H;
+		Map<String, Set> vv = om.get_idx()[0];
+
+		/* problem dimensions */
+		int ng = gen.size();			// number of dispatchable injections
+		int nxyz = (int) x.size();		// total number of control vars of all types
+
+		/* grab Pg & Qg */
+		DoubleMatrix1D Pg = x.viewPart(vv.get("Pg").i0, vv.get("Pg").N);	// active generation in p.u.
+		DoubleMatrix1D Qg = x.viewPart(vv.get("Qg").i0, vv.get("Qg").N);	// reactive generation in p.u.
+
+		/* index ranges */
+		int[] iPg = util.irange(vv.get("Pg").i0, vv.get("Pg").iN);
+		int[] iQg = util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
 
 		/* ----- evaluate cost Hessian ----- */
 
@@ -202,6 +263,7 @@ public class Djp_opf_costfcn {
 			d2f.assign(AA.zMult(H, null).zMult(AA.viewDice(), null).assign(N.viewDice().copy().zMult(M, null).zMult(QQ, null).zMult(diagHwC, null).zMult(N, null), dfunc.plus), dfunc.plus);
 		}
 
-		return new Object[] {f, df, d2f};
+		return d2f;
 	}
+
 }
