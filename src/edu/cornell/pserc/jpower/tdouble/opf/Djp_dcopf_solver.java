@@ -33,6 +33,7 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+import edu.cornell.pserc.jips.tdouble.Dips_qps_jips;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
@@ -188,6 +189,7 @@ public class Djp_dcopf_solver {
 		Map<String, Object> opt = new HashMap<String, Object>();
 		opt.put("alg", (double) alg);
 		opt.put("verbose", (double) verbose);
+		Map<String, Double> jips_opt = new HashMap<String, Double>();
 		if (alg == 200 || alg == 250) {
 			/* try to select an interior initial point */
 
@@ -209,23 +211,23 @@ public class Djp_dcopf_solver {
 			double gradtol = jpopt.get("PDIPM_GRADTOL");
 			double comptol = jpopt.get("PDIPM_COMPTOL");
 			double costtol = jpopt.get("PDIPM_COSTTOL");
-			int max_it = jpopt.get("PDIPM_MAX_IT").intValue();
-			int max_red = jpopt.get("SCPDIPM_RED_IT").intValue();
+			double max_it = jpopt.get("PDIPM_MAX_IT");
+			double max_red = jpopt.get("SCPDIPM_RED_IT");
 			if (feastol == 0)
 				feastol = jpopt.get("OPF_VIOLATION");	// = OPF_VIOLATION by default
-			Map<String, Object> jips_opt = new HashMap<String, Object>();
 			jips_opt.put("feastol", feastol);
 			jips_opt.put("gradtol", gradtol);
 			jips_opt.put("comptol", comptol);
 			jips_opt.put("costtol", costtol);
 			jips_opt.put("max_it", max_it);
 			jips_opt.put("max_red", max_red);
+			jips_opt.put("step_control", (double) ((alg == 250) ? 1:0));
 			opt.put("jips_opt", jips_opt);
 		}
 
 		/* -----  run opf  ----- */
 
-		Object[] qps = Djp_qps_jpower.jp_qps_jpower(HH, CC, A, l, u, xmin, xmax, x0, opt);
+		Object[] qps = Dips_qps_jips.ips_qps_jips(HH, CC, A, l, u, xmin, xmax, x0, jips_opt);
 		DoubleMatrix1D x = (DoubleMatrix1D) qps[0];
 		double f = (Double) qps[1];
 		int info = (Integer) qps[2];
