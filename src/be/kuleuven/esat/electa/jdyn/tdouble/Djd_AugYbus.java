@@ -24,8 +24,9 @@ package be.kuleuven.esat.electa.jdyn.tdouble;
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
+import cern.colt.matrix.tdcomplex.algo.SparseDComplexAlgebra;
+import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -57,7 +58,7 @@ public class Djd_AugYbus {
 	 * @return factorised augmented bus admittance matrix
 	 */
 	@SuppressWarnings("static-access")
-	public static SparseDoubleLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
+	public static SparseDComplexLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
 			DoubleMatrix1D xd_tr, int[] gbus, DoubleMatrix1D P, DoubleMatrix1D Q, DComplexMatrix1D U0) {
 
 		/* Calculate bus admittance matrix */
@@ -76,8 +77,7 @@ public class Djd_AugYbus {
 		for (int i = 0; i < Ybus.rows(); i++)
 			Ybus.set(i, i, cfunc.plus.apply( cfunc.plus.apply(Ybus.get(i, i), ygen.get(i)), yload.get(i) ));
 
-//		return SparseDComplexAlgebra.DEFAULT.lu(Ybus, 0);
-		return null;
+		return SparseDComplexAlgebra.DEFAULT.lu(Ybus, 0);
 	}
 
 }

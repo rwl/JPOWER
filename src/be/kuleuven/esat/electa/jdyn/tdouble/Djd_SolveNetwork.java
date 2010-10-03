@@ -23,9 +23,9 @@ package be.kuleuven.esat.electa.jdyn.tdouble;
 
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
+import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
@@ -56,7 +56,7 @@ public class Djd_SolveNetwork {
 	 */
 	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D jp_SolveNetwork(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
-			SparseDoubleLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
+			SparseDComplexLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
 
 		/* Init */
 		int ngen = gbus.length;
@@ -98,8 +98,9 @@ public class Djd_SolveNetwork {
 		Ig.viewSelection(gbus).assign(Igen);
 
 		// Calculate network voltages: U = Y/Ig
-//		DComplexMatrix1D U = invYbus.solve(Ig);
-
-		return null;
+		invYbus.solve(Ig);
+		DComplexMatrix1D U = Ig;
+		
+		return U;
 	}
 }
