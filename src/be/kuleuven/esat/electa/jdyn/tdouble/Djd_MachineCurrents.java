@@ -21,6 +21,7 @@
 
 package be.kuleuven.esat.electa.jdyn.tdouble;
 
+import be.kuleuven.esat.electa.jdyn.tdouble.jdc.Djd_gen;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
@@ -48,8 +49,8 @@ public class Djd_MachineCurrents {
 
 	/**
 	 *
-	 * @param Xgen state variables of generators
-	 * @param Pgen parameters of generators
+	 * @param xgen0 state variables of generators
+	 * @param pgen0 parameters of generators
 	 * @param U generator voltages
 	 * @param gentype generator models
 	 * @return [Id = d-axis stator current,
@@ -57,11 +58,11 @@ public class Djd_MachineCurrents {
 	 * Pe = generator electric power]
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D[] jd_MachineCurrents(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
+	public static DoubleMatrix1D[] jd_MachineCurrents(Djd_gen xgen0, Djd_gen pgen0,
 			DComplexMatrix1D U, IntMatrix1D gentype) {
 
 		/* Init */
-		int ngen = Xgen.rows();
+		int ngen = xgen0.rows();
 		DoubleMatrix1D Id = DoubleFactory1D.dense.make(ngen);
 		DoubleMatrix1D Iq = DoubleFactory1D.dense.make(ngen);
 		DoubleMatrix1D Pe = DoubleFactory1D.dense.make(ngen);
@@ -74,10 +75,10 @@ public class Djd_MachineCurrents {
 		DoubleMatrix1D delta, Eq_tr, Ed_tr;
 
 		/* Generator type 1: classical model */
-		delta = Xgen.viewColumn(0).viewSelection(type1).copy();
-		Eq_tr = Xgen.viewColumn(2).viewSelection(type1).copy();
+		delta = xgen0.viewColumn(0).viewSelection(type1).copy();
+		Eq_tr = xgen0.viewColumn(2).viewSelection(type1).copy();
 
-		DoubleMatrix1D xd = Pgen.viewColumn(5).viewSelection(type1).copy();
+		DoubleMatrix1D xd = pgen0.D.viewSelection(type1).copy();
 
 		DoubleMatrix1D Um = U.copy().assign(cfunc.abs).getRealPart();
 		DoubleMatrix1D Ua = U.copy().assign(cfunc.arg).getRealPart();
@@ -88,12 +89,12 @@ public class Djd_MachineCurrents {
 		Pe.viewSelection(type1).assign( dfunc.inv );
 
 		/* Generator type 2: 4th order model */
-		delta = Xgen.viewColumn(0).viewSelection(type2).copy();
-		Eq_tr = Xgen.viewColumn(2).viewSelection(type2).copy();
-		Ed_tr = Xgen.viewColumn(3).viewSelection(type2).copy();
+		delta = xgen0.viewColumn(0).viewSelection(type2).copy();
+		Eq_tr = xgen0.viewColumn(2).viewSelection(type2).copy();
+		Ed_tr = xgen0.viewColumn(3).viewSelection(type2).copy();
 
-		DoubleMatrix1D xd_tr = Pgen.viewColumn(7).viewSelection(type2).copy();
-		DoubleMatrix1D xq_tr = Pgen.viewColumn(8).viewSelection(type2).copy();
+		DoubleMatrix1D xd_tr = pgen0.xd_tr.viewSelection(type2).copy();
+		DoubleMatrix1D xq_tr = pgen0.xq_tr.viewSelection(type2).copy();
 
 		/* Tranform U to rotor frame of reference */
 		DoubleMatrix1D vd = Um.viewSelection(type2).copy().assign(dfunc.neg);

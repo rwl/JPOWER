@@ -10,5 +10,7 @@ public class Djd_gen {
 	public IntMatrix1D govmodel;
 	public DoubleMatrix1D xd_tr;
 	public DoubleMatrix1D xp;
+	public DoubleMatrix1D D;
+	public DoubleMatrix1D xq_tr;
 
 }

@@ -29,11 +29,15 @@ import be.kuleuven.esat.electa.jdyn.tdouble.jdc.Djd_exc;
 import be.kuleuven.esat.electa.jdyn.tdouble.jdc.Djd_gen;
 import be.kuleuven.esat.electa.jdyn.tdouble.jdc.Djd_gov;
 import be.kuleuven.esat.electa.jdyn.tdouble.jdc.Djd_linechange;
+import be.kuleuven.esat.electa.jdyn.tdouble.models.exciters.Djp_ExciterInit;
+import be.kuleuven.esat.electa.jdyn.tdouble.models.generators.Djd_GeneratorInit;
+import be.kuleuven.esat.electa.jdyn.tdouble.models.governors.Djd_GovernorInit;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
@@ -155,6 +159,31 @@ public class Djd_rundyn {
 		SparseDComplexLUDecomposition invYbus = Djd_AugYbus.jd_AugYbus(baseMVA, bus, branch, xd_tr, gbus, Pl, Ql, U0);
 		
 		/* Calculate Initial machine state */
+		if (output) 
+			System.out.println("Calculating initial state...");
+		
+		Djd_gen[] gen0 = Djd_GeneratorInit.jd_GeneratorInit(Pgen0, U0.viewSelection(gbus), gen, baseMVA, genmodel);
+		Djd_gen Efd0 = gen0[0], Xgen0 = gen0[1];
+		
+//		DoubleMatrix1D omega0 = Xgen0.viewColumn(1);
+		
+		DoubleMatrix1D[] I = Djd_MachineCurrents.jd_MachineCurrents(Xgen0, Pgen0, U0.viewSelection(gbus), genmodel);
+		DoubleMatrix1D Id0 = I[0], Iq0 = I[1], Pe0 = I[2];
+		
+		/* Exciter initial conditions */
+		DoubleMatrix1D Vexc0 = U0.viewSelection(gbus).assign(cfunc.abs).getRealPart();
+		Djd_exc[] exe0 = Djp_ExciterInit.jp_ExciterInit(Efd0, Pexc0, Vexc0, excmodel);
+		Djd_exc Xexc0 = exe0[0];
+		Pexc0 = exe0[1];
+		
+		/* Governor initial conditions */
+		DoubleMatrix1D Pm0 = Pe0.copy();
+//		Djd_gov[] gov0 = Djd_GovernorInit.jd_GovernorInit(Pm0, Pgov0, omega0, govmodel); 
+//		Djd_gov Xgov0 = gov0[0];
+//		Pgov0 = gov0[1];
+		
+		/* Check Steady-state */
+		
 		
 		return null;
 	}
