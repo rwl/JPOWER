@@ -27,12 +27,12 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.util.tdouble.Djp_mm;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_dcpf;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
-import edu.cornell.pserc.util.tdouble.Djp_mm;
 
 /**
  *

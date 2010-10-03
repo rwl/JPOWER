@@ -34,6 +34,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jips.tdouble.HessianEvaluator;
@@ -44,7 +45,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Evaluates Hessian of Lagrangian for AC OPF.

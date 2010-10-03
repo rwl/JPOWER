@@ -24,11 +24,11 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.Polynomial;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Computes total cost for generators at given output level.

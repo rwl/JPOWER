@@ -31,6 +31,7 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -38,7 +39,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Converts external to internal indexing.

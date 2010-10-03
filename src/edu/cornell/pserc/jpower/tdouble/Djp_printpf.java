@@ -35,6 +35,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
@@ -43,7 +44,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 public class Djp_printpf {
 

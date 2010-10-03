@@ -32,9 +32,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Construct linear constraints for generator capability curves.

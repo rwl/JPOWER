@@ -32,10 +32,10 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition;
 import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Solves the power flow using a fast decoupled method.

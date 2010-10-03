@@ -22,10 +22,10 @@
 package edu.cornell.pserc.jpower.tdouble.opf;
 
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Checks for dispatchable loads.

@@ -25,9 +25,9 @@ import java.io.File;
 import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
+import cern.colt.util.tdouble.Djp_mm;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
-import edu.cornell.pserc.util.tdouble.Djp_mm;
 
 /**
  *

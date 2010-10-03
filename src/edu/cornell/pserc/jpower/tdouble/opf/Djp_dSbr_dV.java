@@ -25,9 +25,9 @@ import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Computes partial derivatives of power flows w.r.t. voltage.

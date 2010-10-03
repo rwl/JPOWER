@@ -24,8 +24,8 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Computes partial derivatives of power injection w.r.t. voltage.

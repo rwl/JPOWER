@@ -24,8 +24,8 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Solves a DC power flow.

@@ -28,13 +28,13 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.util.tdouble.Djp_util;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Converts internal to external bus numbering.

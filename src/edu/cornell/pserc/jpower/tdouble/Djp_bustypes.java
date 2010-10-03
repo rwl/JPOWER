@@ -25,11 +25,11 @@ import cern.colt.list.tint.IntArrayList;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
+import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.util.tdouble.Djp_util;
 
 /**
  * Builds index lists for each type of bus (REF, PV, PQ).

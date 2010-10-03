@@ -18,7 +18,7 @@
  *
  */
 
-package edu.cornell.pserc.util.tdouble;
+package cern.colt.util.tdouble;
 
 import java.util.concurrent.Future;
 
