@@ -464,9 +464,9 @@ public class Djp_util {
 
 	/**
 	 *
-	 * @param r
-	 * @param theta
-	 * @return
+	 * @param r polar radius.
+	 * @param theta polar angle in radians.
+	 * @return complex polar representation.
 	 */
 	public static DComplexMatrix1D polar(DoubleMatrix1D r, DoubleMatrix1D theta) {
 		return polar(r, theta, true);
