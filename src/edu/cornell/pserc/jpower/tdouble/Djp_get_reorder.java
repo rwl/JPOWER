@@ -37,18 +37,6 @@ public class Djp_get_reorder {
 	 *
 	 * @param A
 	 * @param idx
-	 * @return an indexed copy of A.
-	 */
-	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx) {
-		return A.viewSelection(idx).copy();
-	}
-
-	/**
-	 * Returns A(:, ..., :, IDX, :, ..., :), where DIM determines
-	 * in which dimension to place the IDX.
-	 *
-	 * @param A
-	 * @param idx
 	 * @param dim 1 - index rows, 2 - index columns.
 	 * @return a copy of A indexed in dimension dim.
 	 */
@@ -61,4 +49,17 @@ public class Djp_get_reorder {
 			throw new UnsupportedOperationException();
 		}
 	}
+
+	/**
+	 * Returns A(:, ..., :, IDX, :, ..., :), where DIM determines
+	 * in which dimension to place the IDX.
+	 *
+	 * @param A
+	 * @param idx
+	 * @return an indexed copy of A.
+	 */
+	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx) {
+		return A.viewSelection(idx).copy();
+	}
+
 }

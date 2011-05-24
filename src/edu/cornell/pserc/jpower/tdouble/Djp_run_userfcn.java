@@ -25,6 +25,7 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model;
 public class Djp_run_userfcn {
 
 	public static Djp_jpc jp_run_userfcn(String userfcn, String stage, Djp_jpc jpc) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

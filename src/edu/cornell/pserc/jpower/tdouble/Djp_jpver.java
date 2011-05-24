@@ -30,8 +30,10 @@ import java.util.Map;
  */
 public class Djp_jpver {
 
+	private static Map<String, String> ver;
+
 	public static Map<String, String> jp_jpver(String all) {
-		Map<String, String> ver = new HashMap<String, String>();
+		ver = new HashMap<String, String>();
 		ver.put("Name", "JPOWER");
 		ver.put("Version", "0.4.2");
 		ver.put("Release", "");

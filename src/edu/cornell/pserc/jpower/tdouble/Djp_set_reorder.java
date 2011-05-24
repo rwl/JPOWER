@@ -32,16 +32,6 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 public class Djp_set_reorder {
 
 	/**
-	 *
-	 * @param A
-	 * @param idx
-	 * @return an indexed copy of A.
-	 */
-	public static DoubleMatrix1D jp_set_reorder(DoubleMatrix1D A, DoubleMatrix1D B, int[] idx) {
-		return A.viewSelection(idx).assign(B);
-	}
-
-	/**
 	 * Returns A after doing A(:, ..., :, IDX, :, ..., :) = B
 	 * where DIM determines in which dimension to place the IDX.
 	 *
@@ -59,4 +49,15 @@ public class Djp_set_reorder {
 			throw new UnsupportedOperationException();
 		}
 	}
+
+	/**
+	 *
+	 * @param A
+	 * @param idx
+	 * @return an indexed copy of A.
+	 */
+	public static DoubleMatrix1D jp_set_reorder(DoubleMatrix1D A, DoubleMatrix1D B, int[] idx) {
+		return A.viewSelection(idx).assign(B);
+	}
+
 }

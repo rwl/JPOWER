@@ -24,7 +24,7 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 public class Djp_savecase {
 
 	public static void jp_savecase(String fname, Djp_jpc casestruct) {
-
+		// TODO Auto-generated method stub
 	}
 
 }
