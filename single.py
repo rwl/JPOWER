@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__author__ = 'Richard Lincoln <r.w.lincoln@gmail.com>'
+__author__ = 'Richard Lincoln'
 
 """ Creates a single precision copy of JPOWER. """
 

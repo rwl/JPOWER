@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -40,20 +38,24 @@ import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
 /**
  * Solves the power flow using a fast decoupled method.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_fdpf {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static Object[] jp_fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
-			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq) {
-		return jp_fdpf(Ybus, Sbus, V0, Bp, Bpp, ref, pv, pq, Djp_jpoption.jp_jpoption());
-	}
+	private static double tol, normP, normQ;
+	private static int i, max_it, alg, verbose;
+	private static int[] pvpq;
+	private static boolean converged;
+	private static DComplexMatrix1D V, Va, Vm, mis;
+	private static DoubleMatrix1D P, Q;
+	private static SparseCCDoubleMatrix2D CCBp, CCBpp;
+	private static SparseDoubleLUDecomposition luP, luQ;
+	private static DComplexMatrix1D dVa, dVm;
 
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
@@ -86,32 +88,31 @@ public class Djp_fdpf {
 			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
 
 		/* options */
-		double tol	= jpopt.get("PF_TOL");
-		int max_it	= jpopt.get("PF_MAX_IT").intValue();
-		int verbose	= jpopt.get("VERBOSE").intValue();
+		tol	= jpopt.get("PF_TOL");
+		max_it	= jpopt.get("PF_MAX_IT").intValue();
+		verbose	= jpopt.get("VERBOSE").intValue();
 
 		/* initialize */
-		int[] pvpq = util.icat(pv, pq);
-		boolean converged = false;
-		int i = 0;
-		DComplexMatrix1D V = V0;
-		DComplexMatrix1D Va = V.copy().assign(cfunc.arg);
-		DComplexMatrix1D Vm = V.copy().assign(cfunc.abs);
+		pvpq = Djp_util.icat(pv, pq);
+		converged = false;
+		i = 0;
+		V = V0;
+		Va = V.copy().assign(cfunc.arg);
+		Vm = V.copy().assign(cfunc.abs);
 
 		/* evaluate initial mismatch */
-		DComplexMatrix1D mis = Ybus.zMult(V, null).assign(cfunc.conj);
+		mis = Ybus.zMult(V, null).assign(cfunc.conj);
 		mis.assign(V, cfunc.mult).assign(Sbus, cfunc.minus).assign(Vm, cfunc.div);
-		DoubleMatrix1D P = mis.viewSelection(pvpq).getRealPart();
-		DoubleMatrix1D Q = mis.viewSelection(pq).getImaginaryPart();
+		P = mis.viewSelection(pvpq).getRealPart();
+		Q = mis.viewSelection(pq).getImaginaryPart();
 
 		/* check tolerance */
-		double normP = DenseDoubleAlgebra.DEFAULT.norm(P, Norm.Infinity);
-		double normQ = DenseDoubleAlgebra.DEFAULT.norm(Q, Norm.Infinity);
+		normP = DenseDoubleAlgebra.DEFAULT.norm(P, Norm.Infinity);
+		normQ = DenseDoubleAlgebra.DEFAULT.norm(Q, Norm.Infinity);
 
 		if (verbose > 0) {
-			int alg = jpopt.get("PF_ALG").intValue();
-			String s = (alg == 2) ? "XB" : "BX";
-			System.out.printf("(fast-decoupled, %s)\n", s);
+			alg = jpopt.get("PF_ALG").intValue();
+			System.out.printf("(fast-decoupled, %s)\n", (alg == 2) ? "XB" : "BX");
 		}
 		if (verbose > 1) {
 			System.out.printf("\niteration     max mismatch (p.u.)  ");
@@ -127,29 +128,27 @@ public class Djp_fdpf {
 
 		/* reduce B matrices */
 		// column-compressed format for factorisation
-		SparseCCDoubleMatrix2D CCBp = new SparseCCDoubleMatrix2D(pvpq.length, pvpq.length);
+		CCBp = new SparseCCDoubleMatrix2D(pvpq.length, pvpq.length);
 		CCBp.assign(Bp.viewSelection(pvpq, pvpq));
-		SparseCCDoubleMatrix2D CCBpp = new SparseCCDoubleMatrix2D(pq.length, pq.length);
+		CCBpp = new SparseCCDoubleMatrix2D(pq.length, pq.length);
 		CCBpp.assign(Bpp.viewSelection(pq, pq));
 
 		/* factor B matrices */
-		SparseDoubleLUDecomposition luP = SparseDoubleAlgebra.DEFAULT.lu(CCBp, 0);
-		SparseDoubleLUDecomposition luQ = SparseDoubleAlgebra.DEFAULT.lu(CCBpp, 0);
+		luP = SparseDoubleAlgebra.DEFAULT.lu(CCBp, 0);
+		luQ = SparseDoubleAlgebra.DEFAULT.lu(CCBpp, 0);
 
 		/* do P and Q iterations */
-		DComplexMatrix1D dVa;
-		DComplexMatrix1D dVm;
 		while (!converged && i < max_it) {
 			/* update iteration counter */
 			i += 1;
 
 			/* -----  do P iteration, update Va  ----- */
 			luP.solve(P);
-			dVa = util.complex(P.assign(dfunc.neg), null);
+			dVa = Djp_util.complex(P.assign(dfunc.neg), null);
 
 			/* update voltage */
-			Va.viewSelection(pvpq).assign(dVa, DComplexFunctions.plus);
-			V = util.complex(Vm.getRealPart(), Va.getRealPart());
+			Va.viewSelection(pvpq).assign(dVa, cfunc.plus);
+			V = Djp_util.complex(Vm.getRealPart(), Va.getRealPart());
 
 			/* evalute mismatch */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -171,11 +170,11 @@ public class Djp_fdpf {
 
 			/* -----  do Q iteration, update Vm  ----- */
 			luQ.solve(Q);
-			dVm = util.complex(P.assign(dfunc.neg), null);
+			dVm = Djp_util.complex(P.assign(dfunc.neg), null);
 
 			/* update voltage */
 			Vm.viewSelection(pq).assign(dVm, cfunc.plus);
-			V = util.complex(Vm.getRealPart(), Va.getRealPart());
+			V = Djp_util.complex(Vm.getRealPart(), Va.getRealPart());
 
 			/* evalute mismatch */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -202,4 +201,10 @@ public class Djp_fdpf {
 
 		return new Object[] {V, converged, i};
 	}
+
+	public static Object[] jp_fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
+			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq) {
+		return jp_fdpf(Ybus, Sbus, V0, Bp, Bpp, ref, pv, pq, Djp_jpoption.jp_jpoption());
+	}
+
 }

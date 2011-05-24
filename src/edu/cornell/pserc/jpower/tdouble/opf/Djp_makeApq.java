@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -39,14 +37,21 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 /**
  * Construct linear constraints for generator capability curves.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_makeApq {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
+
+	private static int i, ng, npqh, npql;
+	private static int[] ipqh, ipql;
+	private static double tmp;
+	private static Map<String, AbstractMatrix> data;
+
+	private static DoubleMatrix1D ubpqh, ubpql;
+	private static DoubleMatrix2D Apqh, h, Apqh1, Apqh2, Apql, Apql1, Apql2;
 
 	/**
 	 * Constructs the parameters for the following linear constraints
@@ -71,39 +76,37 @@ public class Djp_makeApq {
 	public static Object[] jp_makeApq(double baseMVA, Djp_gen gen) {
 
 		/* data dimensions */
-		int ng = gen.size();		// number of dispatchable injections
+		ng = gen.size();		// number of dispatchable injections
 
 		/* which generators require additional linear constraints
 		 * (in addition to simple box constraints) on (Pg,Qg) to correctly
 		 * model their PQ capability curves
 		 */
-		int[] ipqh = util.nonzero( Djp_hasPQcap.jp_hasPQcap(gen, "U") );
-		int[] ipql = util.nonzero( Djp_hasPQcap.jp_hasPQcap(gen, "L") );
-		int npqh = ipqh.length;		// number of general PQ capability curves (upper)
-		int npql = ipql.length;		// number of general PQ capability curves (lower)
+		ipqh = Djp_util.nonzero( Djp_hasPQcap.jp_hasPQcap(gen, "U") );
+		ipql = Djp_util.nonzero( Djp_hasPQcap.jp_hasPQcap(gen, "L") );
+		npqh = ipqh.length;		// number of general PQ capability curves (upper)
+		npql = ipql.length;		// number of general PQ capability curves (lower)
 
-		Map<String, AbstractMatrix> data = new HashMap<String, AbstractMatrix>();
+		data = new HashMap<String, AbstractMatrix>();
 
 		/* make Apqh if there is a need to add general PQ capability curves;
 		 * use normalized coefficient rows so multipliers have right scaling
 		 * in $$/pu
 		 */
-		DoubleMatrix2D Apqh;
-		DoubleMatrix1D ubpqh;
 		if (npqh > 0) {
-			DoubleMatrix2D h = DoubleFactory2D.dense.make(npqh, 2);
+			h = DoubleFactory2D.dense.make(npqh, 2);
 			data.put("h", h);
 			h.viewColumn(0).assign( gen.Qc1max.viewSelection(ipqh).copy().assign(gen.Qc2max.viewSelection(ipqh), dfunc.minus) );
 			h.viewColumn(1).assign( gen.Pc2.viewSelection(ipqh).copy().assign(gen.Pc1.viewSelection(ipqh), dfunc.minus) );
 
 			ubpqh = h.viewColumn(0).copy().assign(gen.Pc1.viewSelection(ipqh), dfunc.mult).assign(h.viewColumn(1).copy().assign(gen.Qc1max.viewSelection(ipqh), dfunc.mult), dfunc.plus);
-			for (int i = 0; i < npqh; i++) {
-				double tmp = DenseDoubleAlgebra.DEFAULT.norm2(h.viewRow(i));
+			for (i = 0; i < npqh; i++) {
+				tmp = DenseDoubleAlgebra.DEFAULT.norm2(h.viewRow(i));
 				h.viewRow(i).assign(dfunc.div(tmp));
 				ubpqh.set(i, ubpqh.get(i) / tmp);
 			}
-			DoubleMatrix2D Apqh1 = new SparseRCDoubleMatrix2D(npqh, ng, util.irange(npqh), ipqh, h.viewColumn(0).toArray(), false, false, false);
-			DoubleMatrix2D Apqh2 = new SparseRCDoubleMatrix2D(npqh, ng, util.irange(npqh), ipqh, h.viewColumn(1).toArray(), false, false, false);
+			Apqh1 = new SparseRCDoubleMatrix2D(npqh, ng, Djp_util.irange(npqh), ipqh, h.viewColumn(0).toArray(), false, false, false);
+			Apqh2 = new SparseRCDoubleMatrix2D(npqh, ng, Djp_util.irange(npqh), ipqh, h.viewColumn(1).toArray(), false, false, false);
 			Apqh = DoubleFactory2D.sparse.appendColumns(Apqh1, Apqh2);
 			ubpqh.assign(dfunc.div(baseMVA));
 		} else {
@@ -113,8 +116,6 @@ public class Djp_makeApq {
 		}
 
 		/* similarly Apql */
-		DoubleMatrix2D Apql;
-		DoubleMatrix1D ubpql;
 		if (npql > 0) {
 			DoubleMatrix2D l = DoubleFactory2D.dense.make(npql, 2);
 			data.put("l", l);
@@ -122,13 +123,13 @@ public class Djp_makeApq {
 			l.viewColumn(1).assign( gen.Pc1.viewSelection(ipql).copy().assign(gen.Pc2.viewSelection(ipql), dfunc.minus) );
 
 			ubpql = l.viewColumn(0).copy().assign(gen.Pc1.viewSelection(ipql), dfunc.mult).assign(l.viewColumn(1).copy().assign(gen.Qc1min.viewSelection(ipql), dfunc.mult), dfunc.plus);
-			for (int i = 0; i < npql; i++) {
-				double tmp = DenseDoubleAlgebra.DEFAULT.norm2(l.viewRow(i));
+			for (i = 0; i < npql; i++) {
+				tmp = DenseDoubleAlgebra.DEFAULT.norm2(l.viewRow(i));
 				l.viewRow(i).assign(dfunc.div(tmp));
 				ubpql.set(i, ubpql.get(i) / tmp);
 			}
-			DoubleMatrix2D Apql1 = new SparseRCDoubleMatrix2D(npql, ng, util.irange(npqh), ipql, l.viewColumn(0).toArray(), false, false, false);
-			DoubleMatrix2D Apql2 = new SparseRCDoubleMatrix2D(npql, ng, util.irange(npqh), ipql, l.viewColumn(1).toArray(), false, false, false);
+			Apql1 = new SparseRCDoubleMatrix2D(npql, ng, Djp_util.irange(npqh), ipql, l.viewColumn(0).toArray(), false, false, false);
+			Apql2 = new SparseRCDoubleMatrix2D(npql, ng, Djp_util.irange(npqh), ipql, l.viewColumn(1).toArray(), false, false, false);
 			Apql = DoubleFactory2D.sparse.appendColumns(Apql1, Apql2);
 			ubpql.assign(dfunc.div(baseMVA));
 		} else {
@@ -142,4 +143,5 @@ public class Djp_makeApq {
 
 		return new Object[] {Apqh, ubpqh, Apql, ubpql, data};
 	}
+
 }

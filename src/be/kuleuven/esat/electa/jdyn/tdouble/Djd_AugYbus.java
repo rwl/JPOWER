@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2009 Stijn Cole <stijn.cole@esat.kuleuven.be>
- * Copyright (C) 2010 Richard Lincoln <r.w.lincoln@gmail.com>
+ * Copyright (C) 2009 Stijn Cole
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -36,13 +34,12 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus;
 /**
  * Constructs augmented bus admittance matrix Ybus
  *
- * @author Stijn Cole (stijn.cole@esat.kuleuven.be)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Stijn Cole
+ * @author Richard Lincoln
  *
  */
 public class Djd_AugYbus {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
@@ -57,7 +54,6 @@ public class Djd_AugYbus {
 	 * @param U0 steady-state bus voltages
 	 * @return factorised augmented bus admittance matrix
 	 */
-	@SuppressWarnings("static-access")
 	public static SparseDComplexLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
 			DoubleMatrix1D xd_tr, int[] gbus, DoubleMatrix1D P, DoubleMatrix1D Q, DComplexMatrix1D U0) {
 
@@ -66,12 +62,12 @@ public class Djd_AugYbus {
 		DComplexMatrix2D Ybus = Y[0];
 
 		/* Calculate equivalent load admittance */
-		DComplexMatrix1D yload = util.complex(P, Q).assign(cfunc.conj);
+		DComplexMatrix1D yload = Djp_util.complex(P, Q).assign(cfunc.conj);
 		yload.assign(U0.copy().assign(cfunc.abs).assign(cfunc.square), cfunc.div);
 
 		/* Calculate equivalent generator admittance */
 		DComplexMatrix1D ygen = DComplexFactory1D.dense.make(Ybus.rows());
-		ygen.viewSelection(gbus).assign( util.complex(null, xd_tr).assign(cfunc.inv) );
+		ygen.viewSelection(gbus).assign( Djp_util.complex(null, xd_tr).assign(cfunc.inv) );
 
 		/* Add equivalent load and generator admittance to Ybus matrix */
 		for (int i = 0; i < Ybus.rows(); i++)

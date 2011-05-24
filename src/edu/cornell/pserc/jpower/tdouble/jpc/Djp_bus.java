@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -28,12 +26,10 @@ import cern.colt.util.tdouble.Djp_util;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public class Djp_bus {
-
-	private static final Djp_util util = new Djp_util();
 
 	private static final int BUS_I		= 0;
 	private static final int BUS_TYPE	= 1;
@@ -197,20 +193,19 @@ public class Djp_bus {
 	 *
 	 * @param bus
 	 */
-	@SuppressWarnings("static-access")
 	public void fromMatrix(DoubleMatrix2D bus) {
 
-		this.bus_i = util.intm(bus.viewColumn(BUS_I));
-		this.bus_type = util.intm(bus.viewColumn(BUS_TYPE));
+		this.bus_i = Djp_util.intm(bus.viewColumn(BUS_I));
+		this.bus_type = Djp_util.intm(bus.viewColumn(BUS_TYPE));
 		this.Pd = bus.viewColumn(PD);
 		this.Qd = bus.viewColumn(QD);
 		this.Gs = bus.viewColumn(GS);
 		this.Bs = bus.viewColumn(BS);
-		this.bus_area = util.intm(bus.viewColumn(BUS_AREA));
+		this.bus_area = Djp_util.intm(bus.viewColumn(BUS_AREA));
 		this.Vm = bus.viewColumn(VM);
 		this.Va = bus.viewColumn(VA);
 		this.base_kV = bus.viewColumn(BASE_KV);
-		this.zone = util.intm(bus.viewColumn(ZONE));
+		this.zone = Djp_util.intm(bus.viewColumn(ZONE));
 		this.Vmax = bus.viewColumn(VMAX);
 		this.Vmin = bus.viewColumn(VMIN);
 
@@ -231,7 +226,6 @@ public class Djp_bus {
 	 * @param opf include opf data
 	 * @return bus data matrix
 	 */
-	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix(boolean opf) {
 		DoubleMatrix2D matrix;
 		if (opf) {
@@ -240,17 +234,17 @@ public class Djp_bus {
 			matrix = DoubleFactory2D.dense.make(size(), 13);
 		}
 
-		matrix.viewColumn(BUS_I).assign( util.dblm(this.bus_i) );
-		matrix.viewColumn(BUS_TYPE).assign( util.dblm(this.bus_type) );
+		matrix.viewColumn(BUS_I).assign( Djp_util.dblm(this.bus_i) );
+		matrix.viewColumn(BUS_TYPE).assign( Djp_util.dblm(this.bus_type) );
 		matrix.viewColumn(PD).assign(this.Pd);
 		matrix.viewColumn(QD).assign(this.Qd);
 		matrix.viewColumn(GS).assign(this.Gs);
 		matrix.viewColumn(BS).assign(this.Bs);
-		matrix.viewColumn(BUS_AREA).assign( util.dblm(this.bus_area) );
+		matrix.viewColumn(BUS_AREA).assign( Djp_util.dblm(this.bus_area) );
 		matrix.viewColumn(VM).assign(this.Vm);
 		matrix.viewColumn(VA).assign(this.Va);
 		matrix.viewColumn(BASE_KV).assign(this.base_kV);
-		matrix.viewColumn(ZONE).assign( util.dblm(this.zone) );
+		matrix.viewColumn(ZONE).assign( Djp_util.dblm(this.zone) );
 		matrix.viewColumn(VMAX).assign(this.Vmax);
 		matrix.viewColumn(VMIN).assign(this.Vmin);
 

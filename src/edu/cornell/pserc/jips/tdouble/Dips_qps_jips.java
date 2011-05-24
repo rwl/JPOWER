@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -33,7 +31,6 @@ import cern.jet.math.tdouble.DoubleFunctions;
 
 public class Dips_qps_jips {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
@@ -53,14 +50,13 @@ public class Dips_qps_jips {
 		return ips_qps_jips(H, c, A, l, u, xmin, xmax, x0, new HashMap<String, Double>());
 	}
 
-	@SuppressWarnings("static-access")
 	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0, Map<String, Double> opt) {
 
 		/* define nx, set default values for H and c */
 		int nx = 0;
-		if (H == null || H.size() == 0 || !util.any(util.any(H))) {
+		if (H == null || H.size() == 0 || !Djp_util.any(Djp_util.any(H))) {
 			if (A == null || A.size() == 0 && xmin == null ||
 					xmin.size() == 0 && xmax == null || xmax.size() == 0) {
 				System.err.println("qps_mips: LP problem must include constraints or variable bounds");

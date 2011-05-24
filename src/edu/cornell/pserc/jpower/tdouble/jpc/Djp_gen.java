@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -28,12 +26,10 @@ import cern.colt.util.tdouble.Djp_util;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public class Djp_gen {
-
-	private static final Djp_util util = new Djp_util();
 
 	private static final int GEN_BUS	= 0;
 	private static final int PG			= 1;
@@ -240,17 +236,16 @@ public class Djp_gen {
 	 *
 	 * @param other
 	 */
-	@SuppressWarnings("static-access")
 	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.gen_bus = util.intm(other.viewColumn(GEN_BUS));
+		this.gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
 		this.Pg = other.viewColumn(PG);
 		this.Qg = other.viewColumn(QG);
 		this.Qmax = other.viewColumn(QMAX);
 		this.Qmin = other.viewColumn(QMIN);
 		this.Vg = other.viewColumn(VG);
 		this.mBase = other.viewColumn(MBASE);
-		this.gen_status = util.intm(other.viewColumn(GEN_STATUS));
+		this.gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
 		this.Pmax = other.viewColumn(PMAX);
 		this.Pmin = other.viewColumn(PMIN);
 		this.Pc1 = other.viewColumn(PC1);
@@ -282,7 +277,6 @@ public class Djp_gen {
 	 * @param opf include OPF solution data
 	 * @return generator data matrix
 	 */
-	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix(boolean opf) {
 		DoubleMatrix2D matrix;
 		if (opf) {
@@ -291,14 +285,14 @@ public class Djp_gen {
 			matrix = DoubleFactory2D.dense.make(size(), 21);
 		}
 
-		matrix.viewColumn(GEN_BUS).assign( util.dblm(this.gen_bus) );
+		matrix.viewColumn(GEN_BUS).assign( Djp_util.dblm(this.gen_bus) );
 		matrix.viewColumn(PG).assign(this.Pg);
 		matrix.viewColumn(QG).assign(this.Qg);
 		matrix.viewColumn(QMAX).assign(this.Qmax);
 		matrix.viewColumn(QMIN).assign(this.Qmin);
 		matrix.viewColumn(VG).assign(this.Vg);
 		matrix.viewColumn(MBASE).assign(this.mBase);
-		matrix.viewColumn(GEN_STATUS).assign( util.dblm(this.gen_status) );
+		matrix.viewColumn(GEN_STATUS).assign( Djp_util.dblm(this.gen_status) );
 		matrix.viewColumn(PMAX).assign(this.Pmax);
 		matrix.viewColumn(PMIN).assign(this.Pmin);
 		matrix.viewColumn(PC1).assign(this.Pc1);

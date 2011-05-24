@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2009 Stijn Cole <stijn.cole@esat.kuleuven.be>
- * Copyright (C) 2010 Richard Lincoln <r.w.lincoln@gmail.com>
+ * Copyright (C) 2009 Stijn Cole
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -35,13 +33,12 @@ import cern.jet.math.tint.IntFunctions;
 /**
  * Solves the network.
  *
- * @author Stijn Cole (stijn.cole@esat.kuleuven.be)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Stijn Cole
+ * @author Richard Lincoln
  *
  */
 public class Djd_SolveNetwork {
 
-	private static final Djp_util util = new Djp_util();
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
@@ -54,7 +51,6 @@ public class Djd_SolveNetwork {
 	 * @param gentype generator models
 	 * @return bus voltages
 	 */
-	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D jp_SolveNetwork(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
 			SparseDComplexLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
 
@@ -65,7 +61,7 @@ public class Djd_SolveNetwork {
 		int s = invYbus.getPivot().length;
 
 		DComplexMatrix1D Ig = DComplexFactory1D.dense.make(s);
-		IntMatrix1D d = IntFactory1D.dense.make(util.irange((int) gentype.size()));
+		IntMatrix1D d = IntFactory1D.dense.make(Djp_util.irange((int) gentype.size()));
 
 		/* Define types */
 		int[] type1 = d.viewSelection( gentype.copy().assign(ifunc.equals(1)).toArray() ).toArray();
@@ -80,7 +76,7 @@ public class Djd_SolveNetwork {
 		xd_tr = Pgen.viewColumn(6).viewSelection(type1).copy();
 
 		// Calculate generator currents
-		Igen.viewSelection(type1).assign( util.polar(Eq_tr, delta).assign(util.complex(null, xd_tr), cfunc.div) );
+		Igen.viewSelection(type1).assign( Djp_util.polar(Eq_tr, delta).assign(Djp_util.complex(null, xd_tr), cfunc.div) );
 
 		/* Generator type 2: 4th order model */
 		delta = Xgen.viewColumn(0).viewSelection(type2).copy();
@@ -90,8 +86,8 @@ public class Djd_SolveNetwork {
 		xd_tr = Pgen.viewColumn(7).viewSelection(type2).copy();
 
 		// Calculate generator currents
-		Igen.viewSelection(type2).assign( util.complex(Eq_tr, Ed_tr).assign(util.complex(null, delta).assign(cfunc.exp), cfunc.mult) );
-		Igen.viewSelection(type2).assign( util.complex(null, xd_tr), cfunc.div );  // Padiyar, p.417.
+		Igen.viewSelection(type2).assign( Djp_util.complex(Eq_tr, Ed_tr).assign(Djp_util.complex(null, delta).assign(cfunc.exp), cfunc.mult) );
+		Igen.viewSelection(type2).assign( Djp_util.complex(null, xd_tr), cfunc.div );  // Padiyar, p.417.
 
 		/* Calculations */
 		// Generator currents
@@ -100,7 +96,7 @@ public class Djd_SolveNetwork {
 		// Calculate network voltages: U = Y/Ig
 		invYbus.solve(Ig);
 		DComplexMatrix1D U = Ig;
-		
+
 		return U;
 	}
 }

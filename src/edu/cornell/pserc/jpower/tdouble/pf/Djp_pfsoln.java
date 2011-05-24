@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -39,16 +37,26 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 /**
  * Updates bus, gen, branch data structures to match power flow soln.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_pfsoln {
 
-	private static final Djp_util util = new Djp_util();
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
+
+	private static Djp_bus bus;
+	private static Djp_gen gen;
+	private static Djp_branch branch;
+	private static int nb, ngon;
+	private static int[] on, gbus, ig, out, br;
+	private static double Pg_o;
+	private static IntMatrix1D ggbus, refgen;
+	private static DoubleMatrix1D Va, ngb, ngg, Qg_tot, Qg_min, Qg_max, Qg_on, Qg_save, Qg;
+	private static DComplexMatrix1D Sg, Sf, St;
+	private static SparseRCDoubleMatrix2D Cg, Cmin, Cmax;
 
 	/**
 	 * Updates bus, gen, branch data structures to match power flow soln.
@@ -71,24 +79,24 @@ public class Djp_pfsoln {
 			DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V, int ref, int[] pv, int[] pq) {
 
 		/* initialize return values */
-		Djp_bus bus = bus0.copy();
-		Djp_gen gen = gen0.copy();
-		Djp_branch branch = branch0.copy();
+		bus = bus0.copy();
+		gen = gen0.copy();
+		branch = branch0.copy();
 
 		/* ----- update bus voltages ----- */
 		bus.Vm.assign(V.copy().assign(cfunc.abs).getRealPart());
-		DoubleMatrix1D Va = V.copy().assign(cfunc.arg).getRealPart();
+		Va = V.copy().assign(cfunc.arg).getRealPart();
 		bus.Va.assign(Va.assign(dfunc.mult(Math.PI)).assign(dfunc.div(180)));
 
 		/* ----- update Qg for all gens and Pg for swing bus ----- */
 		// generator info
-		int[] on = util.nonzero(gen.gen_status);	// which generators are on?
-		IntMatrix1D ggbus = gen.gen_bus.viewSelection(on);
-		int[] gbus = ggbus.toArray();
-		IntMatrix1D refgen = IntFactory1D.dense.make(util.nonzero( ggbus.assign(ifunc.equals(ref)) ));
+		on = Djp_util.nonzero(gen.gen_status);	// which generators are on?
+		ggbus = gen.gen_bus.viewSelection(on);
+		gbus = ggbus.toArray();
+		refgen = IntFactory1D.dense.make(Djp_util.nonzero( ggbus.assign(ifunc.equals(ref)) ));
 
 		/* compute total injected bus powers */
-		DComplexMatrix1D Sg = Ybus.viewSelection(gbus, null).zMult(V, null);
+		Sg = Ybus.viewSelection(gbus, null).zMult(V, null);
 		Sg.assign(cfunc.conj).assign(V.viewSelection(gbus), cfunc.mult);
 
 		/* update Qg for all generators */
@@ -103,36 +111,36 @@ public class Djp_pfsoln {
 		 */
 		if (on.length > 0) {
 			// build connection matrix, element i, j is 1 if gen on(i) at bus j is ON
-			int nb = bus.size();
-			int ngon = on.length;
-			SparseRCDoubleMatrix2D Cg = new SparseRCDoubleMatrix2D(ngon, nb, util.irange(ngon), gbus, 1, false, false);
+			nb = bus.size();
+			ngon = on.length;
+			Cg = new SparseRCDoubleMatrix2D(ngon, nb, Djp_util.irange(ngon), gbus, 1, false, false);
 
 			// divide Qg by number of generators at the bus to distribute equally
-			DoubleMatrix1D ngb = DoubleFactory1D.sparse.make(nb);
+			ngb = DoubleFactory1D.sparse.make(nb);
 			for (int k = 0; k < nb; k++)
 				ngb.set(k, Cg.viewColumn(k).zSum());
-			DoubleMatrix1D ngg = Cg.zMult(ngb, null);	// ngon x 1, number of gens at this gen's bus
+			ngg = Cg.zMult(ngb, null);	// ngon x 1, number of gens at this gen's bus
 			gen.Qg.viewSelection(on).assign(ngg, dfunc.div);
 
 			// divide proportionally
-			SparseRCDoubleMatrix2D Cmin = new SparseRCDoubleMatrix2D(ngon, nb,
-					util.irange(ngon), gbus, gen.Qmin.viewSelection(on).toArray(), false, false, false);
-			SparseRCDoubleMatrix2D Cmax = new SparseRCDoubleMatrix2D(ngon, nb,
-					util.irange(ngon), gbus, gen.Qmax.viewSelection(on).toArray(), false, false, false);
+			Cmin = new SparseRCDoubleMatrix2D(ngon, nb,
+					Djp_util.irange(ngon), gbus, gen.Qmin.viewSelection(on).toArray(), false, false, false);
+			Cmax = new SparseRCDoubleMatrix2D(ngon, nb,
+					Djp_util.irange(ngon), gbus, gen.Qmax.viewSelection(on).toArray(), false, false, false);
 			// nb x 1 vector of total Qg at each bus
-			DoubleMatrix1D Qg_tot = Cg.viewDice().zMult(gen.Qg.viewSelection(on), null);
-			DoubleMatrix1D Qg_min = DoubleFactory1D.sparse.make(nb);	// nb x 1 vector of min total Qg at each bus
-			DoubleMatrix1D Qg_max = DoubleFactory1D.sparse.make(nb);	// nb x 1 vector of max total Qg at each bus
+			Qg_tot = Cg.viewDice().zMult(gen.Qg.viewSelection(on), null);
+			Qg_min = DoubleFactory1D.sparse.make(nb);	// nb x 1 vector of min total Qg at each bus
+			Qg_max = DoubleFactory1D.sparse.make(nb);	// nb x 1 vector of max total Qg at each bus
 			for (int k = 0; k < nb; k++) {
 				Qg_min.set(k, Cmin.viewColumn(k).zSum());
 				Qg_max.set(k, Cmax.viewColumn(k).zSum());
 			}
 			// gens at buses with Qg range = 0
-			int[] ig = util.nonzero( Cg.zMult(Qg_min, null).assign(Cg.zMult(Qg_max, null), dfunc.equals) );
-			DoubleMatrix1D Qg_on = gen.Qg.viewSelection(on);
-			DoubleMatrix1D Qg_save = Qg_on.viewSelection(ig).copy();
+			ig = Djp_util.nonzero( Cg.zMult(Qg_min, null).assign(Cg.zMult(Qg_max, null), dfunc.equals) );
+			Qg_on = gen.Qg.viewSelection(on);
+			Qg_save = Qg_on.viewSelection(ig).copy();
 
-			DoubleMatrix1D Qg = Cg.zMult(Qg_tot.assign(Qg_min, dfunc.minus).assign(Qg_max.assign(Qg_min, dfunc.minus).assign(dfunc.plus(util.EPS)), dfunc.div), null);
+			Qg = Cg.zMult(Qg_tot.assign(Qg_min, dfunc.minus).assign(Qg_max.assign(Qg_min, dfunc.minus).assign(dfunc.plus(Djp_util.EPS)), dfunc.div), null);
 			Qg.assign(gen.Qmax.viewSelection(on).copy().assign(gen.Qmin.viewSelection(on), dfunc.minus), dfunc.mult);                    //   ^ avoid div by 0
 			gen.Qg.viewSelection(on).assign(gen.Qmin.viewSelection(on)).assign(Qg, dfunc.plus);
 
@@ -143,19 +151,19 @@ public class Djp_pfsoln {
 		gen.Pg.set(on[refgen.get(0)], Sg.getRealPart().get(refgen.get(0)) * baseMVA + bus.Pd.get(ref));	// inj P + local Pd
 		if (refgen.size() > 1) {	// more than one generator at the ref bus
 			// subtract off what is generated by other gens at this bus
-			double Pg_o = gen.Pg.viewSelection(on).viewSelection(refgen.viewPart(1, (int) (refgen.size() - 1)).toArray()).zSum();
+			Pg_o = gen.Pg.viewSelection(on).viewSelection(refgen.viewPart(1, (int) (refgen.size() - 1)).toArray()).zSum();
 			gen.Pg.set(on[refgen.get(0)], gen.Pg.get(on[refgen.get(0)]) - Pg_o);
 		}
 
 		/* ----- update/compute branch power flows ----- */
-		int[] out = util.nonzero(branch.br_status.copy().assign(ifunc.equals(0)));	// out-of-service branches
-		int[] br = util.nonzero(branch.br_status);									// in-service branches
+		out = Djp_util.nonzero(branch.br_status.copy().assign(ifunc.equals(0)));	// out-of-service branches
+		br  = Djp_util.nonzero(branch.br_status);									// in-service branches
 		// complex power at "from" bus
-		DComplexMatrix1D Sf = Yf.viewSelection(br, null).zMult(V, null).assign(cfunc.conj);
+		Sf = Yf.viewSelection(br, null).zMult(V, null).assign(cfunc.conj);
 		Sf.assign(V.viewSelection(branch.f_bus.viewSelection(br).toArray()), cfunc.mult);
 		Sf.assign(cfunc.mult(baseMVA));
 		// complex power injected at "to" bus
-		DComplexMatrix1D St = Yt.viewSelection(br, null).zMult(V, null).assign(cfunc.conj);
+		St = Yt.viewSelection(br, null).zMult(V, null).assign(cfunc.conj);
 		St.assign(V.viewSelection(branch.t_bus.viewSelection(br).toArray()), cfunc.mult);
 		St.assign(cfunc.mult(baseMVA));
 

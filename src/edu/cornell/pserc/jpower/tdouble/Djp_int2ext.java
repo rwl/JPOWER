@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -39,13 +37,11 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
 /**
  * Converts internal to external bus numbering.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_int2ext {
-
-	private static final Djp_util util = new Djp_util();
 
 	public static Object[] jp_int2ext(IntMatrix1D i2e, Djp_bus bus,
 			Djp_gen gen, Djp_branch branch) {
@@ -222,7 +218,6 @@ public class Djp_int2ext {
 	 * @param dim
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D jp_int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering, int dim) {
 		Djp_order o = jpc.order;
 		DoubleMatrix1D int_val;
@@ -263,8 +258,8 @@ public class Djp_int2ext {
 					ne = (int) o.external.branch.size();
 					ni = (int) jpc.branch.size();
 				}
-				v = Djp_get_reorder.jp_get_reorder(val, util.irange(bi, bi + ni));
-				oldv = Djp_get_reorder.jp_get_reorder(oldval, util.irange(be, be + ne));
+				v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
+				oldv = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne));
 
 				DoubleMatrix1D new_v = jp_int2ext(jpc, v, oldv, order, dim);
 				int_val = DoubleFactory1D.dense.append(int_val, new_v);
@@ -273,7 +268,7 @@ public class Djp_int2ext {
 			}
 			ni = (int) val.size();
 			if (ni > bi) {				// the rest
-				DoubleMatrix1D new_v = Djp_get_reorder.jp_get_reorder(val, util.irange(bi, bi + ni));
+				DoubleMatrix1D new_v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
 				int_val = DoubleFactory1D.dense.append(int_val, new_v);
 			}
 		}
@@ -305,7 +300,6 @@ public class Djp_int2ext {
 	 * @param dim
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static DoubleMatrix2D jp_int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering, int dim) {
 		Djp_order o = jpc.order;
 		DoubleMatrix2D int_val;
@@ -352,8 +346,8 @@ public class Djp_int2ext {
 					ne = (int) o.external.branch.size();
 					ni = (int) jpc.branch.size();
 				}
-				v = Djp_get_reorder.jp_get_reorder(val, util.irange(bi, bi + ni), dim);
-				oldv = Djp_get_reorder.jp_get_reorder(oldval, util.irange(be, be + ne), dim);
+				v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
+				oldv = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne), dim);
 
 				DoubleMatrix2D new_v = jp_int2ext(jpc, v, oldv, order, dim);
 				if (dim == 1) {
@@ -368,7 +362,7 @@ public class Djp_int2ext {
 			}
 			ni = (int) val.size();
 			if (ni > bi) {				// the rest
-				DoubleMatrix2D new_v = Djp_get_reorder.jp_get_reorder(val, util.irange(bi, bi + ni), dim);
+				DoubleMatrix2D new_v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
 				if (dim == 1) {
 					int_val = DoubleFactory2D.dense.appendRows(int_val, new_v);
 				} else if (dim == 2) {

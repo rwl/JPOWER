@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -36,20 +34,21 @@ import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
 /**
  * Solves the power flow using a Gauss-Seidel method.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
+ * @author Ray Zimmerman
  * @author Alberto Borghetti, University of Bologna, Italy
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public class Djp_gausspf {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
-			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
-		return jp_gausspf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jp_jpoption());
-	}
+	public static double tol, normF;
+	public static int i, max_it, verbose, npv;
+	public static int[] pvpq;
+	public static boolean converged;
+	public static DComplexMatrix1D V, /*Va, */Vm, mis, dVpq, dVpv, absV;
+	public static DoubleMatrix1D F;
 
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
@@ -80,30 +79,30 @@ public class Djp_gausspf {
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
 
 		/* options */
-		double tol	= jpopt.get("PF_TOL");
-		int max_it	= jpopt.get("PF_MAX_IT").intValue();
-		int verbose	= jpopt.get("VERBOSE").intValue();
+		tol	= jpopt.get("PF_TOL");
+		max_it	= jpopt.get("PF_MAX_IT").intValue();
+		verbose	= jpopt.get("VERBOSE").intValue();
 
 		/* initialize */
-		int[] pvpq = util.icat(pv, pq);
-		boolean converged = false;
-		int i = 0;
-		DComplexMatrix1D V = V0;
-//		DComplexMatrix1D Va = V.copy().assign(cfunc.arg);
-		DComplexMatrix1D Vm = V.copy().assign(cfunc.abs);
+		pvpq = Djp_util.icat(pv, pq);
+		converged = false;
+		i = 0;
+		V = V0;
+		//Va = V.copy().assign(cfunc.arg);
+		Vm = V.copy().assign(cfunc.abs);
 
 		/* set up indexing for updating V */
-		int npv = pv.length;
+		npv = pv.length;
 
 		/* evaluate F(x0) */
-		DComplexMatrix1D mis = Ybus.zMult(V, null).assign(cfunc.conj);
+		mis = Ybus.zMult(V, null).assign(cfunc.conj);
 		mis.assign(V, cfunc.mult).assign(Sbus, cfunc.minus);
-		DoubleMatrix1D F = DoubleFactory1D.sparse.make(new DoubleMatrix1D[] {
+		F = DoubleFactory1D.sparse.make(new DoubleMatrix1D[] {
 				mis.viewSelection(pvpq).getRealPart(),
 				mis.viewSelection(pq).getImaginaryPart() });
 
 		/* check tolerance */
-		double normF = DenseDoubleAlgebra.DEFAULT.norm(F, Norm.Infinity);
+		normF = DenseDoubleAlgebra.DEFAULT.norm(F, Norm.Infinity);
 		if (verbose > 0)
 			System.out.printf("(Gauss-Seidel)\n");
 		if (verbose > 1) {
@@ -123,7 +122,7 @@ public class Djp_gausspf {
 			i += 1;
 
 			/* update voltage at PQ buses */
-			DComplexMatrix1D dVpq = Sbus.viewSelection(pq).copy().assign(V.viewSelection(pq), cfunc.div).assign(cfunc.conj);
+			dVpq = Sbus.viewSelection(pq).copy().assign(V.viewSelection(pq), cfunc.div).assign(cfunc.conj);
 			dVpq.assign(Ybus.viewSelection(pq, null).zMult(V, null), cfunc.minus);
 			for (int k : pq)
 				V.set(k, cfunc.plus.apply(V.get(k), cfunc.div.apply(dVpq.get(k), Ybus.get(k, k))));
@@ -131,11 +130,11 @@ public class Djp_gausspf {
 			/* update voltage at PV buses */
 			if (npv > 0) {
 				Sbus.viewSelection(pv).assignImaginary( Ybus.viewSelection(pv, null).zMult(V, null).assign(cfunc.conj).assign(V.viewSelection(pv), cfunc.mult).getImaginaryPart() );
-				DComplexMatrix1D dVpv = Sbus.viewSelection(pv).copy().assign(V.viewSelection(pv), cfunc.div).assign(cfunc.conj);
+				dVpv = Sbus.viewSelection(pv).copy().assign(V.viewSelection(pv), cfunc.div).assign(cfunc.conj);
 				dVpv.assign(Ybus.viewSelection(pv, null).zMult(V, null), cfunc.minus);
 				for (int k : pv)
 					V.set(k, cfunc.plus.apply(V.get(k), cfunc.div.apply(dVpv.get(k), Ybus.get(k, k))));
-				DComplexMatrix1D absV = V.viewSelection(pv).copy().assign(cfunc.abs);
+				absV = V.viewSelection(pv).copy().assign(cfunc.abs);
 				absV.assign(V.viewSelection(pv), cfunc.swapArgs(cfunc.div));
 				V.viewSelection(pv).assign(Vm).assign(absV, cfunc.mult);
 			}
@@ -162,4 +161,10 @@ public class Djp_gausspf {
 
 		return new Object[] {V, converged, i};
 	}
+
+	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
+		return jp_gausspf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jp_jpoption());
+	}
+
 }

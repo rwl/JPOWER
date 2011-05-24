@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -28,12 +26,10 @@ import cern.colt.util.tdouble.Djp_util;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public class Djp_branch {
-
-	private static final Djp_util util = new Djp_util();
 
 	private static final int F_BUS		= 0;
 	private static final int T_BUS		= 1;
@@ -232,11 +228,10 @@ public class Djp_branch {
 	 *
 	 * @param other
 	 */
-	@SuppressWarnings("static-access")
 	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.f_bus = util.intm(other.viewColumn(F_BUS));
-		this.t_bus = util.intm(other.viewColumn(T_BUS));
+		this.f_bus = Djp_util.intm(other.viewColumn(F_BUS));
+		this.t_bus = Djp_util.intm(other.viewColumn(T_BUS));
 		this.br_r = other.viewColumn(BR_R);
 		this.br_x = other.viewColumn(BR_X);
 		this.br_b = other.viewColumn(BR_B);
@@ -245,7 +240,7 @@ public class Djp_branch {
 		this.rate_c = other.viewColumn(RATE_C);
 		this.tap = other.viewColumn(TAP);
 		this.shift = other.viewColumn(SHIFT);
-		this.br_status = util.intm(other.viewColumn(BR_STATUS));
+		this.br_status = Djp_util.intm(other.viewColumn(BR_STATUS));
 		this.ang_min = other.viewColumn(ANGMIN);
 		this.ang_max = other.viewColumn(ANGMAX);
 
@@ -274,7 +269,6 @@ public class Djp_branch {
 	 * @param opf include optimal power flow solution data
 	 * @return branch data matrix
 	 */
-	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix(boolean pf, boolean opf) {
 		DoubleMatrix2D matrix;
 		if (pf && opf) {
@@ -287,8 +281,8 @@ public class Djp_branch {
 			matrix = DoubleFactory2D.dense.make(size(), 13);
 		}
 
-		matrix.viewColumn(F_BUS).assign( util.dblm(this.f_bus) );
-		matrix.viewColumn(T_BUS).assign( util.dblm(this.t_bus) );
+		matrix.viewColumn(F_BUS).assign( Djp_util.dblm(this.f_bus) );
+		matrix.viewColumn(T_BUS).assign( Djp_util.dblm(this.t_bus) );
 		matrix.viewColumn(BR_R).assign(this.br_r);
 		matrix.viewColumn(BR_X).assign(this.br_x);
 		matrix.viewColumn(BR_B).assign(this.br_b);
@@ -297,7 +291,7 @@ public class Djp_branch {
 		matrix.viewColumn(RATE_C).assign(this.rate_c);
 		matrix.viewColumn(TAP).assign(this.tap);
 		matrix.viewColumn(SHIFT).assign(this.shift);
-		matrix.viewColumn(BR_STATUS).assign( util.dblm(this.br_status) );
+		matrix.viewColumn(BR_STATUS).assign( Djp_util.dblm(this.br_status) );
 		matrix.viewColumn(ANGMIN).assign(this.ang_min);
 		matrix.viewColumn(ANGMAX).assign(this.ang_max);
 

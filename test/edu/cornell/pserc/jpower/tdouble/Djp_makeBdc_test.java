@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,33 +29,38 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public abstract class Djp_makeBdc_test extends Djp_base_test {
 
-	protected Djp_jpc jpc;
+	private Djp_jpc jpc;
 
-	public Djp_makeBdc_test(String name) {
-		super(name);
-		this.fname = "makeBdc";
-		/* Set 'jpc' in subclasses. */
+	public Djp_makeBdc_test(String name, String caseName, Djp_jpc jpc) {
+		super(name, caseName, "makeBdc");
+		this.jpc = jpc;
 	}
 
 	public void test_makeBdc() {
-		Djp_jpc jpc = Djp_loadcase.jp_loadcase(this.jpc);
+		Djp_jpc jpc;
+		AbstractMatrix[] Bdc;
+		File Bbus_file, Bf_file, Pbusinj_file, Pfinj_file;
+		DoubleMatrix2D Bbus, Bf;
+		DoubleMatrix1D Pbusinj, Pfinj;
+
+		jpc = Djp_loadcase.jp_loadcase(this.jpc);
 		jpc = Djp_ext2int.jp_ext2int(jpc);
-		AbstractMatrix[] Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
+		Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
 
-		File Bbus_file = new File(fdir, "Bbus.mtx");
-		File Bf_file = new File(fdir, "Bf.mtx");
-		File Pbusinj_file = new File(fdir, "Pbusinj.mtx");
-		File Pfinj_file = new File(fdir, "Pfinj.mtx");
+		Bbus_file    = new File(fdir, "Bbus.mtx");
+		Bf_file      = new File(fdir, "Bf.mtx");
+		Pbusinj_file = new File(fdir, "Pbusinj.mtx");
+		Pfinj_file   = new File(fdir, "Pfinj.mtx");
 
-		DoubleMatrix2D Bbus = (DoubleMatrix2D) Djp_mm.readMatrix(Bbus_file);
-		DoubleMatrix2D Bf = (DoubleMatrix2D) Djp_mm.readMatrix(Bf_file);
-		DoubleMatrix1D Pbusinj = (DoubleMatrix1D) Djp_mm.readMatrix(Pbusinj_file);
-		DoubleMatrix1D Pfinj = (DoubleMatrix1D) Djp_mm.readMatrix(Pfinj_file);
+		Bbus    = (DoubleMatrix2D) Djp_mm.readMatrix(Bbus_file);
+		Bf      = (DoubleMatrix2D) Djp_mm.readMatrix(Bf_file);
+		Pbusinj = (DoubleMatrix1D) Djp_mm.readMatrix(Pbusinj_file);
+		Pfinj   = (DoubleMatrix1D) Djp_mm.readMatrix(Pfinj_file);
 
 		assertTrue(dprop.equals((DoubleMatrix2D) Bdc[0], Bbus));
 		assertTrue(dprop.equals((DoubleMatrix2D) Bdc[1], Bf));

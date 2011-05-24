@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -108,13 +106,12 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
  * Any extra elements, rows, columns, etc. beyond those indicated
  * in ORDERING, are not disturbed.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_ext2int {
 
-	private static final Djp_util util = new Djp_util();
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	private static final int REF = Djp_jpc.REF;
@@ -142,12 +139,11 @@ public class Djp_ext2int {
 	 * @param areas
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch, Djp_areas areas) {
 
 		int[] i2e = bus.bus_i.toArray();
-		IntMatrix1D e2i = IntFactory1D.sparse.make(util.max(i2e));
-		e2i.viewSelection(i2e).assign(util.irange(bus.size()));
+		IntMatrix1D e2i = IntFactory1D.sparse.make(Djp_util.max(i2e));
+		e2i.viewSelection(i2e).assign(Djp_util.irange(bus.size()));
 
 		bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
 		gen.gen_bus.assign( e2i.viewSelection(gen.gen_bus.toArray()) );
@@ -165,7 +161,6 @@ public class Djp_ext2int {
 	 * @param jpc
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static Djp_jpc jp_ext2int(Djp_jpc jpc) {
 		boolean first = (jpc.order == null);
 		if (first || jpc.order.state.equals('e')) {
@@ -205,24 +200,24 @@ public class Djp_ext2int {
 
 			/* determine which buses, branches, gens are connected & in-service */
 			int[] bi = jpc.bus.bus_i.toArray();
-			IntMatrix1D n2i = new SparseRCIntMatrix2D(util.max(bi) + 1, 1,
-				bi, util.ones(nb), util.irange(nb), false, false, false).viewColumn(0);
+			IntMatrix1D n2i = new SparseRCIntMatrix2D(Djp_util.max(bi) + 1, 1,
+				bi, Djp_util.ones(nb), Djp_util.irange(nb), false, false, false).viewColumn(0);
 
 			/* bus status */
 			IntMatrix1D bs = jpc.bus.bus_type.copy();
 			bs.assign(ifunc.equals(NONE));
-			o.bus.status.off = util.nonzero(bs);	// isolated
+			o.bus.status.off = Djp_util.nonzero(bs);	// isolated
 			bs.assign(ifunc.equals(0));
-			o.bus.status.on = util.nonzero(bs);		// connected
+			o.bus.status.on = Djp_util.nonzero(bs);		// connected
 
 			/* gen status */
 			IntMatrix1D gs = jpc.gen.gen_status.copy();
 			int[] gbus = jpc.gen.gen_bus.toArray();
 			gs.assign(ifunc.equals(1));				// Assume boolean status
 			gs.assign(bs.viewSelection(n2i.viewSelection(gbus).toArray()), ifunc.and);
-			o.gen.status.on = util.nonzero(gs);		// on and connected
+			o.gen.status.on = Djp_util.nonzero(gs);		// on and connected
 			gs.assign(ifunc.equals(0));
-			o.gen.status.off = util.nonzero(gs);	// off or isolated
+			o.gen.status.off = Djp_util.nonzero(gs);	// off or isolated
 
 			/* branch status */
 			IntMatrix1D brs = jpc.branch.br_status.copy();
@@ -230,14 +225,14 @@ public class Djp_ext2int {
 			int[] tbus = jpc.branch.t_bus.toArray();
 			brs.assign(bs.viewSelection(n2i.viewSelection(fbus).toArray()), ifunc.and);
 			brs.assign(bs.viewSelection(n2i.viewSelection(tbus).toArray()), ifunc.and);
-			o.branch.status.on = util.nonzero(brs);	// on and connected
+			o.branch.status.on = Djp_util.nonzero(brs);	// on and connected
 			brs.assign(ifunc.equals(0));
-			o.branch.status.off = util.nonzero(brs);
+			o.branch.status.off = Djp_util.nonzero(brs);
 
 			if (jpc.areas != null) {
 				int[] prbus = jpc.areas.price_ref_bus.toArray();
 				IntMatrix1D as = bs.viewSelection(n2i.viewSelection(prbus).toArray());
-				o.areas.status.on = util.nonzero(as);
+				o.areas.status.on = Djp_util.nonzero(as);
 			}
 
 			/* delete stuff that is "out" */
@@ -256,7 +251,7 @@ public class Djp_ext2int {
 			/* apply consecutive bus numbering */
 			o.bus.i2e = jpc.bus.bus_i.copy();
 			o.bus.e2i = IntFactory1D.sparse.make(o.bus.i2e.aggregate(ifunc.max, ifunc.identity) + 1);
-			o.bus.e2i.viewSelection( o.bus.i2e.toArray() ).assign(util.irange(nb));
+			o.bus.e2i.viewSelection( o.bus.i2e.toArray() ).assign(Djp_util.irange(nb));
 			jpc.bus.bus_i.assign( o.bus.e2i.viewSelection(jpc.bus.bus_i.toArray()) );
 			jpc.gen.gen_bus.assign( o.bus.e2i.viewSelection(jpc.gen.gen_bus.toArray()) );
 			jpc.branch.f_bus.assign( o.bus.e2i.viewSelection( jpc.branch.f_bus.toArray()) );
@@ -380,7 +375,6 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D jp_ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering, int dim) {
 		Djp_order o = jpc.order;
 		DoubleMatrix1D int_val;
@@ -410,14 +404,14 @@ public class Djp_ext2int {
 				} else {				// TODO: enum
 					n= o.external.branch.size();
 				}
-				v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + n));
+				v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b + n));
 				DoubleMatrix1D new_v = jp_ext2int(jpc, v, ordering[k], dim);
 				int_val = DoubleFactory1D.dense.append(int_val, new_v);
 				b += n;
 			}
 			n = (int) val.size();
 			if (n > b) {				// the rest
-				DoubleMatrix1D new_v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b+n));
+				DoubleMatrix1D new_v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b + n));
 				int_val = DoubleFactory1D.dense.append(int_val, new_v);
 			}
 		}
@@ -449,7 +443,6 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static DoubleMatrix2D jp_ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering, int dim) {
 		Djp_order o = jpc.order;
 		DoubleMatrix2D int_val;
@@ -485,7 +478,7 @@ public class Djp_ext2int {
 				} else {				// TODO: enum
 					n = o.external.branch.size();
 				}
-				v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b + n), dim);
+				v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b + n), dim);
 				DoubleMatrix2D new_v = jp_ext2int(jpc, v, ordering[k], dim);
 				if (dim == 1) {
 					int_val = DoubleFactory2D.dense.appendRows(int_val, new_v);
@@ -498,7 +491,7 @@ public class Djp_ext2int {
 			}
 			n = (int) val.size();
 			if (n > b) {				// the rest
-				DoubleMatrix2D new_v = Djp_get_reorder.jp_get_reorder(val, util.irange(b, b+n), dim);
+				DoubleMatrix2D new_v = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b+n), dim);
 				if (dim == 1) {
 					int_val = DoubleFactory2D.dense.appendRows(int_val, new_v);
 				} else if (dim == 2) {
@@ -510,4 +503,5 @@ public class Djp_ext2int {
 		}
 		return int_val;
 	}
+
 }

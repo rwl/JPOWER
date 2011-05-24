@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -32,19 +30,17 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 /**
  * Checks for P-Q capability curve constraints.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_hasPQcap {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
-	public static IntMatrix1D jp_hasPQcap(Djp_gen gen) {
-		return jp_hasPQcap(gen, "B");	// look at both top and bottom by default
-	}
+	private static int[] k;
+	private static DoubleMatrix1D L, U, Qmin_at_Pmax, Qmax_at_Pmax;
 
 	/**
 	 * Returns a column vector of 1's and 0's. The 1's
@@ -76,22 +72,22 @@ public class Djp_hasPQcap {
 	public static IntMatrix1D jp_hasPQcap(Djp_gen gen, String hilo) {
 
 		/* check for errors capability curve data */
-		if ( util.any(gen.Pc1.copy().assign(gen.Pc2, dfunc.greater)) )
+		if ( Djp_util.any(gen.Pc1.copy().assign(gen.Pc2, dfunc.greater)) )
 			System.err.println("hasPQcap: Pc1 > Pc2");
 			// TODO: throw invalid capability curve data exception
 
-		if ( util.any(gen.Qc2max.copy().assign(gen.Qc1max, dfunc.greater)) )
+		if ( Djp_util.any(gen.Qc2max.copy().assign(gen.Qc1max, dfunc.greater)) )
 			System.err.println("hasPQcap: Qc2max > Qc1max");
 
-		if ( util.any(gen.Qc2min.copy().assign(gen.Qc1min, dfunc.less)) )
+		if ( Djp_util.any(gen.Qc2min.copy().assign(gen.Qc1min, dfunc.less)) )
 			System.err.println("hasPQcap: Qc2min < Qc1min");
 
-		DoubleMatrix1D L = DoubleFactory1D.dense.make(gen.size());
-		DoubleMatrix1D U = DoubleFactory1D.dense.make(gen.size());
-		int[] k = util.nonzero(util.intm( gen.Pc1.copy().assign(gen.Pc2, dfunc.equals) ).assign(ifunc.not));
+		L = DoubleFactory1D.dense.make(gen.size());
+		U = DoubleFactory1D.dense.make(gen.size());
+		k = Djp_util.nonzero(Djp_util.intm( gen.Pc1.copy().assign(gen.Pc2, dfunc.equals) ).assign(ifunc.not));
 
 		if (hilo != "U") {		// include lower constraint
-			DoubleMatrix1D Qmin_at_Pmax = gen.Qc2min.viewSelection(k).copy().assign(gen.Qc1min, dfunc.minus);
+			Qmin_at_Pmax = gen.Qc2min.viewSelection(k).copy().assign(gen.Qc1min, dfunc.minus);
 			Qmin_at_Pmax.assign(gen.Pc2.viewSelection(k).copy().assign(gen.Pc1.viewSelection(k), dfunc.minus), dfunc.div);
 			Qmin_at_Pmax.assign(gen.Pmax.viewSelection(k).copy().assign(gen.Pc1, dfunc.minus), dfunc.mult);
 			Qmin_at_Pmax.assign(gen.Qc1min.viewSelection(k).copy(), dfunc.plus);
@@ -100,7 +96,7 @@ public class Djp_hasPQcap {
 		}
 
 		if (hilo != "U") {		// include upper constraint
-			DoubleMatrix1D Qmax_at_Pmax = gen.Qc2max.viewSelection(k).copy().assign(gen.Qc1max, dfunc.minus);
+			Qmax_at_Pmax = gen.Qc2max.viewSelection(k).copy().assign(gen.Qc1max, dfunc.minus);
 			Qmax_at_Pmax.assign( gen.Pc2.viewSelection(k).copy().assign(gen.Pc1.viewSelection(k), dfunc.minus), dfunc.div );
 			Qmax_at_Pmax.assign( gen.Pmax.viewSelection(k).copy().assign(gen.Pc1, dfunc.minus), dfunc.mult );
 			Qmax_at_Pmax.assign( gen.Qc1max.viewSelection(k).copy(), dfunc.plus );
@@ -108,6 +104,11 @@ public class Djp_hasPQcap {
 			U.viewSelection(k).assign( Qmax_at_Pmax.assign(gen.Qmax.viewSelection(k), dfunc.less) );
 		}
 
-		return util.intm(L).assign(util.intm(U), ifunc.or);
+		return Djp_util.intm(L).assign(Djp_util.intm(U), ifunc.or);
 	}
+
+	public static IntMatrix1D jp_hasPQcap(Djp_gen gen) {
+		return jp_hasPQcap(gen, "B");	// look at both top and bottom by default
+	}
+
 }

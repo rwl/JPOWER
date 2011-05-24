@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,15 +29,18 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 /**
  * Converts polynomial cost variable to piecewise linear.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_poly2pwl {
 
-	private static final Djp_util util = new Djp_util();
-
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
+
+	private static int i, m;
+	private static double pmin, pmax, step;
+	private static Djp_gencost pwlcost;
+	private static DoubleMatrix1D xx, yy;
 
 	/**
 	 * Converts the polynomial
@@ -54,33 +55,34 @@ public class Djp_poly2pwl {
 	 * @param npts
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static Djp_gencost jp_poly2pwl(Djp_gencost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
 
-		Djp_gencost pwlcost = polycost.copy();
-		int m = polycost.size();
+		pwlcost = polycost.copy();
+		m = polycost.size();
 
 		pwlcost.model.assign(PW_LINEAR);	// change cost model
 		pwlcost.cost = DoubleFactory2D.dense.make(m, 2 * npts + 1);	// zero out old data
 		pwlcost.ncost.assign(npts);			// change number of data points
 
-		for (int i = 0; i < m; i++) {
-			double pmin = Pmin.get(i), pmax = Pmax.get(i);
-			DoubleMatrix1D xx = null;
+		for (i = 0; i < m; i++) {
+			pmin = Pmin.get(i); pmax = Pmax.get(i);
+
 			if (pmin == 0) {
-				double step = (pmax - pmin) / (npts - 1);
-				xx = DoubleFactory1D.dense.make(util.drange(pmin, pmax, step));
+				step = (pmax - pmin) / (npts - 1);
+				xx = DoubleFactory1D.dense.make(Djp_util.drange(pmin, pmax, step));
 			} else if (pmin > 0) {
-				double step = (pmax - pmin) / (npts - 1);
-				double[] x = util.dcat(new double[] {0}, util.drange(pmin, pmax, step));
+				step = (pmax - pmin) / (npts - 1);
+				double[] x = Djp_util.dcat(new double[] {0}, Djp_util.drange(pmin, pmax, step));
 				xx = DoubleFactory1D.dense.make(x);
 			} else if (pmin < 0 && pmax > 0) {
-				double step = (pmax - pmin) / (npts - 1);
-				xx = DoubleFactory1D.dense.make(util.drange(pmin, pmax, step));
+				step = (pmax - pmin) / (npts - 1);
+				xx = DoubleFactory1D.dense.make(Djp_util.drange(pmin, pmax, step));
+			} else {
+				// FIXME Pmin < 0 && Pmax <= 0
 			}
-			DoubleMatrix1D yy = Djp_totcost.jp_totcost(polycost.copy(new int[] {i}), xx);
-			pwlcost.cost.viewRow(i).viewSelection(util.irange(0, 2*(npts-1), 2)).assign(xx);
-			pwlcost.cost.viewRow(i).viewSelection(util.irange(1, 2*(npts-1)+1, 2)).assign(yy);
+			yy = Djp_totcost.jp_totcost(polycost.copy(new int[] {i}), xx);
+			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(0, 2 * (npts - 1)    , 2)).assign(xx);
+			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
 		}
 		return pwlcost;
 	}

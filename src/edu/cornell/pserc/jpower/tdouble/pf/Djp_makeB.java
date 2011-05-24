@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -30,13 +28,18 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 /**
  * Builds the FDPF matrices, B prime and B double prime.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_makeB {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
+
+	private static Djp_branch temp_branch;
+	private static Djp_bus temp_bus;
+	private static DComplexMatrix2D[] Ybus;
+	private static DoubleMatrix2D Bp, Bpp;
 
 	/**
 	 * Returns the two
@@ -54,16 +57,16 @@ public class Djp_makeB {
 	public static DoubleMatrix2D[] jp_makeB(double baseMVA, Djp_bus bus, Djp_branch branch, int alg) {
 
 		/* -----  form Bp (B prime)  ----- */
-		Djp_branch temp_branch = branch.copy();		// modify a copy of branch
-		Djp_bus temp_bus = bus.copy();				// modify a copy of bus
+		temp_branch = branch.copy();		// modify a copy of branch
+		temp_bus = bus.copy();				// modify a copy of bus
 		temp_bus.Bs.assign(0);						// zero out shunts at buses
 		temp_branch.br_b.assign(0);					// zero out line charging shunts
 		temp_branch.tap.assign(1);					// cancel out taps
 		if (alg == 2)								// if XB method
 			temp_branch.br_r.assign(0);				// zero out line resistance
 
-		DComplexMatrix2D[] Ybus = Djp_makeYbus.jp_makeYbus(baseMVA, temp_bus, temp_branch);
-		DoubleMatrix2D Bp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
+		Ybus = Djp_makeYbus.jp_makeYbus(baseMVA, temp_bus, temp_branch);
+		Bp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
 
 		/* -----  form Bpp (B double prime)  ----- */
 		temp_branch = branch.copy();				// modify a copy of branch
@@ -72,7 +75,7 @@ public class Djp_makeB {
 			temp_branch.br_b.assign(0);				// zero out line resistance
 
 		Ybus = Djp_makeYbus.jp_makeYbus(baseMVA, temp_bus, temp_branch);
-		DoubleMatrix2D Bpp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
+		Bpp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
 
 		return new DoubleMatrix2D[] {Bp, Bpp};
 	}

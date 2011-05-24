@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -36,41 +34,49 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public abstract class Djp_dcpf_test extends Djp_base_test {
 
-	protected Djp_jpc jpc;
+	private Djp_jpc jpc;
 
-	public Djp_dcpf_test(String name) {
-		super(name);
-		this.fname = "dcpf";
-		/* Set 'jpc' in subclasses. */
+	public Djp_dcpf_test(String name, String caseName, Djp_jpc jpc) {
+		super(name, caseName, "dcpf");
+		this.jpc = jpc;
 	}
 
-	@SuppressWarnings("static-access")
-	public void test_makeBdc() {
+	public void test_dcpf() {
+		Djp_jpc jpc;
+		IntMatrix1D[] bustypes;
+		int ref;
+		int[] pv, pq;
+		AbstractMatrix[] Bdc;
+		DoubleMatrix2D Bbus;
+		DComplexMatrix1D Sbus;
+		DoubleMatrix1D Pbus, Va0, Va, mpVa;
+
 		DoubleFunctions dfunc = DoubleFunctions.functions;
 
-		Djp_jpc jpc = Djp_loadcase.jp_loadcase(this.jpc);
+		jpc = Djp_loadcase.jp_loadcase(this.jpc);
 		jpc = Djp_ext2int.jp_ext2int(jpc);
-		IntMatrix1D[] bustypes = Djp_bustypes.jp_bustypes(jpc.bus, jpc.gen);
-		int ref = bustypes[0].get(0);
-		int[] pv = bustypes[1].toArray();
-		int[] pq = bustypes[2].toArray();
-		AbstractMatrix[] Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
-		DoubleMatrix2D Bbus = (DoubleMatrix2D) Bdc[0];
-		DComplexMatrix1D Sbus = Djp_makeSbus.jp_makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
-		DoubleMatrix1D Pbus = Sbus.getRealPart();
-		DoubleMatrix1D Va0 = jpc.bus.Va.copy();
+
+		bustypes = Djp_bustypes.jp_bustypes(jpc.bus, jpc.gen);
+		ref = bustypes[0].get(0);
+		pv  = bustypes[1].toArray();
+		pq  = bustypes[2].toArray();
+
+		Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
+		Bbus = (DoubleMatrix2D) Bdc[0];
+		Sbus = Djp_makeSbus.jp_makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
+		Pbus = Sbus.getRealPart();
+
+		Va0 = jpc.bus.Va.copy();
 		Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
-		DoubleMatrix1D Va = Djp_dcpf.jp_dcpf(Bbus, Pbus, Va0, ref, pv, pq);
+		Va = Djp_dcpf.jp_dcpf(Bbus, Pbus, Va0, ref, pv, pq);
 
-		File Va_file = new File(fdir, "Va.mtx");;
-
-		DoubleMatrix1D mpVa = (DoubleMatrix1D) Djp_mm.readMatrix(Va_file);
+		mpVa = (DoubleMatrix1D) Djp_mm.readMatrix(new File(fdir, "Va.mtx"));
 
 		assertTrue(dprop.equals(Va, mpVa));
 	}

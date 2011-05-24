@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -28,12 +26,10 @@ import cern.colt.util.tdouble.Djp_util;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
 public class Djp_gencost {
-
-	private static final Djp_util util = new Djp_util();
 
 	private static final int MODEL	= 0;
 	private static final int STARTUP	= 1;
@@ -104,29 +100,27 @@ public class Djp_gencost {
 	 *
 	 * @param other
 	 */
-	@SuppressWarnings("static-access")
 	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.model = util.intm(other.viewColumn(MODEL));
+		this.model = Djp_util.intm(other.viewColumn(MODEL));
 		this.startup = other.viewColumn(STARTUP);
 		this.shutdown = other.viewColumn(SHUTDOWN);
-		this.ncost = util.intm(other.viewColumn(NCOST));
-		this.cost = other.viewSelection(null, util.irange(COST, other.columns()));
+		this.ncost = Djp_util.intm(other.viewColumn(NCOST));
+		this.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
 	}
 
 	/**
 	 *
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix() {
-		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), util.max(ncost.toArray()) + 4);
+		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), Djp_util.max(ncost.toArray()) + 4);
 
-		matrix.viewColumn(MODEL).assign( util.dblm(this.model) );
+		matrix.viewColumn(MODEL).assign( Djp_util.dblm(this.model) );
 		matrix.viewColumn(MODEL).assign(this.startup);
 		matrix.viewColumn(SHUTDOWN).assign(this.shutdown);
-		matrix.viewColumn(NCOST).assign( util.dblm(this.ncost) );
-		matrix.viewSelection(null, util.irange(COST, COST + this.cost.columns())).assign(this.cost);
+		matrix.viewColumn(NCOST).assign( Djp_util.dblm(this.ncost) );
+		matrix.viewSelection(null, Djp_util.irange(COST, COST + this.cost.columns())).assign(this.cost);
 
 		return matrix;
 	}

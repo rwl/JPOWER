@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -36,17 +34,21 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 /**
  * Make the A matrix and RHS for the CCV formulation.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_makeAy {
 
-	private static final Djp_util util = new Djp_util();
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
+
+	private static int ny, nnz, k, ns, sidx, j;
+	private static int[] iycost;
+	private static DoubleMatrix1D by, p, c, m, b;
+	private static DoubleMatrix2D Ay;
 
 	/**
 	 * Constructs the parameters for linear "basin constraints" on Pg, Qg
@@ -78,13 +80,11 @@ public class Djp_makeAy {
 			int pgbas, int qgbas, int ybas) {
 
 		/* find all pwl cost rows in gencost, either real or reactive */
-		int[] iycost = util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
+		iycost = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
 
 		/* this is the number of extra "y" variables needed to model those costs */
-		int ny = iycost.length;
+		ny = iycost.length;
 
-		DoubleMatrix2D Ay;
-		DoubleMatrix1D by;
 		if (ny == 0) {
 			Ay = DoubleFactory2D.sparse.make(ybas+ny-1, 0);
 			by = DoubleFactory1D.dense.make(0);
@@ -106,41 +106,40 @@ public class Djp_makeAy {
 		 * this should be the quickest.
 		 */
 
-		int nnz = gencost.ncost.viewSelection(iycost).aggregate(ifunc.plus, ifunc.identity);	// total number of cost points
+		nnz = gencost.ncost.viewSelection(iycost).aggregate(ifunc.plus, ifunc.identity);	// total number of cost points
 		Ay = new SparseRCDoubleMatrix2D(nnz-ny, ybas+ny-1, 2*(nnz-ny));
 		by = DoubleFactory1D.dense.make(0);
 		/* First fill the Pg or Qg coefficients (since their columns come first)
 		 * and the rhs
 		 */
-		int k = 0;
+		k = 0;
 		for (int i : iycost) {
-			int ns = gencost.ncost.get(i);		// # of cost points; segments = ns-1
-			DoubleMatrix1D p = gencost.cost.viewRow(i).copy().viewSelection(util.irange(0, 2*ns-1, 2));
-			DoubleMatrix1D c = gencost.cost.viewRow(i).copy().viewSelection(util.irange(1, 2*ns, 2));
-			DoubleMatrix1D m = util.diff(c).assign(util.diff(p), dfunc.div);	// slopes for Pg (or Qg)
-			if (util.any(util.diff(p).assign(dfunc.equals(0))))
+			ns = gencost.ncost.get(i);		// # of cost points; segments = ns-1
+			p = gencost.cost.viewRow(i).copy().viewSelection(Djp_util.irange(0, 2*ns-1, 2));
+			c = gencost.cost.viewRow(i).copy().viewSelection(Djp_util.irange(1, 2*ns, 2));
+			m = Djp_util.diff(c).assign(Djp_util.diff(p), dfunc.div);	// slopes for Pg (or Qg)
+			if (Djp_util.any(Djp_util.diff(p).assign(dfunc.equals(0))))
 				System.out.printf("\nmakeAy: bad x axis data in row %i of gencost matrix\n", i);
-			DoubleMatrix1D b = m.copy().assign(p.viewPart(0, ns-1), dfunc.mult).assign(c.viewPart(0, ns-1), dfunc.minus);	// and rhs
+			b = m.copy().assign(p.viewPart(0, ns-1), dfunc.mult).assign(c.viewPart(0, ns-1), dfunc.minus);	// and rhs
 			by = DoubleFactory1D.dense.append(by, b);
-			int sidx;
 			if (i > ng) {
 				sidx = qgbas + (i-ng) - 1;		// this was for a q cost
 			} else {
 				sidx = pgbas + i - 1;			// this was for a p cost
 			}
-			Ay.viewColumn(sidx).viewSelection(util.irange(k, k+ns-2)).assign(m);
+			Ay.viewColumn(sidx).viewSelection(Djp_util.irange(k, k+ns-2)).assign(m);
 			k += ns - 1;
 		}
 		/* Now fill the y columns with -1's */
-		k = 0;
-		int j = 0;
+		k = j = 0;
 		for (int i : iycost) {
-			int ns = gencost.ncost.get(i);
-			Ay.viewColumn(ybas+j-1).viewSelection(util.irange(k, k+ns-2));
+			ns = gencost.ncost.get(i);
+			Ay.viewColumn(ybas+j-1).viewSelection(Djp_util.irange(k, k+ns-2));
 			k += ns - 1;
 			j += 1;
 		}
 
 		return null;
 	}
+
 }

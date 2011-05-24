@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -47,7 +45,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_printpf {
 
-	private static final Djp_util util = new Djp_util();
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
@@ -79,7 +76,6 @@ public class Djp_printpf {
 		jp_printpf(results, output, Djp_jpoption.jp_jpoption());
 	}
 
-	@SuppressWarnings("static-access")
 	public static void jp_printpf(Djp_jpc results, OutputStream output, Map<String, Double> jpopt) {
 		PrintWriter pw = new PrintWriter(output);
 
@@ -164,43 +160,43 @@ public class Djp_printpf {
 		int[] ties = tiesm.toArray();	// area inter-ties
 
 		DComplexMatrix1D tap = DComplexFactory1D.dense.make(nl, new double[] {1, 0});	// default tap ratio = 1 for lines
-		int[] xfmr = util.nonzero(branch.tap);							// indices of transformers
+		int[] xfmr = Djp_util.nonzero(branch.tap);							// indices of transformers
 		tap.viewSelection(xfmr).assignReal(branch.tap.viewSelection(xfmr));	// include transformer tap ratios
-		tap.assign(util.polar(tap.getRealPart(), branch.shift, false));	// add phase shifters
+		tap.assign(Djp_util.polar(tap.getRealPart(), branch.shift, false));	// add phase shifters
 
-		IntMatrix1D ld = util.intm(bus.Pd);
-		ld.assign(util.intm(bus.Qd), ifunc.or);
-		int[] nzld = util.nonzero(ld);
+		IntMatrix1D ld = Djp_util.intm(bus.Pd);
+		ld.assign(Djp_util.intm(bus.Qd), ifunc.or);
+		int[] nzld = Djp_util.nonzero(ld);
 
 		IntMatrix1D sorted_areas = IntSorting.quickSort.sort(bus.bus_area);
-		IntMatrix1D s_areasm = sorted_areas.viewSelection(util.nonzero(util.diff(sorted_areas))).copy();
+		IntMatrix1D s_areasm = sorted_areas.viewSelection(Djp_util.nonzero(Djp_util.diff(sorted_areas))).copy();
 		int[] s_areas = s_areasm.toArray();		// area numbers
 
-		IntMatrix1D shunt = util.intm(bus.Gs);
-		shunt.assign(util.intm(bus.Bs), ifunc.or);
-		int[] nzsh = util.nonzero(shunt);
+		IntMatrix1D shunt = Djp_util.intm(bus.Gs);
+		shunt.assign(Djp_util.intm(bus.Bs), ifunc.or);
+		int[] nzsh = Djp_util.nonzero(shunt);
 
 		IntMatrix1D isload = Djp_isload.jp_isload(gen);
 		IntMatrix1D notload = isload.copy();
 		notload.assign(ifunc.equals(0));
 
-		int[] allg = util.nonzero(notload);
+		int[] allg = Djp_util.nonzero(notload);
 		IntMatrix1D gs = gen.gen_status.copy();
 		gs.assign(notload, ifunc.and);
-		int[] ong  = util.nonzero(gs);
+		int[] ong  = Djp_util.nonzero(gs);
 		gs = gen.gen_status.copy();
 		gs.assign(isload, ifunc.and);
-		int[] onld = util.nonzero(gs);
+		int[] onld = Djp_util.nonzero(gs);
 
-		DComplexMatrix1D V = util.polar(bus.Vm, bus.Va, false);
+		DComplexMatrix1D V = Djp_util.polar(bus.Vm, bus.Va, false);
 		IntMatrix1D bs = branch.br_status.copy();
 
-		int[] out = util.nonzero( bs.assign(ifunc.equals(0)) );		// out-of-service branches
+		int[] out = Djp_util.nonzero( bs.assign(ifunc.equals(0)) );		// out-of-service branches
 		int nout = out.length;
 
 		DComplexMatrix1D loss = DComplexFactory1D.dense.make(nl);;
 		if (!isDC) {
-			DComplexMatrix1D z = util.complex(branch.br_r, branch.br_x);
+			DComplexMatrix1D z = Djp_util.complex(branch.br_r, branch.br_x);
 			loss.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()));
 			loss.assign(tap, cfunc.div);
 			loss.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), cfunc.minus);
@@ -317,33 +313,33 @@ public class Djp_printpf {
 			pw.printf("\n----  -----   -----  ------   -----  -----  -----   -----   -----  -----  -----");
 			for (int i = 0; i < s_areas.length; i++) {
 				int a = s_areas[i];
-				int[] ib = util.nonzero(bus.bus_area.copy().assign(ifunc.equals(a)));
+				int[] ib = Djp_util.nonzero(bus.bus_area.copy().assign(ifunc.equals(a)));
 
 				IntMatrix1D a_gbus = bus.bus_area.viewSelection( e2i.viewSelection(gen.gen_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
-				int[] ig = util.nonzero(a_gbus.copy().assign(notload, ifunc.and));
+				int[] ig = Djp_util.nonzero(a_gbus.copy().assign(notload, ifunc.and));
 //				ig = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & ~isload(gen));
-				int[] igon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and));
+				int[] igon = Djp_util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and));
 //				igon = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & gen(:, GEN_STATUS) > 0 & ~isload(gen));
-				int[] ildon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and));
+				int[] ildon = Djp_util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and));
 //				ildon = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & gen(:, GEN_STATUS) > 0 & isload(gen));
 
 				IntMatrix1D a_bus = bus.bus_area.copy().assign(ifunc.equals(a));
-				IntMatrix1D hasload = util.intm( bus.Pd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
-				hasload.assign(util.intm( bus.Qd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
-				int[] inzld = util.nonzero(a_bus.copy().assign(hasload, ifunc.and));
+				IntMatrix1D hasload = Djp_util.intm( bus.Pd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasload.assign(Djp_util.intm( bus.Qd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzld = Djp_util.nonzero(a_bus.copy().assign(hasload, ifunc.and));
 //				inzld = find(bus(:, BUS_AREA) == a & (bus(:, PD) | bus(:, QD)));
-				IntMatrix1D hasshunt = util.intm( bus.Gs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
-				hasshunt.assign(util.intm( bus.Bs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
-				int[] inzsh = util.nonzero(a_bus.copy().assign(hasshunt, ifunc.and));
+				IntMatrix1D hasshunt = Djp_util.intm( bus.Gs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasshunt.assign(Djp_util.intm( bus.Bs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzsh = Djp_util.nonzero(a_bus.copy().assign(hasshunt, ifunc.and));
 //				inzsh = find(bus(:, BUS_AREA) == a & (bus(:, GS) | bus(:, BS)));
 
 				IntMatrix1D a_fbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.f_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
 				IntMatrix1D a_tbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.t_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
-				int[] ibrch = util.nonzero(a_fbus.copy().assign(a_tbus, ifunc.and));
+				int[] ibrch = Djp_util.nonzero(a_fbus.copy().assign(a_tbus, ifunc.and));
 //				ibrch = find(bus(e2i(branch(:, F_BUS)), BUS_AREA) == a & bus(e2i(branch(:, T_BUS)), BUS_AREA) == a);
-				int[] in_tie = util.nonzero( a_fbus.copy().assign(a_tbus.copy().assign(ifunc.equals(0)), ifunc.and) );
+				int[] in_tie = Djp_util.nonzero( a_fbus.copy().assign(a_tbus.copy().assign(ifunc.equals(0)), ifunc.and) );
 //				in_tie = find(bus(e2i(branch(:, F_BUS)), BUS_AREA) == a & bus(e2i(branch(:, T_BUS)), BUS_AREA) ~= a);
-				int[] out_tie = util.nonzero( a_fbus.copy().assign(ifunc.equals(0)).assign(a_tbus, ifunc.and) );
+				int[] out_tie = Djp_util.nonzero( a_fbus.copy().assign(ifunc.equals(0)).assign(a_tbus, ifunc.and) );
 //				out_tie = find(bus(e2i(branch(:, F_BUS)), BUS_AREA) ~= a & bus(e2i(branch(:, T_BUS)), BUS_AREA) == a);
 				int nxfmr;
 				if (xfmr.length == 0) {
@@ -351,7 +347,7 @@ public class Djp_printpf {
 				} else {
 					a_fbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.f_bus.viewSelection(xfmr).toArray()).toArray() ).copy().assign(ifunc.equals(a));
 					a_tbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.t_bus.viewSelection(xfmr).toArray()).toArray() ).copy().assign(ifunc.equals(a));
-					nxfmr = util.nonzero(a_fbus.copy().assign(a_tbus, ifunc.and)).length;
+					nxfmr = Djp_util.nonzero(a_fbus.copy().assign(a_tbus, ifunc.and)).length;
 				}
 				pw.printf("\n%3d  %6d   %5d  %5d   %5d  %5d  %5d   %5d   %5d  %5d  %5d",
 					a, ib.length, ig.length, igon.length,
@@ -371,8 +367,8 @@ public class Djp_printpf {
 				int a = s_areas[i];
 
 				IntMatrix1D a_gbus = bus.bus_area.viewSelection( e2i.viewSelection(gen.gen_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
-				int[] ig = util.nonzero(a_gbus.copy().assign(notload, ifunc.and));
-				int[] igon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and));
+				int[] ig = Djp_util.nonzero(a_gbus.copy().assign(notload, ifunc.and));
+				int[] igon = Djp_util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and));
 
 				pw.printf("\n%3d   %7.1f  %7.1f to %-7.1f  %7.1f  %7.1f to %-7.1f   %7.1f %7.1f",
 					a, gen.Pmax.viewSelection(ig).zSum(), gen.Qmin.viewSelection(ig).zSum(), gen.Qmax.viewSelection(ig).zSum(),
@@ -396,11 +392,11 @@ public class Djp_printpf {
 				int a = s_areas[i];
 
 				IntMatrix1D a_gbus = bus.bus_area.viewSelection( e2i.viewSelection(gen.gen_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
-				int[] ildon = util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and));
+				int[] ildon = Djp_util.nonzero(a_gbus.copy().assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and));
 				IntMatrix1D a_bus = bus.bus_area.copy().assign(ifunc.equals(a));
-				IntMatrix1D hasload = util.intm( bus.Pd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
-				hasload.assign(util.intm( bus.Qd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
-				int[] inzld = util.nonzero(a_bus.copy().assign(hasload, ifunc.and));
+				IntMatrix1D hasload = Djp_util.intm( bus.Pd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasload.assign(Djp_util.intm( bus.Qd.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzld = Djp_util.nonzero(a_bus.copy().assign(hasload, ifunc.and));
 
 //				ildon = find(bus(e2i(gen(:, GEN_BUS)), BUS_AREA) == a & gen(:, GEN_STATUS) > 0 & isload(gen));
 //				inzld = find(bus(:, BUS_AREA) == a & (bus(:, PD) | bus(:, QD)));
@@ -427,24 +423,24 @@ public class Djp_printpf {
 			for (int i = 0; i < s_areas.length; i++) {
 				int a = s_areas[i];
 				IntMatrix1D a_bus = bus.bus_area.copy().assign(ifunc.equals(a));
-				IntMatrix1D hasshunt = util.intm( bus.Gs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
-				hasshunt.assign(util.intm( bus.Bs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
-				int[] inzsh = util.nonzero(a_bus.copy().assign(hasshunt, ifunc.and));
+				IntMatrix1D hasshunt = Djp_util.intm( bus.Gs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+				hasshunt.assign(Djp_util.intm( bus.Bs.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0)), ifunc.or);
+				int[] inzsh = Djp_util.nonzero(a_bus.copy().assign(hasshunt, ifunc.and));
 
 				IntMatrix1D a_fbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.f_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
 				IntMatrix1D a_tbus = bus.bus_area.viewSelection( e2i.viewSelection(branch.t_bus.toArray()).toArray() ).copy().assign(ifunc.equals(a));
-				int[] ibrch = util.nonzero( a_fbus.copy().assign(a_tbus, ifunc.and).assign(branch.br_status, ifunc.and) );
-				int[] in_tie = util.nonzero( a_fbus.copy().assign(a_tbus.copy().assign(ifunc.equals(0)), ifunc.and).assign(branch.br_status, ifunc.and) );
-				int[] out_tie = util.nonzero( a_fbus.copy().assign(ifunc.equals(0)).assign(a_tbus, ifunc.and).assign(branch.br_status, ifunc.and) );
+				int[] ibrch = Djp_util.nonzero( a_fbus.copy().assign(a_tbus, ifunc.and).assign(branch.br_status, ifunc.and) );
+				int[] in_tie = Djp_util.nonzero( a_fbus.copy().assign(a_tbus.copy().assign(ifunc.equals(0)), ifunc.and).assign(branch.br_status, ifunc.and) );
+				int[] out_tie = Djp_util.nonzero( a_fbus.copy().assign(ifunc.equals(0)).assign(a_tbus, ifunc.and).assign(branch.br_status, ifunc.and) );
 
 				pw.printf("\n%3d    %7.1f %7.1f    %7.1f    %7.2f %7.2f   %7.1f %7.1f",
 					a, -bus.Vm.viewSelection(inzsh).copy().assign(dfunc.square).assign(bus.Gs.viewSelection(inzsh), dfunc.mult).zSum(),
 					bus.Vm.viewSelection(inzsh).copy().assign(dfunc.square).assign(bus.Bs.viewSelection(inzsh), dfunc.mult).zSum(),
 					fchg.viewSelection(ibrch).zSum() + tchg.viewSelection(ibrch).zSum() + fchg.viewSelection(out_tie).zSum() + tchg.viewSelection(in_tie).zSum(),
-					loss.viewSelection(ibrch).getRealPart().zSum() + loss.viewSelection(util.icat(in_tie, out_tie)).getRealPart().zSum() / 2,
-					loss.viewSelection(ibrch).getImaginaryPart().zSum() + loss.viewSelection(util.icat(in_tie, out_tie)).getImaginaryPart().zSum() / 2,
-					branch.Pt.viewSelection(in_tie).zSum()+branch.Pf.viewSelection(out_tie).zSum() - loss.viewSelection(util.icat(in_tie, out_tie)).getRealPart().zSum() / 2,
-					branch.Qt.viewSelection(in_tie).zSum()+branch.Qf.viewSelection(out_tie).zSum() - loss.viewSelection(util.icat(in_tie, out_tie)).getImaginaryPart().zSum() / 2 );
+					loss.viewSelection(ibrch).getRealPart().zSum() + loss.viewSelection(Djp_util.icat(in_tie, out_tie)).getRealPart().zSum() / 2,
+					loss.viewSelection(ibrch).getImaginaryPart().zSum() + loss.viewSelection(Djp_util.icat(in_tie, out_tie)).getImaginaryPart().zSum() / 2,
+					branch.Pt.viewSelection(in_tie).zSum()+branch.Pf.viewSelection(out_tie).zSum() - loss.viewSelection(Djp_util.icat(in_tie, out_tie)).getRealPart().zSum() / 2,
+					branch.Qt.viewSelection(in_tie).zSum()+branch.Qf.viewSelection(out_tie).zSum() - loss.viewSelection(Djp_util.icat(in_tie, out_tie)).getImaginaryPart().zSum() / 2 );
 			}
 			pw.printf("\n----    ------  ------    --------    ------  ------    ------  ------");
 			pw.printf("\nTot:   %7.1f %7.1f    %7.1f    %7.2f %7.2f       -       -",
@@ -585,10 +581,10 @@ public class Djp_printpf {
 			double ctol = jpopt.get("OPF_VIOLATION");   // constraint violation tolerance
 			// voltage constraints
 			if (!isDC && ( OUT_V_LIM == 2 || (OUT_V_LIM == 1 &&
-					(util.any( bus.Vm.copy().assign(bus.Vmin.assign(dfunc.plus(ctol)), dfunc.less) ) ||
-							util.any( bus.Vm.copy().assign(bus.Vmax.assign(dfunc.minus(ctol)), dfunc.greater) ) ||
-							util.any( bus.mu_Vmin.copy().assign(dfunc.greater(ptol)) ) ||
-							util.any( bus.mu_Vmax.copy().assign(dfunc.greater(ptol)) )))) ) {
+					(Djp_util.any( bus.Vm.copy().assign(bus.Vmin.assign(dfunc.plus(ctol)), dfunc.less) ) ||
+							Djp_util.any( bus.Vm.copy().assign(bus.Vmax.assign(dfunc.minus(ctol)), dfunc.greater) ) ||
+							Djp_util.any( bus.mu_Vmin.copy().assign(dfunc.greater(ptol)) ) ||
+							Djp_util.any( bus.mu_Vmax.copy().assign(dfunc.greater(ptol)) )))) ) {
 				pw.printf("\n================================================================================");
 				pw.printf("\n|     Voltage Constraints                                                      |");
 				pw.printf("\n================================================================================");
@@ -617,15 +613,15 @@ public class Djp_printpf {
 			}
 
 			/* generator constraints */
-			boolean anyP = ( util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					util.any( gen.mu_Pmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
-					util.any( gen.mu_Pmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
+			boolean anyP = ( Djp_util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					Djp_util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					Djp_util.any( gen.mu_Pmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
+					Djp_util.any( gen.mu_Pmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
 
-			boolean anyQ = ( util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					util.any( gen.mu_Qmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
-					util.any( gen.mu_Qmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
+			boolean anyQ = ( Djp_util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					Djp_util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					Djp_util.any( gen.mu_Qmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
+					Djp_util.any( gen.mu_Qmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
 
 			if (OUT_PG_LIM == 2 ||
 					(OUT_PG_LIM == 1 && anyP) ||
@@ -698,15 +694,15 @@ public class Djp_printpf {
 			}
 
 			/* dispatchable load constraints */
-			boolean anyP_ld = ( util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					util.any( gen.mu_Pmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
-					util.any( gen.mu_Pmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
+			boolean anyP_ld = ( Djp_util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					Djp_util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					Djp_util.any( gen.mu_Pmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
+					Djp_util.any( gen.mu_Pmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
 
-			boolean anyQ_ld = ( util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					util.any( gen.mu_Qmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
-					util.any( gen.mu_Qmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
+			boolean anyQ_ld = ( Djp_util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
+					Djp_util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
+					Djp_util.any( gen.mu_Qmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
+					Djp_util.any( gen.mu_Qmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
 
 			if (OUT_PG_LIM == 2 || OUT_QG_LIM == 2 ||
 					(OUT_PG_LIM == 1 && anyP_ld) ||
@@ -787,28 +783,28 @@ public class Djp_printpf {
 				Ft = branch.Pt.copy();
 				str = "\n  #     Bus    Pf  mu     Pf      |Pmax|      Pt      Pt  mu   Bus";
 			} else if (jpopt.get("OPF_FLOW_LIM") == 2) {   // |I| limit
-				DComplexMatrix1D Sf = util.complex(branch.Pf, branch.Qf);
-				DComplexMatrix1D St = util.complex(branch.Pt, branch.Qt);
+				DComplexMatrix1D Sf = Djp_util.complex(branch.Pf, branch.Qf);
+				DComplexMatrix1D St = Djp_util.complex(branch.Pt, branch.Qt);
 				Sf.assign(V.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray()), cfunc.div);
 				St.assign(V.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), cfunc.div);
 				Ff = Sf.assign(cfunc.abs).getRealPart();
 				Ft = St.assign(cfunc.abs).getRealPart();
 				str = "\n  #     Bus   |If| mu    |If|     |Imax|     |It|    |It| mu   Bus";
 			} else {                // |S| limit
-				DComplexMatrix1D Sf = util.complex(branch.Pf, branch.Qf);
-				DComplexMatrix1D St = util.complex(branch.Pt, branch.Qt);
+				DComplexMatrix1D Sf = Djp_util.complex(branch.Pf, branch.Qf);
+				DComplexMatrix1D St = Djp_util.complex(branch.Pt, branch.Qt);
 				Ff = Sf.assign(cfunc.abs).getRealPart();
 				Ft = St.assign(cfunc.abs).getRealPart();
 				str = "\n  #     Bus   |Sf| mu    |Sf|     |Smax|     |St|    |St| mu   Bus";
 			}
-			IntMatrix1D rated = util.intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
+			IntMatrix1D rated = Djp_util.intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.equals(0));
 			DoubleMatrix1D F_tol = branch.rate_a.copy().assign(dfunc.minus(ctol));
-			IntMatrix1D Uf = util.intm(Ff.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained from
-			IntMatrix1D Ut = util.intm(Ft.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained to
-			boolean anyF = (util.any( rated.copy().assign(Uf, ifunc.and) ) ||
-					util.any( rated.copy().assign(Ut, ifunc.and) ) ||
-					util.any( branch.mu_Sf.copy().assign(dfunc.greater(ptol)) ) ||
-					util.any( branch.mu_St.copy().assign(dfunc.greater(ptol)) ));
+			IntMatrix1D Uf = Djp_util.intm(Ff.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained from
+			IntMatrix1D Ut = Djp_util.intm(Ft.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained to
+			boolean anyF = (Djp_util.any( rated.copy().assign(Uf, ifunc.and) ) ||
+					Djp_util.any( rated.copy().assign(Ut, ifunc.and) ) ||
+					Djp_util.any( branch.mu_Sf.copy().assign(dfunc.greater(ptol)) ) ||
+					Djp_util.any( branch.mu_St.copy().assign(dfunc.greater(ptol)) ));
 			if (OUT_LINE_LIM == 2 || (OUT_LINE_LIM == 1 && anyF)) {
 				pw.printf("\n================================================================================");
 				pw.printf("\n|     Branch Flow Constraints                                                  |");

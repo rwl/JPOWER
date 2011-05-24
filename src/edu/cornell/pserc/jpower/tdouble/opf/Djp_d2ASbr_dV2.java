@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -24,23 +22,25 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 
 /**
  * Computes 2nd derivatives of |complex power flow|^2 w.r.t. V.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_d2ASbr_dV2 {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
+
+	private static DComplexMatrix2D diaglam, conj_diagSbr, Saa, Sav, Sva, Svv, conj_dSbr_dVa, conj_dSbr_dVm;
+	private static DComplexMatrix2D[] d2Sbr_dV2;
+	private static DoubleMatrix2D Haa, Hva, Hav, Hvv;
 
 	/**
 	 * Returns 4 matrices containing the partial derivatives w.r.t. voltage
@@ -64,29 +64,29 @@ public class Djp_d2ASbr_dV2 {
 	public static DoubleMatrix2D[] jp_d2ASbr_dV2(DComplexMatrix2D dSbr_dVa, DComplexMatrix2D dSbr_dVm,
 			DComplexMatrix1D Sbr, DComplexMatrix2D Cbr, DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
 
-		DComplexMatrix2D diaglam = DComplexFactory2D.sparse.diagonal(lam);
-		DComplexMatrix2D conj_diagSbr = DComplexFactory2D.sparse.diagonal(Sbr.copy().assign(cfunc.conj));
+		diaglam = DComplexFactory2D.sparse.diagonal(lam);
+		conj_diagSbr = DComplexFactory2D.sparse.diagonal(Sbr.copy().assign(cfunc.conj));
 
-		DComplexMatrix2D[] d2Sbr_dV2 = Djp_d2Sbr_dV2.jp_d2Sbr_dV2(Cbr, Ybr, V, conj_diagSbr.zMult(lam, null));
-		DComplexMatrix2D Saa = d2Sbr_dV2[0];
-		DComplexMatrix2D Sav = d2Sbr_dV2[1];
-		DComplexMatrix2D Sva = d2Sbr_dV2[2];
-		DComplexMatrix2D Svv = d2Sbr_dV2[3];
+		d2Sbr_dV2 = Djp_d2Sbr_dV2.jp_d2Sbr_dV2(Cbr, Ybr, V, conj_diagSbr.zMult(lam, null));
+		Saa = d2Sbr_dV2[0];
+		Sav = d2Sbr_dV2[1];
+		Sva = d2Sbr_dV2[2];
+		Svv = d2Sbr_dV2[3];
 
-		DComplexMatrix2D conj_dSbr_dVa = dSbr_dVa.copy().assign(cfunc.conj);
-		DComplexMatrix2D conj_dSbr_dVm = dSbr_dVm.copy().assign(cfunc.conj);
+		conj_dSbr_dVa = dSbr_dVa.copy().assign(cfunc.conj);
+		conj_dSbr_dVm = dSbr_dVm.copy().assign(cfunc.conj);
 
 		Saa.assign(dSbr_dVa.viewDice(), cfunc.plus);
-		DoubleMatrix2D Haa = Saa.zMult(diaglam, null).zMult(conj_dSbr_dVa, null).getRealPart().assign(dfunc.mult(2));
+		Haa = Saa.zMult(diaglam, null).zMult(conj_dSbr_dVa, null).getRealPart().assign(dfunc.mult(2));
 
 		Sva.assign(dSbr_dVm.viewDice(), cfunc.plus);
-		DoubleMatrix2D Hva = Sva.zMult(diaglam, null).zMult(conj_dSbr_dVa, null).getRealPart().assign(dfunc.mult(2));
+		Hva = Sva.zMult(diaglam, null).zMult(conj_dSbr_dVa, null).getRealPart().assign(dfunc.mult(2));
 
 		Sav.assign(dSbr_dVa.viewDice(), cfunc.plus);
-		DoubleMatrix2D Hav = Sav.zMult(diaglam, null).zMult(conj_dSbr_dVm, null).getRealPart().assign(dfunc.mult(2));
+		Hav = Sav.zMult(diaglam, null).zMult(conj_dSbr_dVm, null).getRealPart().assign(dfunc.mult(2));
 
 		Svv.assign(dSbr_dVm.viewDice(), cfunc.plus);
-		DoubleMatrix2D Hvv = Svv.zMult(diaglam, null).zMult(conj_dSbr_dVm, null).getRealPart().assign(dfunc.mult(2));
+		Hvv = Svv.zMult(diaglam, null).zMult(conj_dSbr_dVm, null).getRealPart().assign(dfunc.mult(2));
 
 		return new DoubleMatrix2D[] {Haa, Hav, Hva, Hvv};
 	}

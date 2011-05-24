@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 1996-2010 Power System Engineering Research Center (PSERC)
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,13 +29,16 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 /**
  * Computes partial derivatives of branch currents w.r.t. voltage.
  *
- * @author Ray Zimmerman (rz10@cornell.edu)
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
  *
  */
 public class Djp_dIbr_dV {
 
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
+
+	private static DComplexMatrix1D Vnorm, If, It;
+	private static DComplexMatrix2D diagV, diagVnorm, dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm;
 
 	/**
 	 * Returns four matrices containing partial derivatives of the complex
@@ -70,19 +71,19 @@ public class Djp_dIbr_dV {
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] jp_dIbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
 
-		DComplexMatrix1D Vnorm = V.copy().assign(cfunc.abs).assign(V, cfunc.swapArgs(cfunc.div));
-		DComplexMatrix2D diagV = DComplexFactory2D.sparse.diagonal(V);
-		DComplexMatrix2D diagVnorm = DComplexFactory2D.sparse.diagonal(Vnorm);
+		Vnorm = V.copy().assign(cfunc.abs).assign(V, cfunc.swapArgs(cfunc.div));
+		diagV = DComplexFactory2D.sparse.diagonal(V);
+		diagVnorm = DComplexFactory2D.sparse.diagonal(Vnorm);
 
 		diagV.assign(cfunc.mult(new double[] {1, 0}));
-		DComplexMatrix2D dIf_dVa = Yf.zMult(diagV, null);
-		DComplexMatrix2D dIf_dVm = Yf.zMult(diagVnorm, null);
-		DComplexMatrix2D dIt_dVa = Yt.zMult(diagV, null);
-		DComplexMatrix2D dIt_dVm = Yf.zMult(diagVnorm, null);
+		dIf_dVa = Yf.zMult(diagV, null);
+		dIf_dVm = Yf.zMult(diagVnorm, null);
+		dIt_dVa = Yt.zMult(diagV, null);
+		dIt_dVm = Yf.zMult(diagVnorm, null);
 
 		/* compute currents */
-		DComplexMatrix1D If = Yf.zMult(V, null);
-		DComplexMatrix1D It = Yt.zMult(V, null);
+		If = Yf.zMult(V, null);
+		It = Yt.zMult(V, null);
 
 		return new AbstractMatrix[] {dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm, If, It};
 	}

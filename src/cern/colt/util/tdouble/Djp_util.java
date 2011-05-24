@@ -1,20 +1,18 @@
 /*
- * Copyright (C) 2010 Richard Lincoln
+ * Copyright (C) 2010-2011 Richard Lincoln
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * JPOWER is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -39,18 +37,28 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
 
 /**
  *
- * @author Richard Lincoln (r.w.lincoln@gmail.com)
+ * @author Richard Lincoln
  *
  */
-public class Djp_util {
+public class Djp_util extends Object {
 
-	public static IntFunctions ifunc = IntFunctions.intFunctions;
-	public static DoubleFunctions dfunc = DoubleFunctions.functions;
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
+	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
+
+	// singleton
+	public static final Djp_util util = new Djp_util();
+
+	/**
+	 * Makes this class non instantiable, but still let's others inherit from
+	 * it.
+	 */
+	protected Djp_util() {
+	}
 
 	/**
 	 * Machine epsilon.
 	 */
-	public double EPS = 1e-15;
+	public static final double EPS = 1e-15;
 
 	/**
 	 *
@@ -479,7 +487,6 @@ public class Djp_util {
 	 * @param radians is 'theta' expressed in radians.
 	 * @return complex polar representation.
 	 */
-	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D polar(DoubleMatrix1D r, DoubleMatrix1D theta, boolean radians) {
 		DoubleMatrix1D real = theta.copy();
 		DoubleMatrix1D imag = theta.copy();
@@ -504,7 +511,6 @@ public class Djp_util {
 	 * @param x
 	 * @return [x(1)-x(0)  x(2)-x(1) ... x(n)-x(n-1)]
 	 */
-	@SuppressWarnings("static-access")
 	public static IntMatrix1D diff(IntMatrix1D x) {
 		int size = (int) x.size() -1;
 		IntMatrix1D d = IntFactory1D.dense.make(size);
@@ -518,7 +524,6 @@ public class Djp_util {
 	 * @param x
 	 * @return [x(1)-x(0)  x(2)-x(1) ... x(n)-x(n-1)]
 	 */
-	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D diff(DoubleMatrix1D x) {
 		int size = (int) x.size() -1;
 		DoubleMatrix1D d = DoubleFactory1D.dense.make(size);
@@ -649,7 +654,6 @@ public class Djp_util {
 	 * @param row_major
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public static IntMatrix1D sub2ind(int rows, int cols, IntMatrix1D I, IntMatrix1D J, boolean row_major) {
 		IntMatrix1D ind;
 		if (row_major) {
