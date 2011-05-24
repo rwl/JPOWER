@@ -251,7 +251,7 @@ public class Djp_util extends Object {
 				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int i = firstIdx; i < lastIdx; i++) {
-							values[i] = (int) d.getQuick(i);
+							values[i] = (int) Math.round(d.getQuick(i));
 						}
 					}
 				});
@@ -284,7 +284,7 @@ public class Djp_util extends Object {
 				futures[j] = ConcurrencyUtils.submit(new Runnable() {
 					public void run() {
 						for (int i = firstIdx; i < lastIdx; i++) {
-							values.setQuick(i, (int) d.getQuick(i));
+							values.setQuick(i, (int) Math.round( d.getQuick(i)) );
 						}
 					}
 				});

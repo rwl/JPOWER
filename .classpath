@@ -10,6 +10,6 @@
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/netlib-java.jar"/>
 	<classpathentry kind="lib" path="lib/optimization.jar"/>
-	<classpathentry kind="src" path="/ParallelColt"/>
+	<classpathentry kind="lib" path="lib/parallelcolt-0.9.4.jar" sourcepath="/ParallelColt"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

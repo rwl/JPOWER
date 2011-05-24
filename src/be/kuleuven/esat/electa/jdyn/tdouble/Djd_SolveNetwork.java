@@ -21,7 +21,7 @@ package be.kuleuven.esat.electa.jdyn.tdouble;
 
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
-import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
+//import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
@@ -57,52 +57,52 @@ public class Djd_SolveNetwork {
 	 * @param gentype generator models
 	 * @return bus voltages
 	 */
-	@SuppressWarnings("static-access")
-	public static DComplexMatrix1D jp_SolveNetwork(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
-			SparseDComplexLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
-
-		/* Init */
-		ngen = gbus.length;
-		Igen = DComplexFactory1D.dense.make(ngen);
-
-		s = invYbus.getPivot().length;
-
-		Ig = DComplexFactory1D.dense.make(s);
-		d = IntFactory1D.dense.make(Djp_util.irange((int) gentype.size()));
-
-		/* Define types */
-		type1 = d.viewSelection( gentype.copy().assign(ifunc.equals(1)).toArray() ).toArray();
-		type2 = d.viewSelection( gentype.copy().assign(ifunc.equals(2)).toArray() ).toArray();
-
-		/* Generator type 1: classical model */
-		delta = Xgen.viewColumn(0).viewSelection(type1).copy();
-		Eq_tr = Xgen.viewColumn(2).viewSelection(type1).copy();
-
-		xd_tr = Pgen.viewColumn(6).viewSelection(type1).copy();
-
-		// Calculate generator currents
-		Igen.viewSelection(type1).assign( Djp_util.polar(Eq_tr, delta).assign(Djp_util.complex(null, xd_tr), cfunc.div) );
-
-		/* Generator type 2: 4th order model */
-		delta = Xgen.viewColumn(0).viewSelection(type2).copy();
-		Eq_tr = Xgen.viewColumn(2).viewSelection(type2).copy();
-		Ed_tr = Xgen.viewColumn(3).viewSelection(type2).copy();
-
-		xd_tr = Pgen.viewColumn(7).viewSelection(type2).copy();
-
-		// Calculate generator currents
-		Igen.viewSelection(type2).assign( Djp_util.complex(Eq_tr, Ed_tr).assign(Djp_util.complex(null, delta).assign(cfunc.exp), cfunc.mult) );
-		Igen.viewSelection(type2).assign( Djp_util.complex(null, xd_tr), cfunc.div );  // Padiyar, p.417.
-
-		/* Calculations */
-		// Generator currents
-		Ig.viewSelection(gbus).assign(Igen);
-
-		// Calculate network voltages: U = Y/Ig
-		invYbus.solve(Ig);
-		U = Ig;
-
-		return U;
-	}
+//	@SuppressWarnings("static-access")
+//	public static DComplexMatrix1D jp_SolveNetwork(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
+//			SparseDComplexLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
+//
+//		/* Init */
+//		ngen = gbus.length;
+//		Igen = DComplexFactory1D.dense.make(ngen);
+//
+//		s = invYbus.getPivot().length;
+//
+//		Ig = DComplexFactory1D.dense.make(s);
+//		d = IntFactory1D.dense.make(Djp_util.irange((int) gentype.size()));
+//
+//		/* Define types */
+//		type1 = d.viewSelection( gentype.copy().assign(ifunc.equals(1)).toArray() ).toArray();
+//		type2 = d.viewSelection( gentype.copy().assign(ifunc.equals(2)).toArray() ).toArray();
+//
+//		/* Generator type 1: classical model */
+//		delta = Xgen.viewColumn(0).viewSelection(type1).copy();
+//		Eq_tr = Xgen.viewColumn(2).viewSelection(type1).copy();
+//
+//		xd_tr = Pgen.viewColumn(6).viewSelection(type1).copy();
+//
+//		// Calculate generator currents
+//		Igen.viewSelection(type1).assign( Djp_util.polar(Eq_tr, delta).assign(Djp_util.complex(null, xd_tr), cfunc.div) );
+//
+//		/* Generator type 2: 4th order model */
+//		delta = Xgen.viewColumn(0).viewSelection(type2).copy();
+//		Eq_tr = Xgen.viewColumn(2).viewSelection(type2).copy();
+//		Ed_tr = Xgen.viewColumn(3).viewSelection(type2).copy();
+//
+//		xd_tr = Pgen.viewColumn(7).viewSelection(type2).copy();
+//
+//		// Calculate generator currents
+//		Igen.viewSelection(type2).assign( Djp_util.complex(Eq_tr, Ed_tr).assign(Djp_util.complex(null, delta).assign(cfunc.exp), cfunc.mult) );
+//		Igen.viewSelection(type2).assign( Djp_util.complex(null, xd_tr), cfunc.div );  // Padiyar, p.417.
+//
+//		/* Calculations */
+//		// Generator currents
+//		Ig.viewSelection(gbus).assign(Igen);
+//
+//		// Calculate network voltages: U = Y/Ig
+//		invYbus.solve(Ig);
+//		U = Ig;
+//
+//		return U;
+//	}
 
 }

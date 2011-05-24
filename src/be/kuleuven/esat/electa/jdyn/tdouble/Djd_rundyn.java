@@ -32,7 +32,6 @@ import be.kuleuven.esat.electa.jdyn.tdouble.models.generators.Djd_GeneratorInit;
 import be.kuleuven.esat.electa.jdyn.tdouble.models.governors.Djd_GovernorInit;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
-import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
@@ -89,7 +88,7 @@ public class Djd_rundyn {
 	private static Djp_gen gen;
 	private static Djp_branch branch;
 
-	private static SparseDComplexLUDecomposition invYbus;
+//	private static SparseDComplexLUDecomposition invYbus;
 
 	@SuppressWarnings("static-access")
 	public static Object[] jd_rundyn(String casefile_pf, String casefile_dyn, String casefile_ev, DoubleMatrix1D jdopt) {
@@ -176,7 +175,7 @@ public class Djd_rundyn {
 		xd_tr.viewSelection(type2).assign(Pgen0.xd_tr.viewSelection(type2));	// 4th order model: xd_tr column 7
 		xd_tr.viewSelection(type1).assign(Pgen0.xp.viewSelection(type1));		// classical model: xd_tr column 6
 
-		invYbus = Djd_AugYbus.jd_AugYbus(baseMVA, bus, branch, xd_tr, gbus, Pl, Ql, U0);
+//		invYbus = Djd_AugYbus.jd_AugYbus(baseMVA, bus, branch, xd_tr, gbus, Pl, Ql, U0);
 
 		/* Calculate Initial machine state */
 		if (output)

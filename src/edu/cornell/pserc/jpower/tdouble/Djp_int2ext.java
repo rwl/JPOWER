@@ -133,7 +133,7 @@ public class Djp_int2ext {
 			/* update data (in bus, branch and gen only) */
 			jpc.bus.update(o.internal.bus, o.bus.status.on);
 			jpc.branch.update(o.internal.branch, o.branch.status.on);
-			jpc.gen.update(o.internal.gen.copy(o.gen.i2e.toArray()), o.branch.status.on);
+			jpc.gen.update(o.internal.gen.copy(o.gen.i2e.toArray()), o.gen.status.on);
 			if (jpc.areas != null)
 				jpc.areas.update(o.internal.areas, o.areas.status.on);
 

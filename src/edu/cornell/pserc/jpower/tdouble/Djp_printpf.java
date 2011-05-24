@@ -162,7 +162,7 @@ public class Djp_printpf {
 
 		/* internal bus number */
 		i2e = bus.bus_i.copy();
-		e2i = IntFactory1D.sparse.make(i2e.aggregate(ifunc.max, ifunc.identity));
+		e2i = IntFactory1D.sparse.make(i2e.aggregate(ifunc.max, ifunc.identity) + 1);
 		e2i.viewSelection(i2e.toArray()).assign( Djp_util.irange(bus.size()) );
 
 		/* sizes */
@@ -187,7 +187,7 @@ public class Djp_printpf {
 		tiesm.assign(IntFunctions.equals(0));
 		ties = tiesm.toArray();	// area inter-ties
 
-		tap = DComplexFactory1D.dense.make(nl, new double[] {1, 0});	// default tap ratio = 1 for lines
+		tap = DComplexFactory1D.dense.make(nl).assign(1, 0);	// default tap ratio = 1 for lines
 		xfmr = Djp_util.nonzero(branch.tap);							// indices of transformers
 		tap.viewSelection(xfmr).assignReal(branch.tap.viewSelection(xfmr));	// include transformer tap ratios
 		tap.assign(Djp_util.polar(tap.getRealPart(), branch.shift, false));	// add phase shifters
@@ -638,14 +638,18 @@ public class Djp_printpf {
 
 			/* generator constraints */
 			anyP = ( Djp_util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					Djp_util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					Djp_util.any( gen.mu_Pmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
-					Djp_util.any( gen.mu_Pmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
+					Djp_util.any( gen.Pg.viewSelection(ong).copy().assign(gen.Pmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) );
+			if (gen.mu_Pmin != null)  // FIXME Should add zeros for result fields when loading case
+				anyP = anyP || Djp_util.any( gen.mu_Pmin.viewSelection(ong).assign(dfunc.greater(ptol)) );
+			if (gen.mu_Pmax != null)
+				anyP = anyP || Djp_util.any( gen.mu_Pmax.viewSelection(ong).assign(dfunc.greater(ptol)) );
 
 			anyQ = ( Djp_util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmin.viewSelection(ong).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					Djp_util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					Djp_util.any( gen.mu_Qmin.viewSelection(ong).assign(dfunc.greater(ptol)) ) ||
-					Djp_util.any( gen.mu_Qmax.viewSelection(ong).assign(dfunc.greater(ptol)) ) );
+					Djp_util.any( gen.Qg.viewSelection(ong).copy().assign(gen.Qmax.viewSelection(ong).assign(dfunc.minus(ctol)), dfunc.less) ) );
+			if (gen.mu_Qmin != null)
+				anyQ = anyQ || Djp_util.any( gen.mu_Qmin.viewSelection(ong).assign(dfunc.greater(ptol)) );
+			if (gen.mu_Qmax != null)
+				anyQ = anyQ || Djp_util.any( gen.mu_Qmax.viewSelection(ong).assign(dfunc.greater(ptol)) );
 
 			if (OUT_PG_LIM == 2 ||
 					(OUT_PG_LIM == 1 && anyP) ||
@@ -719,14 +723,18 @@ public class Djp_printpf {
 
 			/* dispatchable load constraints */
 			anyP_ld = ( Djp_util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					Djp_util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					Djp_util.any( gen.mu_Pmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
-					Djp_util.any( gen.mu_Pmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
+					Djp_util.any( gen.Pg.viewSelection(onld).copy().assign(gen.Pmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) );
+			if (gen.mu_Pmin != null)  // FIXME Should add zeros for result fields when loading case
+				anyP_ld = anyP_ld || Djp_util.any( gen.mu_Pmin.viewSelection(onld).assign(dfunc.greater(ptol)) );
+			if (gen.mu_Pmax != null)
+				anyP_ld = anyP_ld || Djp_util.any( gen.mu_Pmax.viewSelection(onld).assign(dfunc.greater(ptol)) );
 
 			anyQ_ld = ( Djp_util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmin.viewSelection(onld).assign(dfunc.plus(ctol)) , dfunc.less) ) ||
-					Djp_util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) ||
-					Djp_util.any( gen.mu_Qmin.viewSelection(onld).assign(dfunc.greater(ptol)) ) ||
-					Djp_util.any( gen.mu_Qmax.viewSelection(onld).assign(dfunc.greater(ptol)) ) );
+					Djp_util.any( gen.Qg.viewSelection(onld).copy().assign(gen.Qmax.viewSelection(onld).assign(dfunc.minus(ctol)), dfunc.less) ) );
+			if (gen.mu_Qmin != null)
+				anyQ_ld = anyQ_ld || Djp_util.any( gen.mu_Qmin.viewSelection(onld).assign(dfunc.greater(ptol)) );
+			if (gen.mu_Qmax != null)
+				anyQ_ld = anyQ_ld || Djp_util.any( gen.mu_Qmax.viewSelection(onld).assign(dfunc.greater(ptol)) );
 
 			if (OUT_PG_LIM == 2 || OUT_QG_LIM == 2 ||
 					(OUT_PG_LIM == 1 && anyP_ld) ||
@@ -823,10 +831,14 @@ public class Djp_printpf {
 			F_tol = branch.rate_a.copy().assign(dfunc.minus(ctol));
 			Uf = Djp_util.intm(Ff.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained from
 			Ut = Djp_util.intm(Ft.copy().assign(dfunc.abs).assign(F_tol, dfunc.greater));	// constrained to
+
 			anyF = (Djp_util.any( rated.copy().assign(Uf, ifunc.and) ) ||
-					Djp_util.any( rated.copy().assign(Ut, ifunc.and) ) ||
-					Djp_util.any( branch.mu_Sf.copy().assign(dfunc.greater(ptol)) ) ||
-					Djp_util.any( branch.mu_St.copy().assign(dfunc.greater(ptol)) ));
+					Djp_util.any( rated.copy().assign(Ut, ifunc.and) ));
+			if (branch.mu_Sf != null)  // FIXME Should add zeros for result fields when loading case
+				anyF = anyF || Djp_util.any( branch.mu_Sf.copy().assign(dfunc.greater(ptol)) );
+			if (branch.mu_St != null)
+				anyF = anyF || Djp_util.any( branch.mu_St.copy().assign(dfunc.greater(ptol)) );
+
 			if (OUT_LINE_LIM == 2 || (OUT_LINE_LIM == 1 && anyF)) {
 				pw.printf("\n================================================================================");
 				pw.printf("\n|     Branch Flow Constraints                                                  |");

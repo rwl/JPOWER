@@ -35,9 +35,9 @@ public abstract class Djp_rundcpf_test extends Djp_base_test {
 		this.jpc = jpc;
 	}
 
-	public void test_rundcpf__string() {
+//	public void test_rundcpf__string() {
 //		test_jpc(Djp_rundcpf.jp_rundcpf(casename));  FIXME Run PF from file path
-	}
+//	}
 
 	public void test_rundcpf__jpc() {
 		test_jpc(Djp_rundcpf.jp_rundcpf(this.jpc));

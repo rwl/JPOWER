@@ -144,7 +144,7 @@ public class Djp_gen {
 	 * @return the number of generators.
 	 */
 	public int size() {
-		return (int) this.gen_bus.size();
+		return (int) gen_bus.size();
 	}
 
 	/**
@@ -162,36 +162,36 @@ public class Djp_gen {
 	public Djp_gen copy(int[] indexes) {
 		Djp_gen other = new Djp_gen();
 
-		other.gen_bus = this.gen_bus.viewSelection(indexes).copy();
-		other.Pg = this.Pg.viewSelection(indexes).copy();
-		other.Qg = this.Qg.viewSelection(indexes).copy();
-		other.Qmax = this.Qmax.viewSelection(indexes).copy();
-		other.Qmin = this.Qmin.viewSelection(indexes).copy();
-		other.Vg = this.Vg.viewSelection(indexes).copy();
-		other.mBase = this.mBase.viewSelection(indexes).copy();
-		other.gen_status = this.gen_status.viewSelection(indexes).copy();
-		other.Pmax = this.Pmax.viewSelection(indexes).copy();
-		other.Pmin = this.Pmin.viewSelection(indexes).copy();
-		other.Pc1 = this.Pc1.viewSelection(indexes).copy();
-		other.Pc2 = this.Pc2.viewSelection(indexes).copy();
-		other.Qc1min = this.Qc1min.viewSelection(indexes).copy();
-		other.Qc1max = this.Qc1max.viewSelection(indexes).copy();
-		other.Qc2min = this.Qc2min.viewSelection(indexes).copy();
-		other.Qc2max = this.Qc2max.viewSelection(indexes).copy();
-		other.ramp_agc = this.ramp_agc.viewSelection(indexes).copy();
-		other.ramp_10 = this.ramp_10.viewSelection(indexes).copy();
-		other.ramp_30 = this.ramp_30.viewSelection(indexes).copy();
-		other.ramp_q = this.ramp_q.viewSelection(indexes).copy();
-		other.apf = this.apf.viewSelection(indexes).copy();
+		other.gen_bus = gen_bus.viewSelection(indexes).copy();
+		other.Pg = Pg.viewSelection(indexes).copy();
+		other.Qg = Qg.viewSelection(indexes).copy();
+		other.Qmax = Qmax.viewSelection(indexes).copy();
+		other.Qmin = Qmin.viewSelection(indexes).copy();
+		other.Vg = Vg.viewSelection(indexes).copy();
+		other.mBase = mBase.viewSelection(indexes).copy();
+		other.gen_status = gen_status.viewSelection(indexes).copy();
+		other.Pmax = Pmax.viewSelection(indexes).copy();
+		other.Pmin = Pmin.viewSelection(indexes).copy();
+		other.Pc1 = Pc1.viewSelection(indexes).copy();
+		other.Pc2 = Pc2.viewSelection(indexes).copy();
+		other.Qc1min = Qc1min.viewSelection(indexes).copy();
+		other.Qc1max = Qc1max.viewSelection(indexes).copy();
+		other.Qc2min = Qc2min.viewSelection(indexes).copy();
+		other.Qc2max = Qc2max.viewSelection(indexes).copy();
+		other.ramp_agc = ramp_agc.viewSelection(indexes).copy();
+		other.ramp_10 = ramp_10.viewSelection(indexes).copy();
+		other.ramp_30 = ramp_30.viewSelection(indexes).copy();
+		other.ramp_q = ramp_q.viewSelection(indexes).copy();
+		other.apf = apf.viewSelection(indexes).copy();
 
-		if (this.mu_Pmax != null)
-			other.mu_Pmax = this.mu_Pmax.viewSelection(indexes).copy();
-		if (this.mu_Pmin != null)
-			other.mu_Pmin = this.mu_Pmin.viewSelection(indexes).copy();
-		if (this.mu_Qmax != null)
-			other.mu_Qmax = this.mu_Qmax.viewSelection(indexes).copy();
-		if (this.mu_Qmin != null)
-			other.mu_Qmin = this.mu_Qmin.viewSelection(indexes).copy();
+		if (mu_Pmax != null)
+			other.mu_Pmax = mu_Pmax.viewSelection(indexes).copy();
+		if (mu_Pmin != null)
+			other.mu_Pmin = mu_Pmin.viewSelection(indexes).copy();
+		if (mu_Qmax != null)
+			other.mu_Qmax = mu_Qmax.viewSelection(indexes).copy();
+		if (mu_Qmin != null)
+			other.mu_Qmin = mu_Qmin.viewSelection(indexes).copy();
 
 		return other;
 	}
@@ -204,32 +204,36 @@ public class Djp_gen {
 	 */
 	public void update(Djp_gen other, int[] indexes) {
 
-		this.gen_bus.viewSelection(indexes).assign(other.gen_bus.viewSelection(indexes));
-		this.Pg.viewSelection(indexes).assign(other.Pg.viewSelection(indexes));
-		this.Qg.viewSelection(indexes).assign(other.Qg.viewSelection(indexes));
-		this.Qmax.viewSelection(indexes).assign(other.Qmax.viewSelection(indexes));
-		this.Qmin.viewSelection(indexes).assign(other.Qmin.viewSelection(indexes));
-		this.Vg.viewSelection(indexes).assign(other.Vg.viewSelection(indexes));
-		this.mBase.viewSelection(indexes).assign(other.mBase.viewSelection(indexes));
-		this.gen_status.viewSelection(indexes).assign(other.gen_status.viewSelection(indexes));
-		this.Pmax.viewSelection(indexes).assign(other.Pmax.viewSelection(indexes));
-		this.Pmin.viewSelection(indexes).assign(other.Pmin.viewSelection(indexes));
-		this.Pc1.viewSelection(indexes).assign(other.Pc1.viewSelection(indexes));
-		this.Pc2.viewSelection(indexes).assign(other.Pc2.viewSelection(indexes));
-		this.Qc1min.viewSelection(indexes).assign(other.Qc1min.viewSelection(indexes));
-		this.Qc1max.viewSelection(indexes).assign(other.Qc1max.viewSelection(indexes));
-		this.Qc2min.viewSelection(indexes).assign(other.Qc2min.viewSelection(indexes));
-		this.Qc2max.viewSelection(indexes).assign(other.Qc2max.viewSelection(indexes));
-		this.ramp_agc.viewSelection(indexes).assign(other.ramp_agc.viewSelection(indexes));
-		this.ramp_10.viewSelection(indexes).assign(other.ramp_10.viewSelection(indexes));
-		this.ramp_30.viewSelection(indexes).assign(other.ramp_30.viewSelection(indexes));
-		this.ramp_q.viewSelection(indexes).assign(other.ramp_q.viewSelection(indexes));
-		this.apf.viewSelection(indexes).assign(other.apf.viewSelection(indexes));
+		gen_bus.viewSelection(indexes).assign(other.gen_bus.viewSelection(indexes));
+		Pg.viewSelection(indexes).assign(other.Pg.viewSelection(indexes));
+		Qg.viewSelection(indexes).assign(other.Qg.viewSelection(indexes));
+		Qmax.viewSelection(indexes).assign(other.Qmax.viewSelection(indexes));
+		Qmin.viewSelection(indexes).assign(other.Qmin.viewSelection(indexes));
+		Vg.viewSelection(indexes).assign(other.Vg.viewSelection(indexes));
+		mBase.viewSelection(indexes).assign(other.mBase.viewSelection(indexes));
+		gen_status.viewSelection(indexes).assign(other.gen_status.viewSelection(indexes));
+		Pmax.viewSelection(indexes).assign(other.Pmax.viewSelection(indexes));
+		Pmin.viewSelection(indexes).assign(other.Pmin.viewSelection(indexes));
+		Pc1.viewSelection(indexes).assign(other.Pc1.viewSelection(indexes));
+		Pc2.viewSelection(indexes).assign(other.Pc2.viewSelection(indexes));
+		Qc1min.viewSelection(indexes).assign(other.Qc1min.viewSelection(indexes));
+		Qc1max.viewSelection(indexes).assign(other.Qc1max.viewSelection(indexes));
+		Qc2min.viewSelection(indexes).assign(other.Qc2min.viewSelection(indexes));
+		Qc2max.viewSelection(indexes).assign(other.Qc2max.viewSelection(indexes));
+		ramp_agc.viewSelection(indexes).assign(other.ramp_agc.viewSelection(indexes));
+		ramp_10.viewSelection(indexes).assign(other.ramp_10.viewSelection(indexes));
+		ramp_30.viewSelection(indexes).assign(other.ramp_30.viewSelection(indexes));
+		ramp_q.viewSelection(indexes).assign(other.ramp_q.viewSelection(indexes));
+		apf.viewSelection(indexes).assign(other.apf.viewSelection(indexes));
 
-		this.mu_Pmax.viewSelection(indexes).assign(other.mu_Pmax.viewSelection(indexes));
-		this.mu_Pmin.viewSelection(indexes).assign(other.mu_Pmin.viewSelection(indexes));
-		this.mu_Qmax.viewSelection(indexes).assign(other.mu_Qmax.viewSelection(indexes));
-		this.mu_Qmin.viewSelection(indexes).assign(other.mu_Qmin.viewSelection(indexes));
+		if (mu_Pmax != null)
+			mu_Pmax.viewSelection(indexes).assign(other.mu_Pmax.viewSelection(indexes));
+		if (mu_Pmin != null)
+			mu_Pmin.viewSelection(indexes).assign(other.mu_Pmin.viewSelection(indexes));
+		if (mu_Qmax != null)
+			mu_Qmax.viewSelection(indexes).assign(other.mu_Qmax.viewSelection(indexes));
+		if (mu_Qmin != null)
+			mu_Qmin.viewSelection(indexes).assign(other.mu_Qmin.viewSelection(indexes));
 	}
 
 	/**
@@ -238,33 +242,33 @@ public class Djp_gen {
 	 */
 	public void fromMatrix(DoubleMatrix2D other) {
 
-		this.gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
-		this.Pg = other.viewColumn(PG);
-		this.Qg = other.viewColumn(QG);
-		this.Qmax = other.viewColumn(QMAX);
-		this.Qmin = other.viewColumn(QMIN);
-		this.Vg = other.viewColumn(VG);
-		this.mBase = other.viewColumn(MBASE);
-		this.gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
-		this.Pmax = other.viewColumn(PMAX);
-		this.Pmin = other.viewColumn(PMIN);
-		this.Pc1 = other.viewColumn(PC1);
-		this.Pc2 = other.viewColumn(PC2);
-		this.Qc1min = other.viewColumn(QC1MIN);
-		this.Qc1max = other.viewColumn(QC1MAX);
-		this.Qc2min = other.viewColumn(QC2MIN);
-		this.Qc2max = other.viewColumn(QC2MAX);
-		this.ramp_agc = other.viewColumn(RAMP_AGC);
-		this.ramp_10 = other.viewColumn(RAMP_10);
-		this.ramp_30 = other.viewColumn(RAMP_30);
-		this.ramp_q = other.viewColumn(RAMP_Q);
-		this.apf = other.viewColumn(APF);
+		gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
+		Pg = other.viewColumn(PG);
+		Qg = other.viewColumn(QG);
+		Qmax = other.viewColumn(QMAX);
+		Qmin = other.viewColumn(QMIN);
+		Vg = other.viewColumn(VG);
+		mBase = other.viewColumn(MBASE);
+		gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
+		Pmax = other.viewColumn(PMAX);
+		Pmin = other.viewColumn(PMIN);
+		Pc1 = other.viewColumn(PC1);
+		Pc2 = other.viewColumn(PC2);
+		Qc1min = other.viewColumn(QC1MIN);
+		Qc1max = other.viewColumn(QC1MAX);
+		Qc2min = other.viewColumn(QC2MIN);
+		Qc2max = other.viewColumn(QC2MAX);
+		ramp_agc = other.viewColumn(RAMP_AGC);
+		ramp_10 = other.viewColumn(RAMP_10);
+		ramp_30 = other.viewColumn(RAMP_30);
+		ramp_q = other.viewColumn(RAMP_Q);
+		apf = other.viewColumn(APF);
 
 		if (other.columns() > APF + 1) {
-			this.mu_Pmax = other.viewColumn(MU_PMAX);
-			this.mu_Pmin = other.viewColumn(MU_PMIN);
-			this.mu_Qmax = other.viewColumn(MU_QMAX);
-			this.mu_Qmin = other.viewColumn(MU_QMIN);
+			mu_Pmax = other.viewColumn(MU_PMAX);
+			mu_Pmin = other.viewColumn(MU_PMIN);
+			mu_Qmax = other.viewColumn(MU_QMAX);
+			mu_Qmin = other.viewColumn(MU_QMIN);
 		}
 	}
 
@@ -285,33 +289,33 @@ public class Djp_gen {
 			matrix = DoubleFactory2D.dense.make(size(), 21);
 		}
 
-		matrix.viewColumn(GEN_BUS).assign( Djp_util.dblm(this.gen_bus) );
-		matrix.viewColumn(PG).assign(this.Pg);
-		matrix.viewColumn(QG).assign(this.Qg);
-		matrix.viewColumn(QMAX).assign(this.Qmax);
-		matrix.viewColumn(QMIN).assign(this.Qmin);
-		matrix.viewColumn(VG).assign(this.Vg);
-		matrix.viewColumn(MBASE).assign(this.mBase);
-		matrix.viewColumn(GEN_STATUS).assign( Djp_util.dblm(this.gen_status) );
-		matrix.viewColumn(PMAX).assign(this.Pmax);
-		matrix.viewColumn(PMIN).assign(this.Pmin);
-		matrix.viewColumn(PC1).assign(this.Pc1);
-		matrix.viewColumn(PC2).assign(this.Pc2);
-		matrix.viewColumn(QC1MIN).assign(this.Qc1min);
-		matrix.viewColumn(QC1MAX).assign(this.Qc1max);
-		matrix.viewColumn(QC2MIN).assign(this.Qc2min);
-		matrix.viewColumn(QC2MAX).assign(this.Qc2max);
-		matrix.viewColumn(RAMP_AGC).assign(this.ramp_agc);
-		matrix.viewColumn(RAMP_10).assign(this.ramp_10);
-		matrix.viewColumn(RAMP_30).assign(this.ramp_30);
-		matrix.viewColumn(RAMP_Q).assign(this.ramp_q);
-		matrix.viewColumn(APF).assign(this.apf);
+		matrix.viewColumn(GEN_BUS).assign( Djp_util.dblm(gen_bus) );
+		matrix.viewColumn(PG).assign(Pg);
+		matrix.viewColumn(QG).assign(Qg);
+		matrix.viewColumn(QMAX).assign(Qmax);
+		matrix.viewColumn(QMIN).assign(Qmin);
+		matrix.viewColumn(VG).assign(Vg);
+		matrix.viewColumn(MBASE).assign(mBase);
+		matrix.viewColumn(GEN_STATUS).assign( Djp_util.dblm(gen_status) );
+		matrix.viewColumn(PMAX).assign(Pmax);
+		matrix.viewColumn(PMIN).assign(Pmin);
+		matrix.viewColumn(PC1).assign(Pc1);
+		matrix.viewColumn(PC2).assign(Pc2);
+		matrix.viewColumn(QC1MIN).assign(Qc1min);
+		matrix.viewColumn(QC1MAX).assign(Qc1max);
+		matrix.viewColumn(QC2MIN).assign(Qc2min);
+		matrix.viewColumn(QC2MAX).assign(Qc2max);
+		matrix.viewColumn(RAMP_AGC).assign(ramp_agc);
+		matrix.viewColumn(RAMP_10).assign(ramp_10);
+		matrix.viewColumn(RAMP_30).assign(ramp_30);
+		matrix.viewColumn(RAMP_Q).assign(ramp_q);
+		matrix.viewColumn(APF).assign(apf);
 
 		if (opf) {
-			matrix.viewColumn(MU_PMAX).assign(this.mu_Pmax);
-			matrix.viewColumn(MU_PMIN).assign(this.mu_Pmin);
-			matrix.viewColumn(MU_QMAX).assign(this.mu_Qmax);
-			matrix.viewColumn(MU_QMIN).assign(this.mu_Qmin);
+			matrix.viewColumn(MU_PMAX).assign(mu_Pmax);
+			matrix.viewColumn(MU_PMIN).assign(mu_Pmin);
+			matrix.viewColumn(MU_QMAX).assign(mu_Qmax);
+			matrix.viewColumn(MU_QMIN).assign(mu_Qmin);
 		}
 
 		return matrix;

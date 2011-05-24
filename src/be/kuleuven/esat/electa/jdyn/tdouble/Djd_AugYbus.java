@@ -22,8 +22,8 @@ package be.kuleuven.esat.electa.jdyn.tdouble;
 import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
-import cern.colt.matrix.tdcomplex.algo.SparseDComplexAlgebra;
-import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
+//import cern.colt.matrix.tdcomplex.algo.SparseDComplexAlgebra;
+//import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
@@ -58,27 +58,27 @@ public class Djd_AugYbus {
 	 * @param U0 steady-state bus voltages
 	 * @return factorised augmented bus admittance matrix
 	 */
-	@SuppressWarnings("static-access")
-	public static SparseDComplexLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
-			DoubleMatrix1D xd_tr, int[] gbus, DoubleMatrix1D P, DoubleMatrix1D Q, DComplexMatrix1D U0) {
-
-		/* Calculate bus admittance matrix */
-		Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
-		Ybus = Y[0];
-
-		/* Calculate equivalent load admittance */
-		yload = Djp_util.complex(P, Q).assign(cfunc.conj);
-		yload.assign(U0.copy().assign(cfunc.abs).assign(cfunc.square), cfunc.div);
-
-		/* Calculate equivalent generator admittance */
-		ygen = DComplexFactory1D.dense.make(Ybus.rows());
-		ygen.viewSelection(gbus).assign( Djp_util.complex(null, xd_tr).assign(cfunc.inv) );
-
-		/* Add equivalent load and generator admittance to Ybus matrix */
-		for (int i = 0; i < Ybus.rows(); i++)
-			Ybus.set(i, i, cfunc.plus.apply( cfunc.plus.apply(Ybus.get(i, i), ygen.get(i)), yload.get(i) ));
-
-		return SparseDComplexAlgebra.DEFAULT.lu(Ybus, 0);
-	}
+//	@SuppressWarnings("static-access")
+//	public static SparseDComplexLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
+//			DoubleMatrix1D xd_tr, int[] gbus, DoubleMatrix1D P, DoubleMatrix1D Q, DComplexMatrix1D U0) {
+//
+//		/* Calculate bus admittance matrix */
+//		Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
+//		Ybus = Y[0];
+//
+//		/* Calculate equivalent load admittance */
+//		yload = Djp_util.complex(P, Q).assign(cfunc.conj);
+//		yload.assign(U0.copy().assign(cfunc.abs).assign(cfunc.square), cfunc.div);
+//
+//		/* Calculate equivalent generator admittance */
+//		ygen = DComplexFactory1D.dense.make(Ybus.rows());
+//		ygen.viewSelection(gbus).assign( Djp_util.complex(null, xd_tr).assign(cfunc.inv) );
+//
+//		/* Add equivalent load and generator admittance to Ybus matrix */
+//		for (int i = 0; i < Ybus.rows(); i++)
+//			Ybus.set(i, i, cfunc.plus.apply( cfunc.plus.apply(Ybus.get(i, i), ygen.get(i)), yload.get(i) ));
+//
+//		return SparseDComplexAlgebra.DEFAULT.lu(Ybus, 0);
+//	}
 
 }
