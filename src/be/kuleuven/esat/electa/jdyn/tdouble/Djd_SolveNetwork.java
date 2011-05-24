@@ -42,6 +42,12 @@ public class Djd_SolveNetwork {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
+	private static int ngen, s;
+	private static int[] type1, type2;
+	private static IntMatrix1D d;
+	private static DoubleMatrix1D delta, Eq_tr, Ed_tr, xd_tr;
+	private static DComplexMatrix1D Igen, Ig, U;
+
 	/**
 	 *
 	 * @param Xgen state variables of generators
@@ -54,12 +60,6 @@ public class Djd_SolveNetwork {
 	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D jp_SolveNetwork(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
 			SparseDComplexLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
-
-		int ngen, s;
-		int[] type1, type2;
-		IntMatrix1D d;
-		DoubleMatrix1D delta, Eq_tr, Ed_tr, xd_tr;
-		DComplexMatrix1D Igen, Ig, U;
 
 		/* Init */
 		ngen = gbus.length;
