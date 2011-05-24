@@ -61,44 +61,68 @@ public class Djd_rundyn {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static Object[] jd_rundyn(String casefile_pf, String casefile_dyn, String casefile_ev) {
-		return jd_rundyn(casefile_pf, casefile_dyn, casefile_ev, Djd_Jdoption.jd_Jdoption());
-	}
+	private static long t0;
+	private static int method, ngen, nbus;
+	private static int[] on, gbus, type1, type2;
+	private static double tol, minstepsize, maxstepsize, freq, stepsize, stoptime, baseMVA;
+	private static double[] dyn;
+	private static boolean output, plots;
 
+	private static Djd_gen Pgen0, Efd0, Xgen0;
+	private static Djd_exc Pexc0, Xexc0;
+	private static Djd_gov Pgov0;
+	private static Djd_event event;
+	private static Djd_buschange buschange;
+	private static Djd_linechange linechange;
+
+	private static Djd_gen[] gen0;
+	private static Djd_exc[] exe0;
+
+	private static IntMatrix1D genmodel, excmodel, govmodel;
+	private static DoubleMatrix1D Pl, Ql, xd_tr, Id0, Iq0, Pe0, Vexc0, Pm0;
+	private static DComplexMatrix1D U0, U00;
+	private static DoubleMatrix1D[] I;
+
+	private static Map<String, Double> jpopt;
+	private static Djp_jpc jpc;
+	private static Djp_bus bus;
+	private static Djp_gen gen;
+	private static Djp_branch branch;
+
+	private static SparseDComplexLUDecomposition invYbus;
+
+	@SuppressWarnings("static-access")
 	public static Object[] jd_rundyn(String casefile_pf, String casefile_dyn, String casefile_ev, DoubleMatrix1D jdopt) {
 
 		/* Begin timing */
-		long t0 = System.currentTimeMillis();
+		t0 = System.currentTimeMillis();
 
 		/* Options */
-		int method = (int) jdopt.get(0);
-		double tol = jdopt.get(1);
-		double minstepsize = jdopt.get(2);
-		double maxstepsize = jdopt.get(3);
-		boolean output = jdopt.get(4) == 0.0 ? false : true;
-		boolean plots = jdopt.get(5) == 0.0 ? false : true;
+		method = (int) jdopt.get(0);
+		tol = jdopt.get(1);
+		minstepsize = jdopt.get(2);
+		maxstepsize = jdopt.get(3);
+		output = jdopt.get(4) == 0.0 ? false : true;
+		plots  = jdopt.get(5) == 0.0 ? false : true;
 
 		/* Load all data */
 		if (output)
 			System.out.println("Loading dynamic simulation data...");
 
 		// Load dynamic simulation data
-		double[] dyn = Djd_Loaddyn.jd_Loaddyn(casefile_dyn);
-		double freq = dyn[0], stepsize = dyn[1], stoptime = dyn[2];
+		dyn = Djd_Loaddyn.jd_Loaddyn(casefile_dyn);
+		freq = dyn[0]; stepsize = dyn[1]; stoptime = dyn[2];
 
 		// Load generator data
-		Djd_gen Pgen0 = Djd_Loadgen.jd_Loadgen(casefile_dyn, output);
+		Pgen0 = Djd_Loadgen.jd_Loadgen(casefile_dyn, output);
 
 		// Load exciter data
-		Djd_exc Pexc0 = Djd_Loadexc.jd_Loadexc(casefile_dyn);
+		Pexc0 = Djd_Loadexc.jd_Loadexc(casefile_dyn);
 
 		// Load governor data
-		Djd_gov Pgov0 = Djd_Loadgov.jd_Loadgov(casefile_dyn);
+		Pgov0 = Djd_Loadgov.jd_Loadgov(casefile_dyn);
 
 		// Load event data
-		Djd_event event = null;
-		Djd_buschange buschange = null;
-		Djd_linechange linechange = null;
 		if (casefile_ev != "") {
 			Object[] events = Djd_Loadevents.jd_Loadevents(casefile_ev);
 			event = (Djd_event) events[0];
@@ -106,23 +130,23 @@ public class Djd_rundyn {
 			linechange = (Djd_linechange) events[2];
 		}
 
-		IntMatrix1D genmodel = Pgen0.genmodel;
-		IntMatrix1D excmodel = Pgen0.excmodel;
-		IntMatrix1D govmodel = Pgen0.govmodel;
+		genmodel = Pgen0.genmodel;
+		excmodel = Pgen0.excmodel;
+		govmodel = Pgen0.govmodel;
 
 		/* Initialization: Power Flow */
 
 		// Power flow options
-		Map<String, Double> jpopt = Djp_jpoption.jp_jpoption();
+		jpopt = Djp_jpoption.jp_jpoption();
 		jpopt.put("VERBOSE", 0.0);
 		jpopt.put("OUT_ALL", 0.0);
 
 		// Run power flow
-		Djp_jpc jpc = Djp_runpf.jp_runpf(casefile_pf, jpopt);
-		double baseMVA = jpc.baseMVA;
-		Djp_bus bus = jpc.bus;
-		Djp_gen gen = jpc.gen;
-		Djp_branch branch = jpc.branch;
+		jpc = Djp_runpf.jp_runpf(casefile_pf, jpopt);
+		baseMVA = jpc.baseMVA;
+		bus = jpc.bus;
+		gen = jpc.gen;
+		branch = jpc.branch;
 
 		if (!jpc.success) {
 			System.err.println("Power flow did not converge. Exiting...");
@@ -131,45 +155,45 @@ public class Djd_rundyn {
 				System.out.println("Power flow converged");
 		}
 
-		DComplexMatrix1D U0 = Djp_util.polar(bus.Vm, bus.Va, false);
-		DComplexMatrix1D U00 = U0.copy();
+		U0 = Djp_util.polar(bus.Vm, bus.Va, false);
+		U00 = U0.copy();
 		// Get generator info
-		int[] on = Djp_util.nonzero( gen.gen_status.copy().assign(ifunc.equals(1)) );	// which generators are on?
-		int[] gbus = gen.gen_bus.toArray();		// what buses are they at?
-		int ngen = gbus.length;
-		int nbus = (int) U0.size();
+		on = Djp_util.nonzero( gen.gen_status.copy().assign(ifunc.equals(1)) );	// which generators are on?
+		gbus = gen.gen_bus.toArray();		// what buses are they at?
+		ngen = gbus.length;
+		nbus = (int) U0.size();
 
 		/* Construct augmented Ybus */
 		if (output)
 			System.out.println("Constructing augmented admittance matrix...");
-		DoubleMatrix1D Pl = bus.Pd.copy().assign(dfunc.div(baseMVA));	// load power
-		DoubleMatrix1D Ql = bus.Qd.copy().assign(dfunc.div(baseMVA));
+		Pl = bus.Pd.copy().assign(dfunc.div(baseMVA));	// load power
+		Ql = bus.Qd.copy().assign(dfunc.div(baseMVA));
 
-		int[] type1 = genmodel.copy().assign(ifunc.equals(1)).toArray();
-		int[] type2 = genmodel.copy().assign(ifunc.equals(2)).toArray();
+		type1 = genmodel.copy().assign(ifunc.equals(1)).toArray();
+		type2 = genmodel.copy().assign(ifunc.equals(2)).toArray();
 
-		DoubleMatrix1D xd_tr = DoubleFactory1D.dense.make(ngen);
+		xd_tr = DoubleFactory1D.dense.make(ngen);
 		xd_tr.viewSelection(type2).assign(Pgen0.xd_tr.viewSelection(type2));	// 4th order model: xd_tr column 7
 		xd_tr.viewSelection(type1).assign(Pgen0.xp.viewSelection(type1));		// classical model: xd_tr column 6
 
-		SparseDComplexLUDecomposition invYbus = Djd_AugYbus.jd_AugYbus(baseMVA, bus, branch, xd_tr, gbus, Pl, Ql, U0);
+		invYbus = Djd_AugYbus.jd_AugYbus(baseMVA, bus, branch, xd_tr, gbus, Pl, Ql, U0);
 
 		/* Calculate Initial machine state */
 		if (output)
 			System.out.println("Calculating initial state...");
 
-		Djd_gen[] gen0 = Djd_GeneratorInit.jd_GeneratorInit(Pgen0, U0.viewSelection(gbus), gen, baseMVA, genmodel);
-		Djd_gen Efd0 = gen0[0], Xgen0 = gen0[1];
+		gen0 = Djd_GeneratorInit.jd_GeneratorInit(Pgen0, U0.viewSelection(gbus), gen, baseMVA, genmodel);
+		Efd0 = gen0[0]; Xgen0 = gen0[1];
 
-//		DoubleMatrix1D omega0 = Xgen0.viewColumn(1);
+//		omega0 = Xgen0.viewColumn(1);
 
-		DoubleMatrix1D[] I = Djd_MachineCurrents.jd_MachineCurrents(Xgen0, Pgen0, U0.viewSelection(gbus), genmodel);
-		DoubleMatrix1D Id0 = I[0], Iq0 = I[1], Pe0 = I[2];
+		I = Djd_MachineCurrents.jd_MachineCurrents(Xgen0, Pgen0, U0.viewSelection(gbus), genmodel);
+		Id0 = I[0]; Iq0 = I[1]; Pe0 = I[2];
 
 		/* Exciter initial conditions */
-		DoubleMatrix1D Vexc0 = U0.viewSelection(gbus).assign(cfunc.abs).getRealPart();
-		Djd_exc[] exe0 = Djp_ExciterInit.jp_ExciterInit(Efd0, Pexc0, Vexc0, excmodel);
-		Djd_exc Xexc0 = exe0[0];
+		Vexc0 = U0.viewSelection(gbus).assign(cfunc.abs).getRealPart();
+		exe0 = Djp_ExciterInit.jp_ExciterInit(Efd0, Pexc0, Vexc0, excmodel);
+		Xexc0 = exe0[0];
 		Pexc0 = exe0[1];
 
 		/* Governor initial conditions */
@@ -183,4 +207,9 @@ public class Djd_rundyn {
 
 		return null;
 	}
+
+	public static Object[] jd_rundyn(String casefile_pf, String casefile_dyn, String casefile_ev) {
+		return jd_rundyn(casefile_pf, casefile_dyn, casefile_ev, Djd_Jdoption.jd_Jdoption());
+	}
+
 }

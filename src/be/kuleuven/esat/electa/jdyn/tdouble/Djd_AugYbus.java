@@ -42,6 +42,10 @@ public class Djd_AugYbus {
 
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
+	private static DComplexMatrix1D yload, ygen;
+	private static DComplexMatrix2D Ybus;
+	private static DComplexMatrix2D[] Y;
+
 	/**
 	 *
 	 * @param baseMVA power base
@@ -54,19 +58,20 @@ public class Djd_AugYbus {
 	 * @param U0 steady-state bus voltages
 	 * @return factorised augmented bus admittance matrix
 	 */
+	@SuppressWarnings("static-access")
 	public static SparseDComplexLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
 			DoubleMatrix1D xd_tr, int[] gbus, DoubleMatrix1D P, DoubleMatrix1D Q, DComplexMatrix1D U0) {
 
 		/* Calculate bus admittance matrix */
-		DComplexMatrix2D[] Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
-		DComplexMatrix2D Ybus = Y[0];
+		Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
+		Ybus = Y[0];
 
 		/* Calculate equivalent load admittance */
-		DComplexMatrix1D yload = Djp_util.complex(P, Q).assign(cfunc.conj);
+		yload = Djp_util.complex(P, Q).assign(cfunc.conj);
 		yload.assign(U0.copy().assign(cfunc.abs).assign(cfunc.square), cfunc.div);
 
 		/* Calculate equivalent generator admittance */
-		DComplexMatrix1D ygen = DComplexFactory1D.dense.make(Ybus.rows());
+		ygen = DComplexFactory1D.dense.make(Ybus.rows());
 		ygen.viewSelection(gbus).assign( Djp_util.complex(null, xd_tr).assign(cfunc.inv) );
 
 		/* Add equivalent load and generator admittance to Ybus matrix */

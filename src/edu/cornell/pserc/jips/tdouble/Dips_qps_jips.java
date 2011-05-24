@@ -31,31 +31,14 @@ import cern.jet.math.tdouble.DoubleFunctions;
 
 public class Dips_qps_jips {
 
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
-			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u) {
-		return ips_qps_jips(H, c, A, l, u, null, null);
-	}
-
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
-			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
-			DoubleMatrix1D xmin, DoubleMatrix1D xmax) {
-		return ips_qps_jips(H, c, A, l, u, xmin, xmax, null);
-	}
-
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
-			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
-			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0) {
-		return ips_qps_jips(H, c, A, l, u, xmin, xmax, x0, new HashMap<String, Double>());
-	}
+	private static int nx;
 
 	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0, Map<String, Double> opt) {
 
 		/* define nx, set default values for H and c */
-		int nx = 0;
+		nx = 0;
 		if (H == null || H.size() == 0 || !Djp_util.any(Djp_util.any(H))) {
 			if (A == null || A.size() == 0 && xmin == null ||
 					xmin.size() == 0 && xmax == null || xmax.size() == 0) {
@@ -82,12 +65,10 @@ public class Dips_qps_jips {
 
 		class Dips_qp_f implements ObjectiveEvaluator {
 
-			DoubleMatrix1D x;
 			DoubleMatrix2D H;
 			DoubleMatrix1D c;
 
 			public Dips_qp_f(DoubleMatrix1D x, DoubleMatrix2D H, DoubleMatrix1D c) {
-				this.x = x;
 				this.H = H;
 				this.c = c;
 			}
@@ -97,7 +78,7 @@ public class Dips_qps_jips {
 			}
 
 			public DoubleMatrix1D df(DoubleMatrix1D x) {
-				return H.zMult(x, null).assign(c, dfunc.plus);
+				return H.zMult(x, null).assign(c, DoubleFunctions.plus);
 			}
 
 			public DoubleMatrix2D d2f(DoubleMatrix1D x) {
@@ -108,6 +89,23 @@ public class Dips_qps_jips {
 		Dips_qp_f f_fcn = new Dips_qp_f(x0, H, c);
 
 		return Dips_jips.ips_jips(f_fcn, x0, A, l, u, xmin, xmax);
+	}
+
+	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u) {
+		return ips_qps_jips(H, c, A, l, u, null, null);
+	}
+
+	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
+			DoubleMatrix1D xmin, DoubleMatrix1D xmax) {
+		return ips_qps_jips(H, c, A, l, u, xmin, xmax, null);
+	}
+
+	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
+			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0) {
+		return ips_qps_jips(H, c, A, l, u, xmin, xmax, x0, new HashMap<String, Double>());
 	}
 
 }

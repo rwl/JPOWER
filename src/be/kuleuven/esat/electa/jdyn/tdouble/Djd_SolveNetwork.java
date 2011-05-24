@@ -51,23 +51,28 @@ public class Djd_SolveNetwork {
 	 * @param gentype generator models
 	 * @return bus voltages
 	 */
+	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D jp_SolveNetwork(DoubleMatrix2D Xgen, DoubleMatrix2D Pgen,
 			SparseDComplexLUDecomposition invYbus, int[] gbus, IntMatrix1D gentype) {
 
+		int ngen, s;
+		int[] type1, type2;
+		IntMatrix1D d;
+		DoubleMatrix1D delta, Eq_tr, Ed_tr, xd_tr;
+		DComplexMatrix1D Igen, Ig, U;
+
 		/* Init */
-		int ngen = gbus.length;
-		DComplexMatrix1D Igen = DComplexFactory1D.dense.make(ngen);
+		ngen = gbus.length;
+		Igen = DComplexFactory1D.dense.make(ngen);
 
-		int s = invYbus.getPivot().length;
+		s = invYbus.getPivot().length;
 
-		DComplexMatrix1D Ig = DComplexFactory1D.dense.make(s);
-		IntMatrix1D d = IntFactory1D.dense.make(Djp_util.irange((int) gentype.size()));
+		Ig = DComplexFactory1D.dense.make(s);
+		d = IntFactory1D.dense.make(Djp_util.irange((int) gentype.size()));
 
 		/* Define types */
-		int[] type1 = d.viewSelection( gentype.copy().assign(ifunc.equals(1)).toArray() ).toArray();
-		int[] type2 = d.viewSelection( gentype.copy().assign(ifunc.equals(2)).toArray() ).toArray();
-
-		DoubleMatrix1D delta, Eq_tr, Ed_tr, xd_tr;
+		type1 = d.viewSelection( gentype.copy().assign(ifunc.equals(1)).toArray() ).toArray();
+		type2 = d.viewSelection( gentype.copy().assign(ifunc.equals(2)).toArray() ).toArray();
 
 		/* Generator type 1: classical model */
 		delta = Xgen.viewColumn(0).viewSelection(type1).copy();
@@ -95,8 +100,9 @@ public class Djd_SolveNetwork {
 
 		// Calculate network voltages: U = Y/Ig
 		invYbus.solve(Ig);
-		DComplexMatrix1D U = Ig;
+		U = Ig;
 
 		return U;
 	}
+
 }

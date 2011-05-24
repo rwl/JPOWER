@@ -28,4 +28,5 @@ public interface ObjectiveEvaluator {
 	public DoubleMatrix1D df(DoubleMatrix1D x);
 
 	public DoubleMatrix2D d2f(DoubleMatrix1D x);
+
 }

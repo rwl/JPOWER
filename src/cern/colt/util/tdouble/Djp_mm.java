@@ -47,155 +47,153 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
  */
 public class Djp_mm {
 
-	public static AbstractMatrix readMatrix(File file) {
-		return readMatrix(file.getAbsolutePath());
-	}
+	private static int i, j;
+	private static int[] row, col;
+	private static double[] data, dataR, dataI;
+
+	private static FileReader fileReader;
+	private static MatrixVectorReader reader;
+	private static MatrixInfo info;
+	private static MatrixSize size;
+
+	private static AbstractMatrix m;
 
 	/**
 	 *
 	 * @param uri
 	 * @return
-	 * @throws IOException
 	 */
 	public static AbstractMatrix readMatrix(String fileName) {
 
-		FileReader fileReader = null;
 		try {
 			fileReader = new FileReader(fileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+			reader = new MatrixVectorReader(fileReader);
 
-		MatrixVectorReader reader = new MatrixVectorReader(fileReader);
-
-		MatrixInfo info = null;
-		MatrixSize size = null;
-		try {
 			info = reader.readMatrixInfo();
 			size = reader.readMatrixSize(info);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		double[] data = new double[size.numEntries()];
-		double[] dataR = new double[size.numEntries()];
-		double[] dataI = new double[size.numEntries()];
+			data  = new double[size.numEntries()];
+			dataR = new double[size.numEntries()];
+			dataI = new double[size.numEntries()];
 
-		int[] row = new int[size.numEntries()];
-		int[] col = new int[size.numEntries()];
+			row = new int[size.numEntries()];
+			col = new int[size.numEntries()];
 
-		AbstractMatrix m = null;
-
-		if (info.isArray()) {
-			if (info.isComplex()) {
-				try {
-					reader.readArray(dataR, dataI);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (info.isDense()) {
-					m = DComplexFactory1D.dense.make(size.numEntries());
-					for (int i = 0; i < size.numEntries(); i++)
-						((DenseDComplexMatrix1D) m).setQuick(i, dataR[i], dataI[i]);
-				} else if (info.isSparse()) {
-					m = DComplexFactory1D.sparse.make(size.numEntries());
-					for (int i = 0; i < size.numEntries(); i++)
-						((SparseDComplexMatrix1D) m).setQuick(i, dataR[i], dataI[i]);
-				} else {
-					throw new UnsupportedOperationException();
-				}
-			} else {
-				try {
-					reader.readArray(data);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				if (size.numRows() == 1 || size.numColumns() == 1) {
+			if (info.isArray()) {
+				if (info.isComplex()) {
+					try {
+						reader.readArray(dataR, dataI);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					if (info.isDense()) {
-						m = DoubleFactory1D.dense.make(size.numEntries());
-						for (int i = 0; i < size.numEntries(); i++)
-							((DenseDoubleMatrix1D) m).setQuick(i, data[i]);
+						m = DComplexFactory1D.dense.make(size.numEntries());
+						for (i = 0; i < size.numEntries(); i++)
+							((DenseDComplexMatrix1D) m).setQuick(i, dataR[i], dataI[i]);
 					} else if (info.isSparse()) {
-						m = DoubleFactory1D.sparse.make(size.numEntries());
-						for (int i = 0; i < size.numEntries(); i++)
-							((SparseDoubleMatrix1D) m).setQuick(i, data[i]);
+						m = DComplexFactory1D.sparse.make(size.numEntries());
+						for (i = 0; i < size.numEntries(); i++)
+							((SparseDComplexMatrix1D) m).setQuick(i, dataR[i], dataI[i]);
 					} else {
 						throw new UnsupportedOperationException();
 					}
 				} else {
+					reader.readArray(data);
+
+					if (size.numRows() == 1 || size.numColumns() == 1) {
+						if (info.isDense()) {
+							m = DoubleFactory1D.dense.make(size.numEntries());
+							for (i = 0; i < size.numEntries(); i++)
+								((DenseDoubleMatrix1D) m).setQuick(i, data[i]);
+						} else if (info.isSparse()) {
+							m = DoubleFactory1D.sparse.make(size.numEntries());
+							for (i = 0; i < size.numEntries(); i++)
+								((SparseDoubleMatrix1D) m).setQuick(i, data[i]);
+						} else {
+							throw new UnsupportedOperationException();
+						}
+					} else {
+						if (info.isDense()) {
+							m = DoubleFactory2D.dense.make(size.numRows(), size.numColumns());
+							for (i = 0; i < size.numColumns(); i++) {
+								for (j = 0; j < size.numRows(); j++) {
+									((DenseDoubleMatrix2D) m).setQuick(j, i, data[i * size.numRows() + j]);
+								}
+							}
+						} else if (info.isSparse()) {
+							m = DoubleFactory2D.sparse.make(size.numRows(), size.numColumns());
+							for (i = 0; i < size.numColumns(); i++) {
+								for (j = 0; j < size.numRows(); j++) {
+									((SparseDoubleMatrix2D) m).setQuick(j, i, data[i * size.numRows() + j]);
+								}
+							}
+						} else {
+							throw new UnsupportedOperationException();
+						}
+					}
+				}
+			} else if (info.isCoordinate()) {
+				if (info.isComplex()) {
+					reader.readCoordinate(row, col, dataR, dataI);
+
+					if (info.isDense()) {
+						m = DComplexFactory2D.dense.make(size.numRows(), size.numColumns());
+						for (i = 0; i < size.numEntries(); i++) {
+							((DenseDComplexMatrix2D) m).setQuick(row[i], col[i], dataR[i], dataI[i]);
+							if (info.isSymmetric())
+								((DenseDComplexMatrix2D) m).setQuick(col[i], row[i], dataR[i], dataI[i]);
+						}
+					} else if (info.isSparse()) {
+						m = DComplexFactory2D.sparse.make(size.numRows(), size.numColumns());
+						for (i = 0; i < size.numEntries(); i++) {
+							((SparseDComplexMatrix2D) m).setQuick(row[i], col[i], dataR[i], dataI[i]);
+							if (info.isSymmetric())
+								((SparseDComplexMatrix2D) m).setQuick(col[i], row[i], dataR[i], dataI[i]);
+						}
+					} else {
+						throw new UnsupportedOperationException();
+					}
+				} else {
+					reader.readCoordinate(row, col, data);
+
 					if (info.isDense()) {
 						m = DoubleFactory2D.dense.make(size.numRows(), size.numColumns());
-						for (int i = 0; i < size.numColumns(); i++) {
-							for (int j = 0; j < size.numRows(); j++) {
-								((DenseDoubleMatrix2D) m).setQuick(j, i, data[i * size.numRows() + j]);
-							}
+						for (i = 0; i < size.numEntries(); i++) {
+							((DenseDoubleMatrix2D) m).setQuick(row[i], col[i], data[i]);
+							if (info.isSymmetric())
+								((DenseDoubleMatrix2D) m).setQuick(col[i], row[i], data[i]);
 						}
 					} else if (info.isSparse()) {
 						m = DoubleFactory2D.sparse.make(size.numRows(), size.numColumns());
-						for (int i = 0; i < size.numColumns(); i++) {
-							for (int j = 0; j < size.numRows(); j++) {
-								((SparseDoubleMatrix2D) m).setQuick(j, i, data[i * size.numRows() + j]);
+						for (i = 0; i < size.numEntries(); i++) {
+							((SparseDoubleMatrix2D) m).setQuick(row[i], col[i], data[i]);
+							if (info.isSymmetric()) {
+								((SparseDoubleMatrix2D) m).setQuick(col[i], row[i], data[i]);
 							}
 						}
 					} else {
 						throw new UnsupportedOperationException();
 					}
 				}
-			}
-		} else if (info.isCoordinate()) {
-			if (info.isComplex()) {
-				try {
-					reader.readCoordinate(row, col, dataR, dataI);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (info.isDense()) {
-					m = DComplexFactory2D.dense.make(size.numRows(), size.numColumns());
-					for (int i = 0; i < size.numEntries(); i++) {
-						((DenseDComplexMatrix2D) m).setQuick(row[i], col[i], dataR[i], dataI[i]);
-						if (info.isSymmetric())
-							((DenseDComplexMatrix2D) m).setQuick(col[i], row[i], dataR[i], dataI[i]);
-					}
-				} else if (info.isSparse()) {
-					m = DComplexFactory2D.sparse.make(size.numRows(), size.numColumns());
-					for (int i = 0; i < size.numEntries(); i++) {
-						((SparseDComplexMatrix2D) m).setQuick(row[i], col[i], dataR[i], dataI[i]);
-						if (info.isSymmetric())
-							((SparseDComplexMatrix2D) m).setQuick(col[i], row[i], dataR[i], dataI[i]);
-					}
-				} else {
-					throw new UnsupportedOperationException();
-				}
 			} else {
-				try {
-					reader.readCoordinate(row, col, data);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (info.isDense()) {
-					m = DoubleFactory2D.dense.make(size.numRows(), size.numColumns());
-					for (int i = 0; i < size.numEntries(); i++) {
-						((DenseDoubleMatrix2D) m).setQuick(row[i], col[i], data[i]);
-						if (info.isSymmetric())
-							((DenseDoubleMatrix2D) m).setQuick(col[i], row[i], data[i]);
-					}
-				} else if (info.isSparse()) {
-					m = DoubleFactory2D.sparse.make(size.numRows(), size.numColumns());
-					for (int i = 0; i < size.numEntries(); i++) {
-						((SparseDoubleMatrix2D) m).setQuick(row[i], col[i], data[i]);
-						if (info.isSymmetric()) {
-							((SparseDoubleMatrix2D) m).setQuick(col[i], row[i], data[i]);
-						}
-					}
-				} else {
-					throw new UnsupportedOperationException();
-				}
+				throw new UnsupportedOperationException();
 			}
-		} else {
-			throw new UnsupportedOperationException();
+
+			fileReader.close();
+			reader.close();
+		} catch (FileNotFoundException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return m;
 	}
+
+	public static AbstractMatrix readMatrix(File file) {
+		return readMatrix(file.getAbsolutePath());
+	}
+
 }
