@@ -181,7 +181,7 @@ public class Djp_runpf {
 			/* adjusted for phase shifters and real shunts */
 			Pbus = Djp_makeSbus.jp_makeSbus(baseMVA, bus, gen).getRealPart();
 			Pbus.assign(Pbusinj, dfunc.minus);
-			Pbus.assign(bus.Gs, dfunc.chain(dfunc.div(baseMVA), dfunc.minus));
+			Pbus.assign(bus.Gs.copy().assign(dfunc.div(baseMVA)), dfunc.minus);
 
 			/* "run" the power flow */
 			Va = Djp_dcpf.jp_dcpf(B, Pbus, Va0, ref, pv, pq);
@@ -190,7 +190,7 @@ public class Djp_runpf {
 			branch.Qf.assign(0);
 			branch.Qt.assign(0);
 			branch.Pf.assign( Bf.zMult(Va, null).assign(Pfinj, dfunc.plus).assign(dfunc.mult(baseMVA)) );
-			branch.Pt.assign( branch.Pt.copy().assign(dfunc.neg) );
+			branch.Pt.assign( branch.Pf.copy().assign(dfunc.neg) );
 			bus.Vm.assign(1);
 			bus.Va.assign(Va);
 			bus.Va.assign(dfunc.chain(dfunc.mult(180), dfunc.div(Math.PI)));

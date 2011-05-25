@@ -34,7 +34,7 @@ public abstract class Djp_int2ext_test extends Djp_base_test {
 		this.jpc = jpc;
 	}
 
-	public void test_ext2int__jpc() {
+	public void test_int2ext__jpc() {
 		Djp_jpc jpc;
 
 		jpc = Djp_loadcase.jp_loadcase(this.jpc);

@@ -26,7 +26,6 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
 import cern.colt.matrix.tint.algo.IntProperty;
 import cern.colt.util.tdouble.Djp_mm;
-import cern.jet.math.tdouble.DoubleFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import junit.framework.TestCase;
 
@@ -73,7 +72,7 @@ abstract class Djp_base_test extends TestCase {
 	protected void test_jpc(Djp_jpc jpc, boolean pf, boolean opf) {
 		File mm_version, mm_baseMVA, mm_bus, mm_gen, mm_branch;
 		DoubleMatrix1D version, baseMVA;
-		DoubleMatrix2D bus, gen, branch;
+		DoubleMatrix2D bus, gen, branch, busout, genout, branchout;
 
 		mm_version = new File(fdir, "version.mtx");
 		mm_baseMVA = new File(fdir, "baseMVA.mtx");
@@ -87,17 +86,15 @@ abstract class Djp_base_test extends TestCase {
 		gen     = (DoubleMatrix2D) Djp_mm.readMatrix(mm_gen);
 		branch  = (DoubleMatrix2D) Djp_mm.readMatrix(mm_branch);
 
-		/* Matlab indexing starts at 1 */
-		bus   .viewColumn(0).assign(DoubleFunctions.minus(1));
-		gen   .viewColumn(0).assign(DoubleFunctions.minus(1));
-		branch.viewColumn(0).assign(DoubleFunctions.minus(1));
-		branch.viewColumn(1).assign(DoubleFunctions.minus(1));
+		busout = jpc.bus.toMatrix(opf);
+		genout = jpc.gen.toMatrix(opf);
+		branchout = jpc.branch.toMatrix(pf, opf);
 
 		assertEquals(Double.valueOf(jpc.version), version.get(0), precision);
 		assertEquals(jpc.baseMVA, baseMVA.get(0), precision);
-		assertTrue(dprop.equals(jpc.bus.toMatrix(opf), bus));
-		assertTrue(dprop.equals(jpc.gen.toMatrix(opf), gen));
-		assertTrue(dprop.equals(jpc.branch.toMatrix(pf, opf), branch));
+		assertTrue(dprop.equals(busout, bus));
+		assertTrue(dprop.equals(genout, gen));
+		assertTrue(dprop.equals(branchout, branch));
 	}
 
 	protected void test_jpc(Djp_jpc jpc) {

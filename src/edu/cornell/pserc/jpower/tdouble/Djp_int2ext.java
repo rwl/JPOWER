@@ -138,7 +138,7 @@ public class Djp_int2ext {
 				jpc.areas.update(o.internal.areas, o.areas.status.on);
 
 			/* revert to original bus numbers */
-			jpc.bus.bus_i.viewSelection(o.bus.status.on).assign( o.bus.i2e.viewSelection(jpc.bus.bus_i.viewSelection(o.bus.status.on).toArray()) );
+			jpc.bus.bus_i.viewSelection(o.bus.status.on).assign( o.bus.i2e.viewSelection( jpc.bus.bus_i.viewSelection(o.bus.status.on).toArray() ) );
 			jpc.branch.f_bus.viewSelection(o.branch.status.on).assign( o.bus.i2e.viewSelection(jpc.branch.f_bus.viewSelection(o.branch.status.on).toArray()) );
 			jpc.branch.t_bus.viewSelection(o.branch.status.on).assign( o.bus.i2e.viewSelection(jpc.branch.t_bus.viewSelection(o.branch.status.on).toArray()) );
 			jpc.gen.gen_bus.viewSelection(o.gen.status.on).assign( o.bus.i2e.viewSelection(jpc.gen.gen_bus.viewSelection(o.gen.status.on).toArray()) );

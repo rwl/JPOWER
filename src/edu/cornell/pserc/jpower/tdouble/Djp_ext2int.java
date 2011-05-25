@@ -27,6 +27,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.matrix.tint.IntMatrix2D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
@@ -136,43 +137,6 @@ public class Djp_ext2int {
 
 	/**
 	 *
-	 * @param bus
-	 * @param gen
-	 * @param branch
-	 * @return
-	 */
-	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch) {
-		return jp_ext2int(bus, gen, branch, null);
-	}
-
-	/**
-	 * old form
-	 *
-	 * @param bus
-	 * @param gen
-	 * @param branch
-	 * @param areas
-	 * @return
-	 */
-	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch, Djp_areas areas) {
-
-		i2e = bus.bus_i.toArray();
-		e2i = IntFactory1D.sparse.make(Djp_util.max(i2e));
-		e2i.viewSelection(i2e).assign(Djp_util.irange(bus.size()));
-
-		bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
-		gen.gen_bus.assign( e2i.viewSelection(gen.gen_bus.toArray()) );
-		branch.f_bus.assign( e2i.viewSelection(branch.f_bus.toArray()) );
-		branch.t_bus.assign( e2i.viewSelection(branch.t_bus.toArray()) );
-
-		if (areas != null && areas.size() != 0)
-			areas.price_ref_bus.assign( e2i.viewSelection(areas.price_ref_bus.toArray()) );
-
-		return new Object[] {bus, gen, branch, areas};
-	}
-
-	/**
-	 *
 	 * @param jpc
 	 * @return
 	 */
@@ -217,11 +181,10 @@ public class Djp_ext2int {
 			/* determine which buses, branches, gens are connected & in-service */
 			bi = jpc.bus.bus_i.toArray();
 			n2i = new SparseRCIntMatrix2D(Djp_util.max(bi) + 1, 1,
-				bi, Djp_util.ones(nb), Djp_util.irange(nb), false, false, false).viewColumn(0);
+					bi, Djp_util.zeros(nb), Djp_util.irange(nb), false, false, false).viewColumn(0);
 
 			/* bus status */
-			bs = jpc.bus.bus_type.copy();
-			bs.assign(ifunc.equals(NONE));
+			bs = jpc.bus.bus_type.copy().assign(ifunc.equals(NONE));
 			o.bus.status.off = Djp_util.nonzero(bs);	// isolated
 			bs.assign(ifunc.equals(0));
 			o.bus.status.on = Djp_util.nonzero(bs);		// connected
@@ -229,7 +192,7 @@ public class Djp_ext2int {
 			/* gen status */
 			gs = jpc.gen.gen_status.copy();
 			gbus = jpc.gen.gen_bus.toArray();
-			gs.assign(ifunc.equals(1));				// Assume boolean status
+			gs.assign(ifunc.equals(1));				// assume boolean status
 			gs.assign(bs.viewSelection(n2i.viewSelection(gbus).toArray()), ifunc.and);
 			o.gen.status.on = Djp_util.nonzero(gs);		// on and connected
 			gs.assign(ifunc.equals(0));
@@ -509,6 +472,44 @@ public class Djp_ext2int {
 			}
 		}
 		return int_val2;
+	}
+
+	/**
+	 * old form
+	 *
+	 * @param bus
+	 * @param gen
+	 * @param branch
+	 * @return
+	 */
+	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch) {
+		return jp_ext2int(bus, gen, branch, null);
+	}
+
+	/**
+	 * old form
+	 *
+	 * @param bus
+	 * @param gen
+	 * @param branch
+	 * @param areas
+	 * @return
+	 */
+	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch, Djp_areas areas) {
+
+		i2e = bus.bus_i.toArray();
+		e2i = IntFactory1D.sparse.make(Djp_util.max(i2e));
+		e2i.viewSelection(i2e).assign(Djp_util.irange(bus.size()));
+
+		bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
+		gen.gen_bus.assign( e2i.viewSelection(gen.gen_bus.toArray()) );
+		branch.f_bus.assign( e2i.viewSelection(branch.f_bus.toArray()) );
+		branch.t_bus.assign( e2i.viewSelection(branch.t_bus.toArray()) );
+
+		if (areas != null && areas.size() != 0)
+			areas.price_ref_bus.assign( e2i.viewSelection(areas.price_ref_bus.toArray()) );
+
+		return new Object[] {bus, gen, branch, areas};
 	}
 
 }

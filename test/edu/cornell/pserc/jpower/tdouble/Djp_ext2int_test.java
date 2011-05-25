@@ -18,6 +18,7 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
+import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
@@ -38,7 +39,14 @@ public abstract class Djp_ext2int_test extends Djp_base_test {
 		Djp_jpc jpc;
 
 		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		test_jpc(Djp_ext2int.jp_ext2int(jpc));
+		jpc = Djp_ext2int.jp_ext2int(jpc);
+
+		jpc.bus.bus_i.assign(IntFunctions.plus(1));
+		jpc.gen.gen_bus.assign(IntFunctions.plus(1));
+		jpc.branch.f_bus.assign(IntFunctions.plus(1));
+		jpc.branch.t_bus.assign(IntFunctions.plus(1));
+
+		test_jpc(jpc);
 	}
 
 	// TODO: test overloaded methods.

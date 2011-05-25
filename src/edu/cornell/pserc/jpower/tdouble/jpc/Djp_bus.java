@@ -258,4 +258,9 @@ public class Djp_bus {
 		return matrix;
 	}
 
+	@Override
+	public String toString() {
+		return toMatrix().toString();
+	}
+
 }
