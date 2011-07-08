@@ -19,6 +19,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
@@ -104,5 +105,10 @@ public class Djp_t_is {
 
 	public static void jp_t_is(Djp_areas got, Djp_areas expected, int prec, String msg) {
 		jp_t_is(got, expected, prec, msg);
+	}
+
+	public static void jp_t_is(DComplexMatrix2D dSbus_dVm_sp, DComplexMatrix2D num_dSbus_dVm, int prec, String msg) {
+		// TODO Auto-generated method stub
+
 	}
 }

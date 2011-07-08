@@ -507,6 +507,30 @@ public class Djp_util extends Object {
 		return cmplx;
 	}
 
+	public static DComplexMatrix2D polar(DoubleMatrix2D r, DoubleMatrix2D theta) {
+		return polar(r, theta, true);
+	}
+
+	@SuppressWarnings("static-access")
+	public static DComplexMatrix2D polar(DoubleMatrix2D r, DoubleMatrix2D theta, boolean radians) {
+		DoubleMatrix2D real = theta.copy();
+		DoubleMatrix2D imag = theta.copy();
+		if (!radians) {
+			real.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
+			imag.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
+		}
+		real.assign(dfunc.cos);
+		imag.assign(dfunc.sin);
+		real.assign(r, dfunc.mult);
+		imag.assign(r, dfunc.mult);
+
+		DComplexMatrix2D cmplx = DComplexFactory2D.dense.make(r.rows(), r.columns());
+		cmplx.assignReal(real);
+		cmplx.assignImaginary(imag);
+
+		return cmplx;
+	}
+
 	/**
 	 *
 	 * @param x
