@@ -19,9 +19,12 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
+import cern.colt.util.tdouble.Djp_util;
 import edu.cornell.pserc.jpower.tdouble.Djp_ext2int;
 import edu.cornell.pserc.jpower.tdouble.Djp_int2ext;
 import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_t_ext2int2ext {
@@ -33,6 +36,7 @@ public class Djp_t_ext2int2ext {
 	public static void jp_t_ext2int2ext(boolean quiet) {
 		String t;
 		Djp_jpc jpce, jpci, jpc;
+		int[] eVmQgcols, iVmQgcols;
 
 		int verbose = quiet ? 0 : 1;
 
@@ -105,8 +109,14 @@ public class Djp_t_ext2int2ext {
 		jpci = Djp_loadcase.jp_loadcase(Djp_t_case_int.jp_t_case_int());
 		jpce.N = null;
 		jpci.N = null;
-		jpce.gencost = [jpce.gencost; jpce.gencost];
-		jpci.gencost = [jpci.gencost; jpci.gencost];
+		jpce.gencost = Djp_gencost.fromMatrix(DoubleFactory2D.dense.appendRows(
+				jpce.gencost.toMatrix(),
+				jpce.gencost.toMatrix()
+		));
+		jpci.gencost = Djp_gencost.fromMatrix(DoubleFactory2D.dense.appendRows(
+				jpci.gencost.toMatrix(),
+				jpci.gencost.toMatrix()
+		));
 		jpc = Djp_ext2int.jp_ext2int(jpce);
 		Djp_t_is.jp_t_is(jpc.bus, jpci.bus, 12, t + "bus");
 		Djp_t_is.jp_t_is(jpc.branch, jpci.branch, 12, t + "branch");
@@ -115,32 +125,38 @@ public class Djp_t_ext2int2ext {
 		Djp_t_is.jp_t_is(jpc.areas, jpci.areas, 12, t + "areas");
 		Djp_t_is.jp_t_is(jpc.A, jpci.A, 12, t + "A");
 
-		t = "jpc = ext2int(jpc) - A, N are DC sized : ";
-		jpce = Djp_loadcase.jp_loadcase(Djp_t_case_ext.jp_t_case_ext());
-		jpci = Djp_loadcase.jp_loadcase(Djp_t_case_int.jp_t_case_int());
-		eVmQgcols = [11:20 25:28];
-		iVmQgcols = [10:18 22:24];
-		jpce.A(:, eVmQgcols) = [];
-		jpce.N(:, eVmQgcols) = [];
-		jpci.A(:, iVmQgcols) = [];
-		jpci.N(:, iVmQgcols) = [];
-		jpc = ext2int(jpce);
-		t_is(jpc.bus, jpci.bus, 12, t + "bus");
-		t_is(jpc.branch, jpci.branch, 12, t + "branch");
-		t_is(jpc.gen, jpci.gen, 12, t + "gen");
-		t_is(jpc.gencost, jpci.gencost, 12, t + "gencost");
-		t_is(jpc.areas, jpci.areas, 12, t + "areas");
-		t_is(jpc.A, jpci.A, 12, t + "A");
-		t_is(jpc.N, jpci.N, 12, t + "N");
-		t = "jpc = int2ext(jpc) - A, N are DC sized : ";
-		jpc = int2ext(jpc);
-		t_is(jpc.bus, jpce.bus, 12, t + "bus");
-		t_is(jpc.branch, jpce.branch, 12, t + "branch");
-		t_is(jpc.gen, jpce.gen, 12, t + "gen");
-		t_is(jpc.gencost, jpce.gencost, 12, t + "gencost");
-		t_is(jpc.areas, jpce.areas, 12, t + "areas");
-		t_is(jpc.A, jpce.A, 12, t + "A");
-		t_is(jpc.N, jpce.N, 12, t + "N");
+//		t = "jpc = ext2int(jpc) - A, N are DC sized : ";
+//		jpce = Djp_loadcase.jp_loadcase(Djp_t_case_ext.jp_t_case_ext());
+//		jpci = Djp_loadcase.jp_loadcase(Djp_t_case_int.jp_t_case_int());
+//		eVmQgcols = Djp_util.icat(
+//				Djp_util.irange(10, 20),
+//				Djp_util.irange(24, 28)
+//		);
+//		iVmQgcols = Djp_util.icat(
+//				Djp_util.irange(9, 18),
+//				Djp_util.irange(21, 24)
+//		);
+//		jpce.A.(:, eVmQgcols) = [];
+//		jpce.N(:, eVmQgcols) = [];
+//		jpci.A(:, iVmQgcols) = [];
+//		jpci.N(:, iVmQgcols) = [];
+//		jpc = ext2int(jpce);
+//		t_is(jpc.bus, jpci.bus, 12, t + "bus");
+//		t_is(jpc.branch, jpci.branch, 12, t + "branch");
+//		t_is(jpc.gen, jpci.gen, 12, t + "gen");
+//		t_is(jpc.gencost, jpci.gencost, 12, t + "gencost");
+//		t_is(jpc.areas, jpci.areas, 12, t + "areas");
+//		t_is(jpc.A, jpci.A, 12, t + "A");
+//		t_is(jpc.N, jpci.N, 12, t + "N");
+//		t = "jpc = int2ext(jpc) - A, N are DC sized : ";
+//		jpc = int2ext(jpc);
+//		t_is(jpc.bus, jpce.bus, 12, t + "bus");
+//		t_is(jpc.branch, jpce.branch, 12, t + "branch");
+//		t_is(jpc.gen, jpce.gen, 12, t + "gen");
+//		t_is(jpc.gencost, jpce.gencost, 12, t + "gencost");
+//		t_is(jpc.areas, jpce.areas, 12, t + "areas");
+//		t_is(jpc.A, jpce.A, 12, t + "A");
+//		t_is(jpc.N, jpce.N, 12, t + "N");
 
 		Djp_t_end.jp_t_end();
 	}
