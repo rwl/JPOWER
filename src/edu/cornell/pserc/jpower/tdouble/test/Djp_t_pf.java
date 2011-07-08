@@ -19,14 +19,15 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_mm;
 
 import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_rundcpf;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf;
@@ -59,27 +60,24 @@ public class Djp_t_pf {
 	 */
 	public static void jp_t_pf(boolean quiet) {
 
+		String t;
+		Djp_jpc jpc, r;
+		DoubleMatrix2D bus_soln, gen_soln, branch_soln;
+		Map<String, Double> jpopt;
+
 		Djp_t_begin.jp_t_begin(25, quiet);
 
 		String casefile = "t_case9_pf";
-		Map<String, Double> opt = new HashMap<String, Double>();
-		opt.put("OUT_ALL", 0.0);
-		opt.put("VERBOSE", quiet ? 0.0 : 1.0);
-		Map<String, Double> jpopt = Djp_jpoption.jp_jpoption();
+		jpopt = Djp_jpoption.jp_jpoption("OUT_ALL", 0.0, "VERBOSE", quiet ? 0.0 : 1.0);
 
 		/* get solved AC power flow case from MatrixMarket file. */
-		DoubleMatrix2D bus_soln = (DoubleMatrix2D) Djp_mm.readMatrix(BUS_SOLN9);
-		DoubleMatrix2D gen_soln = (DoubleMatrix2D) Djp_mm.readMatrix(GEN_SOLN9);
-		DoubleMatrix2D branch_soln = (DoubleMatrix2D) Djp_mm.readMatrix(BRANCH_SOLN9);
-
-		String t;
-		Djp_jpc jpc;
-		Map<String, Double> alg = new HashMap<String, Double>();
+		bus_soln = (DoubleMatrix2D) Djp_mm.readMatrix(BUS_SOLN9);
+		gen_soln = (DoubleMatrix2D) Djp_mm.readMatrix(GEN_SOLN9);
+		branch_soln = (DoubleMatrix2D) Djp_mm.readMatrix(BRANCH_SOLN9);
 
 		/* run Newton PF */
 		t = "Newton PF : ";
-		alg.put("PF_ALG", (double) 1);
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, alg);
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_ALG", 1.0);
 		jpc = Djp_runpf.jp_runpf(casefile, jpopt);
 		Djp_t_ok.jp_t_ok(jpc.success, t + "success");
 		Djp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
@@ -88,8 +86,7 @@ public class Djp_t_pf {
 
 		/* run fast-decoupled PF (XB version) */
 		t = "Fast Decoupled (XB) PF : ";
-		alg.put("PF_ALG", (double) 2);
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, alg);
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_ALG", 2.0);
 		jpc = Djp_runpf.jp_runpf(casefile, jpopt);
 		Djp_t_ok.jp_t_ok(jpc.success, t + "success");
 		Djp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
@@ -98,8 +95,7 @@ public class Djp_t_pf {
 
 		/* run fast-decoupled PF (BX version) */
 		t = "Fast Decoupled (BX) PF : ";
-		alg.put("PF_ALG", (double) 3);
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, alg);
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_ALG", 3.0);
 		jpc = Djp_runpf.jp_runpf(casefile, jpopt);
 		Djp_t_ok.jp_t_ok(jpc.success, t + "success");
 		Djp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
@@ -108,8 +104,7 @@ public class Djp_t_pf {
 
 		/* run Gauss-Seidel PF */
 		t = "Gauss-Seidel PF : ";
-		alg.put("PF_ALG", (double) 4);
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, alg);
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_ALG", 4.0);
 		jpc = Djp_runpf.jp_runpf(casefile, jpopt);
 		Djp_t_ok.jp_t_ok(jpc.success, t + "success");
 		Djp_t_is.jp_t_is(jpc.bus.toMatrix(), bus_soln, 6, t + "bus");
@@ -130,5 +125,54 @@ public class Djp_t_pf {
 		Djp_t_is.jp_t_is(jpc.branch.toMatrix(), branch_soln, 6, t + "branch");
 
 		/* check Qg distribution, when Qmin = Qmax */
+		t = "check Qg : ";
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_ALG", 1.0, "VERBOSE", 0.0);
+		jpc = Djp_loadcase.jp_loadcase(casefile);
+		jpc.gen.Qmin.set(0, 20);
+		jpc.gen.Qmax.set(0, 20);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.get(0), 24.07, 2, t + "single gen, Qmin = Qmax");
+
+		jpc.gen = Djp_gen.fromMatrix( DoubleFactory2D.dense.appendRows(
+			jpc.gen.toMatrix().viewSelection(new int[] {0}, null),
+			jpc.gen.toMatrix()
+		) );
+		jpc.gen.Qmin.set(0, 10);
+		jpc.gen.Qmax.set(0, 10);
+		jpc.gen.Qmin.set(1, 0);
+		jpc.gen.Qmax.set(1, 50);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {10, 14.07}, 2,
+				t + "2 gens, Qmin = Qmax for one");
+
+		jpc.gen.Qmin.set(0, 10);
+		jpc.gen.Qmax.set(0, 10);
+		jpc.gen.Qmin.set(1, -50);
+		jpc.gen.Qmax.set(1, -50);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {12.03, 12.03}, 2,
+				t + "2 gens, Qmin = Qmax for both");
+
+		jpc.gen.Qmin.set(0, 0);
+		jpc.gen.Qmax.set(0, 50);
+		jpc.gen.Qmin.set(1, 0);
+		jpc.gen.Qmax.set(1, 100);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {8.02, 16.05}, 2,
+				t + "2 gens, proportional");
+
+		jpc.gen.Qmin.set(0, -50);
+		jpc.gen.Qmax.set(0, 0);
+		jpc.gen.Qmin.set(1, 50);
+		jpc.gen.Qmax.set(1, 150);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {-50+8.02, 50+16.05}, 2,
+				t + "2 gens, proportional");
+
+		Djp_t_end.jp_t_end();
 	}
 }

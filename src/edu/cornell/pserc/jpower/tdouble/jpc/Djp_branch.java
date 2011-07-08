@@ -230,37 +230,71 @@ public class Djp_branch {
 
 	/**
 	 *
-	 * @param other
+	 * @param data
 	 */
-	public void fromMatrix(DoubleMatrix2D other) {
+//	public void fromMatrix(DoubleMatrix2D other) {
+//
+//		f_bus = Djp_util.intm(other.viewColumn(F_BUS));
+//		t_bus = Djp_util.intm(other.viewColumn(T_BUS));
+//		br_r = other.viewColumn(BR_R);
+//		br_x = other.viewColumn(BR_X);
+//		br_b = other.viewColumn(BR_B);
+//		rate_a = other.viewColumn(RATE_A);
+//		rate_b = other.viewColumn(RATE_B);
+//		rate_c = other.viewColumn(RATE_C);
+//		tap = other.viewColumn(TAP);
+//		shift = other.viewColumn(SHIFT);
+//		br_status = Djp_util.intm(other.viewColumn(BR_STATUS));
+//		ang_min = other.viewColumn(ANGMIN);
+//		ang_max = other.viewColumn(ANGMAX);
+//
+//		if (other.columns() > ANGMAX + 1) {
+//			Pf = other.viewColumn(PF);
+//			Qf = other.viewColumn(QF);
+//			Pt = other.viewColumn(PT);
+//			Qt = other.viewColumn(QT);
+//		}
+//
+//		if (other.columns() > QT + 1) {
+//			mu_Sf = other.viewColumn(MU_SF);
+//			mu_St = other.viewColumn(MU_ST);
+//			mu_angmin = other.viewColumn(MU_ANGMIN);
+//			mu_angmax = other.viewColumn(MU_ANGMAX);
+//		}
+//	}
 
-		f_bus = Djp_util.intm(other.viewColumn(F_BUS));
-		t_bus = Djp_util.intm(other.viewColumn(T_BUS));
-		br_r = other.viewColumn(BR_R);
-		br_x = other.viewColumn(BR_X);
-		br_b = other.viewColumn(BR_B);
-		rate_a = other.viewColumn(RATE_A);
-		rate_b = other.viewColumn(RATE_B);
-		rate_c = other.viewColumn(RATE_C);
-		tap = other.viewColumn(TAP);
-		shift = other.viewColumn(SHIFT);
-		br_status = Djp_util.intm(other.viewColumn(BR_STATUS));
-		ang_min = other.viewColumn(ANGMIN);
-		ang_max = other.viewColumn(ANGMAX);
+	public static Djp_branch fromMatrix(DoubleMatrix2D data) {
+		Djp_branch branch = new Djp_branch();
 
-		if (other.columns() > ANGMAX + 1) {
-			Pf = other.viewColumn(PF);
-			Qf = other.viewColumn(QF);
-			Pt = other.viewColumn(PT);
-			Qt = other.viewColumn(QT);
+		branch.f_bus = Djp_util.intm(data.viewColumn(F_BUS));
+		branch.t_bus = Djp_util.intm(data.viewColumn(T_BUS));
+		branch.br_r = data.viewColumn(BR_R);
+		branch.br_x = data.viewColumn(BR_X);
+		branch.br_b = data.viewColumn(BR_B);
+		branch.rate_a = data.viewColumn(RATE_A);
+		branch.rate_b = data.viewColumn(RATE_B);
+		branch.rate_c = data.viewColumn(RATE_C);
+		branch.tap = data.viewColumn(TAP);
+		branch.shift = data.viewColumn(SHIFT);
+		branch.br_status = Djp_util.intm(data.viewColumn(BR_STATUS));
+		branch.ang_min = data.viewColumn(ANGMIN);
+		branch.ang_max = data.viewColumn(ANGMAX);
+
+		if (data.columns() > ANGMAX + 1) {
+			branch.Pf = data.viewColumn(PF);
+			branch.Qf = data.viewColumn(QF);
+			branch.Pt = data.viewColumn(PT);
+			branch.Qt = data.viewColumn(QT);
 		}
 
-		if (other.columns() > QT + 1) {
-			mu_Sf = other.viewColumn(MU_SF);
-			mu_St = other.viewColumn(MU_ST);
-			mu_angmin = other.viewColumn(MU_ANGMIN);
-			mu_angmax = other.viewColumn(MU_ANGMAX);
+		if (data.columns() > QT + 1) {
+			branch.mu_Sf = data.viewColumn(MU_SF);
+			branch.mu_St = data.viewColumn(MU_ST);
+			branch.mu_angmin = data.viewColumn(MU_ANGMIN);
+			branch.mu_angmax = data.viewColumn(MU_ANGMAX);
 		}
+
+		return branch;
 	}
 
 	public DoubleMatrix2D toMatrix() {

@@ -83,10 +83,19 @@ public class Djp_areas {
 	 *
 	 * @param other
 	 */
-	public void fromMatrix(DoubleMatrix2D other) {
+//	public void fromMatrix(DoubleMatrix2D other) {
+//
+//		this.area_i = Djp_util.intm(other.viewColumn(AREA_I));
+//		this.price_ref_bus = Djp_util.intm(other.viewColumn(PRICE_REF_BUS));
+//	}
 
-		this.area_i = Djp_util.intm(other.viewColumn(AREA_I));
-		this.price_ref_bus = Djp_util.intm(other.viewColumn(PRICE_REF_BUS));
+	public static Djp_areas fromMatrix(DoubleMatrix2D other) {
+		Djp_areas area = new Djp_areas();
+
+		area.area_i = Djp_util.intm(other.viewColumn(AREA_I));
+		area.price_ref_bus = Djp_util.intm(other.viewColumn(PRICE_REF_BUS));
+
+		return area;
 	}
 
 }

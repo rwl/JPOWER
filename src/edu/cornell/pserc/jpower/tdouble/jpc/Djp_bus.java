@@ -193,28 +193,55 @@ public class Djp_bus {
 	 *
 	 * @param bus
 	 */
-	public void fromMatrix(DoubleMatrix2D bus) {
+//	public void fromMatrix(DoubleMatrix2D bus) {
+//
+//		this.bus_i = Djp_util.intm(bus.viewColumn(BUS_I));
+//		this.bus_type = Djp_util.intm(bus.viewColumn(BUS_TYPE));
+//		this.Pd = bus.viewColumn(PD);
+//		this.Qd = bus.viewColumn(QD);
+//		this.Gs = bus.viewColumn(GS);
+//		this.Bs = bus.viewColumn(BS);
+//		this.bus_area = Djp_util.intm(bus.viewColumn(BUS_AREA));
+//		this.Vm = bus.viewColumn(VM);
+//		this.Va = bus.viewColumn(VA);
+//		this.base_kV = bus.viewColumn(BASE_KV);
+//		this.zone = Djp_util.intm(bus.viewColumn(ZONE));
+//		this.Vmax = bus.viewColumn(VMAX);
+//		this.Vmin = bus.viewColumn(VMIN);
+//
+//		if (bus.columns() > VMIN + 1) {
+//			this.lam_P = bus.viewColumn(LAM_P);
+//			this.lam_Q = bus.viewColumn(LAM_Q);
+//			this.mu_Vmax = bus.viewColumn(MU_VMAX);
+//			this.mu_Vmin = bus.viewColumn(MU_VMIN);
+//		}
+//	}
 
-		this.bus_i = Djp_util.intm(bus.viewColumn(BUS_I));
-		this.bus_type = Djp_util.intm(bus.viewColumn(BUS_TYPE));
-		this.Pd = bus.viewColumn(PD);
-		this.Qd = bus.viewColumn(QD);
-		this.Gs = bus.viewColumn(GS);
-		this.Bs = bus.viewColumn(BS);
-		this.bus_area = Djp_util.intm(bus.viewColumn(BUS_AREA));
-		this.Vm = bus.viewColumn(VM);
-		this.Va = bus.viewColumn(VA);
-		this.base_kV = bus.viewColumn(BASE_KV);
-		this.zone = Djp_util.intm(bus.viewColumn(ZONE));
-		this.Vmax = bus.viewColumn(VMAX);
-		this.Vmin = bus.viewColumn(VMIN);
+	public static Djp_bus fromMatrix(DoubleMatrix2D data) {
+		Djp_bus bus = new Djp_bus();
 
-		if (bus.columns() > VMIN + 1) {
-			this.lam_P = bus.viewColumn(LAM_P);
-			this.lam_Q = bus.viewColumn(LAM_Q);
-			this.mu_Vmax = bus.viewColumn(MU_VMAX);
-			this.mu_Vmin = bus.viewColumn(MU_VMIN);
+		bus.bus_i = Djp_util.intm(data.viewColumn(BUS_I));
+		bus.bus_type = Djp_util.intm(data.viewColumn(BUS_TYPE));
+		bus.Pd = data.viewColumn(PD);
+		bus.Qd = data.viewColumn(QD);
+		bus.Gs = data.viewColumn(GS);
+		bus.Bs = data.viewColumn(BS);
+		bus.bus_area = Djp_util.intm(data.viewColumn(BUS_AREA));
+		bus.Vm = data.viewColumn(VM);
+		bus.Va = data.viewColumn(VA);
+		bus.base_kV = data.viewColumn(BASE_KV);
+		bus.zone = Djp_util.intm(data.viewColumn(ZONE));
+		bus.Vmax = data.viewColumn(VMAX);
+		bus.Vmin = data.viewColumn(VMIN);
+
+		if (data.columns() > VMIN + 1) {
+			bus.lam_P = data.viewColumn(LAM_P);
+			bus.lam_Q = data.viewColumn(LAM_Q);
+			bus.mu_Vmax = data.viewColumn(MU_VMAX);
+			bus.mu_Vmin = data.viewColumn(MU_VMIN);
 		}
+
+		return bus;
 	}
 
 	public DoubleMatrix2D toMatrix() {

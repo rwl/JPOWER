@@ -168,19 +168,43 @@ public class Djp_jpoption {
 
 	/**
 	 *
-	 * @return the default options vector.
+	 * @param tuples odd elements option names, even elements are new option values
+	 * @return the default options vector with new values for the given options
 	 */
-	public static Map<String, Double> jp_jpoption() {
-		return jp_jpoption(null);
+	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6, String name7, Double value7) {
+		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, name7, value7);
+	}
+
+	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6) {
+		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5) {
+		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4) {
+		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, null, null, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3) {
+		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, null, null, null, null, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2) {
+		return jp_jpoption(null, name1, value1, name2, value2, null, null, null, null, null, null, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(String name1, Double value1) {
+		return jp_jpoption(null, name1, value1, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	/**
 	 *
-	 * @param tuples odd elements option names, even elements are new option values
-	 * @return the default options vector with new values for the given options
+	 * @return the default options vector.
 	 */
-	public static Map<String, Double> jp_jpoption(Map<String, Double> spec) {
-		return jp_jpoption(null, spec);
+	public static Map<String, Double> jp_jpoption() {
+		return jp_jpoption(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	/**
@@ -191,7 +215,7 @@ public class Djp_jpoption {
 	 * @param specified odd elements option names, even elements are new option values
 	 * @return the base options map with new values for the given options
 	 */
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, Map<String, Double> specified) {
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6, String name7, Double value7) {
 		if (options == null) {
 
 			/* use defaults for base options vector */
@@ -258,9 +282,46 @@ public class Djp_jpoption {
 			options.put("SMOOTHING_RATIO", 0.04);
 		}
 
-		if (specified != null)
-			options.putAll(specified);
+		if (name1 != null)
+			options.put(name1, value1);
+		if (name2 != null)
+			options.put(name2, value2);
+		if (name3 != null)
+			options.put(name3, value3);
+		if (name4 != null)
+			options.put(name4, value4);
+		if (name5 != null)
+			options.put(name5, value5);
+		if (name6 != null)
+			options.put(name6, value6);
+		if (name7 != null)
+			options.put(name7, value7);
 
 		return options;
 	}
+
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6) {
+		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5) {
+		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4) {
+		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, null, null, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3) {
+		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, null, null, null, null, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2) {
+		return jp_jpoption(options, name1, value1, name2, value2, null, null, null, null, null, null, null, null, null, null);
+	}
+
+	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1) {
+		return jp_jpoption(options, name1, value1, null, null, null, null, null, null, null, null, null, null, null, null);
+	}
+
 }

@@ -240,36 +240,75 @@ public class Djp_gen {
 	 *
 	 * @param other
 	 */
-	public void fromMatrix(DoubleMatrix2D other) {
+//	public void fromMatrix(DoubleMatrix2D other) {
+//
+//		gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
+//		Pg = other.viewColumn(PG);
+//		Qg = other.viewColumn(QG);
+//		Qmax = other.viewColumn(QMAX);
+//		Qmin = other.viewColumn(QMIN);
+//		Vg = other.viewColumn(VG);
+//		mBase = other.viewColumn(MBASE);
+//		gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
+//		Pmax = other.viewColumn(PMAX);
+//		Pmin = other.viewColumn(PMIN);
+//		Pc1 = other.viewColumn(PC1);
+//		Pc2 = other.viewColumn(PC2);
+//		Qc1min = other.viewColumn(QC1MIN);
+//		Qc1max = other.viewColumn(QC1MAX);
+//		Qc2min = other.viewColumn(QC2MIN);
+//		Qc2max = other.viewColumn(QC2MAX);
+//		ramp_agc = other.viewColumn(RAMP_AGC);
+//		ramp_10 = other.viewColumn(RAMP_10);
+//		ramp_30 = other.viewColumn(RAMP_30);
+//		ramp_q = other.viewColumn(RAMP_Q);
+//		apf = other.viewColumn(APF);
+//
+//		if (other.columns() > APF + 1) {
+//			mu_Pmax = other.viewColumn(MU_PMAX);
+//			mu_Pmin = other.viewColumn(MU_PMIN);
+//			mu_Qmax = other.viewColumn(MU_QMAX);
+//			mu_Qmin = other.viewColumn(MU_QMIN);
+//		}
+//	}
 
-		gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
-		Pg = other.viewColumn(PG);
-		Qg = other.viewColumn(QG);
-		Qmax = other.viewColumn(QMAX);
-		Qmin = other.viewColumn(QMIN);
-		Vg = other.viewColumn(VG);
-		mBase = other.viewColumn(MBASE);
-		gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
-		Pmax = other.viewColumn(PMAX);
-		Pmin = other.viewColumn(PMIN);
-		Pc1 = other.viewColumn(PC1);
-		Pc2 = other.viewColumn(PC2);
-		Qc1min = other.viewColumn(QC1MIN);
-		Qc1max = other.viewColumn(QC1MAX);
-		Qc2min = other.viewColumn(QC2MIN);
-		Qc2max = other.viewColumn(QC2MAX);
-		ramp_agc = other.viewColumn(RAMP_AGC);
-		ramp_10 = other.viewColumn(RAMP_10);
-		ramp_30 = other.viewColumn(RAMP_30);
-		ramp_q = other.viewColumn(RAMP_Q);
-		apf = other.viewColumn(APF);
+	/**
+	 *
+	 * @param other
+	 */
+	public static Djp_gen fromMatrix(DoubleMatrix2D other) {
+		Djp_gen gen = new Djp_gen();
+
+		gen.gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
+		gen.Pg = other.viewColumn(PG);
+		gen.Qg = other.viewColumn(QG);
+		gen.Qmax = other.viewColumn(QMAX);
+		gen.Qmin = other.viewColumn(QMIN);
+		gen.Vg = other.viewColumn(VG);
+		gen.mBase = other.viewColumn(MBASE);
+		gen.gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
+		gen.Pmax = other.viewColumn(PMAX);
+		gen.Pmin = other.viewColumn(PMIN);
+		gen.Pc1 = other.viewColumn(PC1);
+		gen.Pc2 = other.viewColumn(PC2);
+		gen.Qc1min = other.viewColumn(QC1MIN);
+		gen.Qc1max = other.viewColumn(QC1MAX);
+		gen.Qc2min = other.viewColumn(QC2MIN);
+		gen.Qc2max = other.viewColumn(QC2MAX);
+		gen.ramp_agc = other.viewColumn(RAMP_AGC);
+		gen.ramp_10 = other.viewColumn(RAMP_10);
+		gen.ramp_30 = other.viewColumn(RAMP_30);
+		gen.ramp_q = other.viewColumn(RAMP_Q);
+		gen.apf = other.viewColumn(APF);
 
 		if (other.columns() > APF + 1) {
-			mu_Pmax = other.viewColumn(MU_PMAX);
-			mu_Pmin = other.viewColumn(MU_PMIN);
-			mu_Qmax = other.viewColumn(MU_QMAX);
-			mu_Qmin = other.viewColumn(MU_QMIN);
+			gen.mu_Pmax = other.viewColumn(MU_PMAX);
+			gen.mu_Pmin = other.viewColumn(MU_PMIN);
+			gen.mu_Qmax = other.viewColumn(MU_QMAX);
+			gen.mu_Qmin = other.viewColumn(MU_QMIN);
 		}
+
+		return gen;
 	}
 
 	public DoubleMatrix2D toMatrix() {

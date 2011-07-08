@@ -100,13 +100,25 @@ public class Djp_gencost {
 	 *
 	 * @param other
 	 */
-	public void fromMatrix(DoubleMatrix2D other) {
+//	public void fromMatrix(DoubleMatrix2D other) {
+//
+//		this.model = Djp_util.intm(other.viewColumn(MODEL));
+//		this.startup = other.viewColumn(STARTUP);
+//		this.shutdown = other.viewColumn(SHUTDOWN);
+//		this.ncost = Djp_util.intm(other.viewColumn(NCOST));
+//		this.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
+//	}
 
-		this.model = Djp_util.intm(other.viewColumn(MODEL));
-		this.startup = other.viewColumn(STARTUP);
-		this.shutdown = other.viewColumn(SHUTDOWN);
-		this.ncost = Djp_util.intm(other.viewColumn(NCOST));
-		this.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
+	public static Djp_gencost fromMatrix(DoubleMatrix2D other) {
+		Djp_gencost gencost = new Djp_gencost();
+
+		gencost.model = Djp_util.intm(other.viewColumn(MODEL));
+		gencost.startup = other.viewColumn(STARTUP);
+		gencost.shutdown = other.viewColumn(SHUTDOWN);
+		gencost.ncost = Djp_util.intm(other.viewColumn(NCOST));
+		gencost.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
+
+		return gencost;
 	}
 
 	/**

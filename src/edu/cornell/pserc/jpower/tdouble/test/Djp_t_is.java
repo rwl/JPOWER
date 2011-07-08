@@ -19,8 +19,14 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 
 /**
  * Tests if two matrices are identical to some tolerance.
@@ -35,7 +41,7 @@ public class Djp_t_is {
 		jp_t_is(got, expected, 5);
 	}
 
-	public static void jp_t_is(DoubleMatrix2D got, DoubleMatrix2D expected, double prec) {
+	public static void jp_t_is(DoubleMatrix2D got, DoubleMatrix2D expected, int prec) {
 		jp_t_is(got, expected, prec, "");
 	}
 
@@ -53,7 +59,7 @@ public class Djp_t_is {
 	 * @param prec
 	 * @param msg
 	 */
-	public static void jp_t_is(DoubleMatrix2D got, DoubleMatrix2D expected, double prec, String msg) {
+	public static void jp_t_is(DoubleMatrix2D got, DoubleMatrix2D expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		boolean condition = prop.equals(got, expected);
 
@@ -67,5 +73,36 @@ public class Djp_t_is {
 //				System.out.printf("        expected: %d x %d\n\n", size(expected));
 //			}
 //		}
+	}
+
+	public static void jp_t_is(DoubleMatrix1D viewSelection, double[] ds, int prec, String msg) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static void jp_t_is(double d, double e, int prec, String msg) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static void jp_t_is(Djp_bus got, Djp_bus expected, int prec, String msg) {
+		jp_t_is(got, expected, prec, msg);
+
+	}
+
+	public static void jp_t_is(Djp_branch got, Djp_branch expected, int prec, String msg) {
+		jp_t_is(got, expected, prec, msg);
+	}
+
+	public static void jp_t_is(Djp_gen got, Djp_gen expected, int prec, String msg) {
+		jp_t_is(got, expected, prec, msg);
+	}
+
+	public static void jp_t_is(Djp_gencost got, Djp_gencost expected, int prec, String msg) {
+		jp_t_is(got, expected, prec, msg);
+	}
+
+	public static void jp_t_is(Djp_areas got, Djp_areas expected, int prec, String msg) {
+		jp_t_is(got, expected, prec, msg);
 	}
 }
