@@ -1,15 +1,31 @@
+/*
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
+ *
+ * JPOWER is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * JPOWER is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package edu.cornell.pserc.jpower.tdouble.test;
 
 import java.util.Map;
 
 import cern.colt.matrix.AbstractMatrix;
-import cern.colt.matrix.tdcomplex.DComplexFactory1D;
 import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
-import cern.colt.matrix.tdcomplex.DComplexMatrix1DTest;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
@@ -127,20 +143,25 @@ public class Djp_t_jacobian {
 		Va.zMult(nb1, null);
 		Vmp = Djp_util.polar(Vm.zMult(nb1, null).assign(pert_eye, dfunc.plus),
 				Va.zMult(nb1, null));
-		//Vmp = (Vm*ones(1,nb) + pert*eye(nb,nb)) .* (exp(1j * Va) * ones(1,nb));
+		/** Vmp = (Vm*ones(1,nb) + pert*eye(nb,nb)) .* (exp(1j * Va) * ones(1,nb)); */
 
 		Vap = Djp_util.polar(Vm.zMult(nb1, null),
 				Va.zMult(nb1, null).assign(pert_eye, dfunc.plus));
-		//Vap = (Vm*ones(1,nb)) .* (exp(1j * (Va*ones(1,nb) + pert*eye(nb,nb))));
+		/** Vap = (Vm*ones(1,nb)) .* (exp(1j * (Va*ones(1,nb) + pert*eye(nb,nb)))); */
 
-		DComplexMatrix2D nb1c = DComplexFactory2D.dense.make(1, nb).assign(1, 0);
-		DComplexMatrix2D arg1 = Ybus.zMult(Vmp, null).assign(cfunc.conj).assign(Vmp, cfunc.mult);
-		DComplexMatrix2D Vsq = V2.zMult(nb1c, null);
-		DComplexMatrix2D arg3 = Ybus.zMult(Vsq, null).assign(cfunc.conj);
+		DComplexMatrix2D nb1c, arg1, Vsq, arg3;
+		nb1c = DComplexFactory2D.dense.make(1, nb).assign(1, 0);
+		Vsq = V2.zMult(nb1c, null);
 
+		arg1 = Ybus.zMult(Vmp, null).assign(cfunc.conj).assign(Vmp, cfunc.mult);
+		arg3 = Ybus.zMult(Vsq, null).assign(cfunc.conj);
 		num_dSbus_dVm = arg1.assign(Vsq, cfunc.minus).assign(arg3, cfunc.mult).assign(cfunc.div(pert));
-		//num_dSbus_dVm = full( (Vmp .* conj(Ybus * Vmp) - V*ones(1,nb) .* conj(Ybus * V*ones(1,nb))) / pert );
-		num_dSbus_dVa = full( (Vap .* conj(Ybus * Vap) - V*ones(1,nb) .* conj(Ybus * V*ones(1,nb))) / pert );
+		/** num_dSbus_dVm = full( (Vmp .* conj(Ybus * Vmp) - V*ones(1,nb) .* conj(Ybus * V*ones(1,nb))) / pert ); */
+
+		arg1 = Ybus.zMult(Vap, null).assign(cfunc.conj).assign(Vap, cfunc.mult);
+		arg3 = Ybus.zMult(Vsq, null);
+		num_dSbus_dVa = arg1.assign(Vsq, cfunc.minus).assign(arg3, cfunc.mult).assign(cfunc.div(pert));
+		/** num_dSbus_dVa = full( (Vap .* conj(Ybus * Vap) - V*ones(1,nb) .* conj(Ybus * V*ones(1,nb))) / pert ); */
 
 		Djp_t_is.jp_t_is(dSbus_dVm_sp, num_dSbus_dVm, 5, "dSbus_dVm (sparse)");
 		Djp_t_is.jp_t_is(dSbus_dVa_sp, num_dSbus_dVa, 5, "dSbus_dVa (sparse)");
@@ -175,17 +196,21 @@ public class Djp_t_jacobian {
 		Vapf = Vap.viewSelection(f, null);
 		Vmpt = Vmp.viewSelection(t, null);
 		Vapt = Vap.viewSelection(t, null);
-		Sf2 = (V(f)*ones(1,nb)) .* conj(Yf * V*ones(1,nb));
-		St2 = (V(t)*ones(1,nb)) .* conj(Yt * V*ones(1,nb));
-		Smpf = Vmpf .* conj(Yf * Vmp);
-		Sapf = Vapf .* conj(Yf * Vap);
-		Smpt = Vmpt .* conj(Yt * Vmp);
-		Sapt = Vapt .* conj(Yt * Vap);
+		Sf2 = V2.viewSelection(f, null).zMult(nb1c, null).assign(
+				Yf.zMult(V2.zMult(nb1c, null), null).assign(cfunc.conj), cfunc.mult);
+		/** Sf2 = (V(f)*ones(1,nb)) .* conj(Yf * V*ones(1,nb)); */
+		St2 = V2.viewSelection(t, null).zMult(nb1c, null).assign(
+				Yt.zMult(V2.zMult(nb1c, null), null).assign(cfunc.conj), cfunc.mult);
+		/** St2 = (V(t)*ones(1,nb)) .* conj(Yt * V*ones(1,nb)); */
+		Smpf = Yf.zMult(Vmp, null).assign(cfunc.conj).assign(Vmpf, cfunc.mult);
+		Sapf = Yf.zMult(Vap, null).assign(cfunc.conj).assign(Vapf, cfunc.mult);
+		Smpt = Yt.zMult(Vmp, null).assign(cfunc.conj).assign(Vmpt, cfunc.mult);
+		Sapt = Yt.zMult(Vap, null).assign(cfunc.conj).assign(Vapt, cfunc.mult);
 
-		num_dSf_dVm = DComplexFactory2D.dense.make( (Smpf - Sf2) / pert );
-		num_dSf_dVa = DComplexFactory2D.dense.make( (Sapf - Sf2) / pert );
-		num_dSt_dVm = DComplexFactory2D.dense.make( (Smpt - St2) / pert );
-		num_dSt_dVa = DComplexFactory2D.dense.make( (Sapt - St2) / pert );
+		num_dSf_dVm = DComplexFactory2D.dense.make( Smpf.copy().assign(Sf2, cfunc.minus).assign(cfunc.div(pert)).toArray() );
+		num_dSf_dVa = DComplexFactory2D.dense.make( Sapf.copy().assign(Sf2, cfunc.minus).assign(cfunc.div(pert)).toArray() );
+		num_dSt_dVm = DComplexFactory2D.dense.make( Smpt.copy().assign(St2, cfunc.minus).assign(cfunc.div(pert)).toArray() );
+		num_dSt_dVa = DComplexFactory2D.dense.make( Sapt.copy().assign(St2, cfunc.minus).assign(cfunc.div(pert)).toArray() );
 
 		Djp_t_is.jp_t_is(dSf_dVm_sp, num_dSf_dVm, 5, "dSf_dVm (sparse)");
 		Djp_t_is.jp_t_is(dSf_dVa_sp, num_dSf_dVa, 5, "dSf_dVa (sparse)");
@@ -215,10 +240,10 @@ public class Djp_t_jacobian {
 		dAt_dVm_sp = DoubleFactory2D.dense.make(dAt_dVm.toArray());
 
 		// compute numerically to compare
-		num_dAf_dVm = DoubleFactory2D.dense.make( (abs(Smpf).^2 - abs(Sf2).^2) / pert );
-		num_dAf_dVa = DoubleFactory2D.dense.make( (abs(Sapf).^2 - abs(Sf2).^2) / pert );
-		num_dAt_dVm = DoubleFactory2D.dense.make( (abs(Smpt).^2 - abs(St2).^2) / pert );
-		num_dAt_dVa = DoubleFactory2D.dense.make( (abs(Sapt).^2 - abs(St2).^2) / pert );
+		num_dAf_dVm = DoubleFactory2D.dense.make( Smpf.assign(cfunc.abs).assign(cfunc.square).assign( Sf2.assign(cfunc.abs).assign(cfunc.square), cfunc.minus ).assign(cfunc.div(pert)).toArray() );
+		num_dAf_dVa = DoubleFactory2D.dense.make( Sapf.assign(cfunc.abs).assign(cfunc.square).assign( Sf2.assign(cfunc.abs).assign(cfunc.square), cfunc.minus ).assign(cfunc.div(pert)).toArray() );
+		num_dAt_dVm = DoubleFactory2D.dense.make( Smpt.assign(cfunc.abs).assign(cfunc.square).assign( St2.assign(cfunc.abs).assign(cfunc.square), cfunc.minus ).assign(cfunc.div(pert)).toArray() );
+		num_dAt_dVa = DoubleFactory2D.dense.make( Sapt.assign(cfunc.abs).assign(cfunc.square).assign( St2.assign(cfunc.abs).assign(cfunc.square), cfunc.minus ).assign(cfunc.div(pert)).toArray() );
 
 		Djp_t_is.jp_t_is(dAf_dVm_sp, num_dAf_dVm, 4, "dAf_dVm (sparse)");
 		Djp_t_is.jp_t_is(dAf_dVa_sp, num_dAf_dVa, 4, "dAf_dVa (sparse)");
@@ -236,8 +261,8 @@ public class Djp_t_jacobian {
 		dIf_dVm_full = (DComplexMatrix2D) dIbr_dV[1];
 		dIt_dVa_full = (DComplexMatrix2D) dIbr_dV[2];
 		dIt_dVm_full = (DComplexMatrix2D) dIbr_dV[3];
-//		If = (DComplexMatrix1D) dIbr_dV[4];
-//		It = (DComplexMatrix1D) dIbr_dV[5];
+		//If = (DComplexMatrix1D) dIbr_dV[4];
+		//It = (DComplexMatrix1D) dIbr_dV[5];
 
 		// sparse matrices
 		dIbr_dV = Djp_dIbr_dV.jp_dIbr_dV(branch, Yf, Yt, V);
@@ -245,18 +270,18 @@ public class Djp_t_jacobian {
 		dIf_dVm = (DComplexMatrix2D) dIbr_dV[1];
 		dIt_dVa = (DComplexMatrix2D) dIbr_dV[2];
 		dIt_dVm = (DComplexMatrix2D) dIbr_dV[3];
-//		If = (DComplexMatrix1D) dIbr_dV[4];
-//		It = (DComplexMatrix1D) dIbr_dV[5];
+		//If = (DComplexMatrix1D) dIbr_dV[4];
+		//It = (DComplexMatrix1D) dIbr_dV[5];
 		dIf_dVa_sp = DComplexFactory2D.dense.make(dIf_dVa.toArray());
 		dIf_dVm_sp = DComplexFactory2D.dense.make(dIf_dVm.toArray());
 		dIt_dVa_sp = DComplexFactory2D.dense.make(dIt_dVa.toArray());
 		dIt_dVm_sp = DComplexFactory2D.dense.make(dIt_dVm.toArray());
 
 		// compute numerically to compare
-		num_dIf_dVm = DComplexFactory2D.dense.make( (Yf * Vmp - Yf * V*ones(1,nb)) / pert );
-		num_dIf_dVa = DComplexFactory2D.dense.make( (Yf * Vap - Yf * V*ones(1,nb)) / pert );
-		num_dIt_dVm = DComplexFactory2D.dense.make( (Yt * Vmp - Yt * V*ones(1,nb)) / pert );
-		num_dIt_dVa = DComplexFactory2D.dense.make( (Yt * Vap - Yt * V*ones(1,nb)) / pert );
+		num_dIf_dVm = DComplexFactory2D.dense.make( Yf.zMult(Vmp, null).assign(Yf.zMult(V2.zMult(nb1c, null), null), cfunc.minus).assign(cfunc.div(pert)).toArray() );
+		num_dIf_dVa = DComplexFactory2D.dense.make( Yf.zMult(Vap, null).assign(Yf.zMult(V2.zMult(nb1c, null), null), cfunc.minus).assign(cfunc.div(pert)).toArray() );
+		num_dIt_dVm = DComplexFactory2D.dense.make( Yt.zMult(Vmp, null).assign(Yt.zMult(V2.zMult(nb1c, null), null), cfunc.minus).assign(cfunc.div(pert)).toArray() );
+		num_dIt_dVa = DComplexFactory2D.dense.make( Yt.zMult(Vap, null).assign(Yt.zMult(V2.zMult(nb1c, null), null), cfunc.minus).assign(cfunc.div(pert)).toArray() );
 
 		Djp_t_is.jp_t_is(dIf_dVm_sp, num_dIf_dVm, 5, "dIf_dVm (sparse)");
 		Djp_t_is.jp_t_is(dIf_dVa_sp, num_dIf_dVa, 5, "dIf_dVa (sparse)");
