@@ -38,39 +38,39 @@ public class Djp_t_end {
 		    if (all_ok) {
 		    	System.out.print("ok");
 		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.print(String.format(" (%d of %d skipped)",
+		        	System.out.printf(" (%d of %d skipped)",
 		        			TestGlobals.t_skip_cnt,
-		        			TestGlobals.t_num_of_tests));
+		        			TestGlobals.t_num_of_tests);
 		        }
 		    } else {
 		    	System.out.print("not ok\n");
-		    	System.out.print(String.format("\t#####  Ran %d of %d tests: %d passed, %d failed",
+		    	System.out.printf("\t#####  Ran %d of %d tests: %d passed, %d failed",
 		    			TestGlobals.t_counter, TestGlobals.t_num_of_tests,
-		    			TestGlobals.t_ok_cnt, TestGlobals.t_not_ok_cnt));
+		    			TestGlobals.t_ok_cnt, TestGlobals.t_not_ok_cnt);
 		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.print(String.format(", %d skipped", TestGlobals.t_skip_cnt));
+		        	System.out.printf(", %d skipped", TestGlobals.t_skip_cnt);
 		        }
 		    }
 		    System.out.print("\n");
 		} else {
 		    if (all_ok) {
 		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.print(String.format("All tests successful (%d passed, %d skipped of %d)",
-		            		TestGlobals.t_ok_cnt, TestGlobals.t_skip_cnt, TestGlobals.t_num_of_tests));
+		        	System.out.printf("All tests successful (%d passed, %d skipped of %d)",
+		            		TestGlobals.t_ok_cnt, TestGlobals.t_skip_cnt, TestGlobals.t_num_of_tests);
 		        } else {
-		        	System.out.print(String.format("All tests successful (%d of %d)",
-		        			TestGlobals.t_ok_cnt, TestGlobals.t_num_of_tests));
+		        	System.out.printf("All tests successful (%d of %d)",
+		        			TestGlobals.t_ok_cnt, TestGlobals.t_num_of_tests);
 		        }
 		    } else {
-		    	System.out.print(String.format("Ran %d of %d tests: %d passed, %d failed",
+		    	System.out.printf("Ran %d of %d tests: %d passed, %d failed",
 		        		TestGlobals.t_counter, TestGlobals.t_num_of_tests,
-		        		TestGlobals.t_ok_cnt, TestGlobals.t_not_ok_cnt));
+		        		TestGlobals.t_ok_cnt, TestGlobals.t_not_ok_cnt);
 		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.print(String.format(", %d skipped", TestGlobals.t_skip_cnt));
+		        	System.out.printf(", %d skipped", TestGlobals.t_skip_cnt);
 		        }
 		    }
-		    System.out.print(String.format("\nElapsed time %.2f seconds.\n",
-		    		(System.currentTimeMillis() - TestGlobals.t_clock) / 1000F));
+		    System.out.printf("\nElapsed time %.2f seconds.\n",
+		    		(System.currentTimeMillis() - TestGlobals.t_clock) / 1000F);
 		}
 	}
 

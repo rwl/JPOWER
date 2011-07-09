@@ -19,20 +19,28 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
-public class Djp_t_loadcase {
+public class Djp_t_skip {
 
-	public static void jp_t_loadcase() {
-		jp_t_loadcase(false);
+	public static void jp_t_skip(int cnt) {
+		jp_t_skip(cnt, "");
 	}
 
-	public static void jp_t_loadcase(boolean quiet) {
+	/**
+	 * Skips a number of tests.
+	 *
+	 * @param cnt
+	 * @param msg
+	 */
+	public static void jp_t_skip(int cnt, String msg) {
+		if (msg.length() > 0)
+			msg = " : " + msg;
 
-		Djp_t_begin.jp_t_begin(240, quiet);
+		TestGlobals.t_skip_cnt = TestGlobals.t_skip_cnt + cnt;
+		if (!TestGlobals.t_quiet)
+		    System.out.printf("skipped tests %d..%d%s\n",
+		    		TestGlobals.t_counter, TestGlobals.t_counter + cnt-1, msg);
 
-	}
-
-	public static void main(String[] args) {
-		jp_t_loadcase(false);
+		TestGlobals.t_counter = TestGlobals.t_counter + cnt;
 	}
 
 }

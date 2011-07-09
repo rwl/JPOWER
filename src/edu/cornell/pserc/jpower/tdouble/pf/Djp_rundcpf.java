@@ -19,7 +19,6 @@
 
 package edu.cornell.pserc.jpower.tdouble.pf;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
@@ -35,8 +34,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  */
 public class Djp_rundcpf {
 
-	private static Map<String, Double> dc;
-
 	/**
 	 *
 	 * @param casedata
@@ -48,9 +45,7 @@ public class Djp_rundcpf {
 	public static Djp_jpc jp_rundcpf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
-		dc = new HashMap<String, Double>();
-		dc.put("PF_DC", (double) 1);
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, dc);
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_DC", 1.0);
 
 		return Djp_runpf.jp_runpf(casedata, jpopt, fname, solvedcase);
 	}

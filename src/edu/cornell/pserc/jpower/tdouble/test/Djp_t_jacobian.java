@@ -295,4 +295,8 @@ public class Djp_t_jacobian {
 		Djp_t_end.jp_t_end();
 	}
 
+	public static void main(String[] args) {
+		jp_t_jacobian(false);
+	}
+
 }

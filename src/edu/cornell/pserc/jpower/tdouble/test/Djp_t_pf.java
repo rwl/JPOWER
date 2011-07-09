@@ -175,4 +175,9 @@ public class Djp_t_pf {
 
 		Djp_t_end.jp_t_end();
 	}
+
+	public static void main(String[] args) {
+		jp_t_pf(false);
+	}
+
 }

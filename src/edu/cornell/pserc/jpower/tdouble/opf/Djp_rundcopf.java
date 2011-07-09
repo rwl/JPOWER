@@ -19,7 +19,6 @@
 
 package edu.cornell.pserc.jpower.tdouble.opf;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
@@ -34,8 +33,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  */
 public class Djp_rundcopf {
 
-	private static Map<String, Double> dcopf_opt;
-
 	/**
 	 * Runs a DC optimal power flow, returning a RESULTS object.
 	 *
@@ -46,9 +43,7 @@ public class Djp_rundcopf {
 	 * @return
 	 */
 	public static Djp_jpc jp_rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		dcopf_opt = new HashMap<String, Double>();
-		dcopf_opt.put("PF_DC", 1.0);
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, dcopf_opt);
+		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_DC", 1.0);
 		return Djp_runopf.jp_runopf(casedata, jpopt, fname, solvedcase);
 	}
 
