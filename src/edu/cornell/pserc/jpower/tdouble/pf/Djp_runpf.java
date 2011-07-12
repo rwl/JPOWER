@@ -85,27 +85,6 @@ public class Djp_runpf {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static int i, verbose, qlim, ref, refgen, ref0, /*iterations, */k, bi, ref_temp;
-	private static int[] pv, pq, on, gbus, limited, mx, mn;
-	private static long t0;
-	private static boolean dc, success;
-	private static double baseMVA, Varef0;
-	private static double[] maxloc;
-	private static Djp_jpc jpc, results;
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-	private static Map<String, String> v;
-	private static IntMatrix1D[] bustypes;
-	private static DoubleMatrix1D Va0, Pbusinj, Pfinj, Pbus, Va, fixedQg;
-	private static DoubleMatrix2D B, Bf;
-	private static AbstractMatrix[] Bdc;
-	private static DoubleMatrix2D[] BB;
-	private static DComplexMatrix1D V0, normV0g, cVg, Sbus, V;
-	private static DComplexMatrix2D Ybus, Yf, Yt;
-	private static DComplexMatrix2D[] Y;
-	private static Object[] soln, data;
-
 	/**
 	 *
 	 * @param casedata
@@ -117,6 +96,26 @@ public class Djp_runpf {
 	@SuppressWarnings("static-access")
 	public static Djp_jpc jp_runpf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
+		int i, verbose, qlim, ref, refgen, ref0, /*iterations, */k, bi, ref_temp;
+		int[] pv, pq, on, gbus, limited, mx, mn;
+		long t0;
+		boolean dc, success;
+		double baseMVA, Varef0;
+		double[] maxloc;
+		Djp_jpc jpc, results;
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
+		Map<String, String> v;
+		IntMatrix1D[] bustypes;
+		DoubleMatrix1D Va0, Pbusinj, Pfinj, Pbus, Va, fixedQg;
+		DoubleMatrix2D B, Bf;
+		AbstractMatrix[] Bdc;
+		DoubleMatrix2D[] BB;
+		DComplexMatrix1D V0, normV0g, cVg, Sbus, V;
+		DComplexMatrix2D Ybus, Yf, Yt;
+		DComplexMatrix2D[] Y;
+		Object[] soln, data;
 
 		/* options */
 		verbose = jpopt.get("VERBOSE").intValue();

@@ -38,13 +38,6 @@ public class Djp_makeBdc {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
-	private static int nb, nl;
-	private static int[] xfmr, ft, il;
-	private static double[] v;
-	private static DoubleMatrix1D stat, b, tap, Pfinj, Pbusinj;
-	private static SparseRCDoubleMatrix2D Cft;
-	private static DoubleMatrix2D Bf, Bbus;
-
 	/**
 	 * Builds the B matrices and phase shift injections for DC power flow.
 	 * Returns the
@@ -63,6 +56,12 @@ public class Djp_makeBdc {
 	 */
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] jp_makeBdc(double baseMVA, Djp_bus bus, Djp_branch branch) {
+		int nb, nl;
+		int[] xfmr, ft, il;
+		double[] v;
+		DoubleMatrix1D stat, b, tap, Pfinj, Pbusinj;
+		SparseRCDoubleMatrix2D Cft;
+		DoubleMatrix2D Bf, Bbus;
 
 		/* constants */
 		nb = bus.size();		// number of buses

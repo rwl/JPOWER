@@ -36,11 +36,6 @@ public class Djp_makeB {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
-	private static Djp_branch temp_branch;
-	private static Djp_bus temp_bus;
-	private static DComplexMatrix2D[] Ybus;
-	private static DoubleMatrix2D Bp, Bpp;
-
 	/**
 	 * Returns the two
 	 * matrices B prime and B double prime used in the fast decoupled power
@@ -55,6 +50,10 @@ public class Djp_makeB {
 	 */
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix2D[] jp_makeB(double baseMVA, Djp_bus bus, Djp_branch branch, int alg) {
+		Djp_branch temp_branch;
+		Djp_bus temp_bus;
+		DComplexMatrix2D[] Ybus;
+		DoubleMatrix2D Bp, Bpp;
 
 		/* -----  form Bp (B prime)  ----- */
 		temp_branch = branch.copy();		// modify a copy of branch

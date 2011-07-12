@@ -48,17 +48,6 @@ public class Djp_newtonpf {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static int i, max_it, verbose, npv, npq;
-	private static int[] pvpq;
-	private static double tol, normF;
-	private static boolean converged;
-	private static DoubleMatrix1D F, dx;
-	private static DoubleMatrix2D J11, J12, J21, J22, J1, J2, J;
-	private static DComplexMatrix1D mis, V, Va, Vm, dxz;
-	private static DComplexMatrix2D dSbus_dVm, dSbus_dVa;
-	private static DComplexMatrix2D[] dSbus_dV;
-	private static SparseRCDoubleMatrix2D JJ;
-
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
 	 * all buses), the complex bus power injection vector (for all buses),
@@ -86,6 +75,16 @@ public class Djp_newtonpf {
 	@SuppressWarnings("static-access")
 	public static Object[] jp_newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
+		int i, max_it, verbose, npv, npq;
+		int[] pvpq;
+		double tol, normF;
+		boolean converged;
+		DoubleMatrix1D F, dx;
+		DoubleMatrix2D J11, J12, J21, J22, J1, J2, J;
+		DComplexMatrix1D mis, V, Va, Vm, dxz;
+		DComplexMatrix2D dSbus_dVm, dSbus_dVa;
+		DComplexMatrix2D[] dSbus_dV;
+		SparseRCDoubleMatrix2D JJ;
 
 		/* options */
 		tol	= jpopt.get("PF_TOL");

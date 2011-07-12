@@ -47,17 +47,6 @@ public class Djp_pfsoln {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-	private static int nb, ngon;
-	private static int[] on, gbus, ig, out, br;
-	private static double Pg_o;
-	private static IntMatrix1D ggbus, refgen;
-	private static DoubleMatrix1D Va, ngb, ngg, Qg_tot, Qg_min, Qg_max, Qg_on, Qg_save, Qg;
-	private static DComplexMatrix1D Sg, Sf, St;
-	private static SparseRCDoubleMatrix2D Cg, Cmin, Cmax;
-
 	/**
 	 * Updates bus, gen, branch data structures to match power flow soln.
 	 *
@@ -77,6 +66,16 @@ public class Djp_pfsoln {
 	@SuppressWarnings("static-access")
 	public static Object[] jp_pfsoln(double baseMVA, Djp_bus bus0, Djp_gen gen0, Djp_branch branch0,
 			DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V, int ref, int[] pv, int[] pq) {
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
+		int nb, ngon;
+		int[] on, gbus, ig, out, br;
+		double Pg_o;
+		IntMatrix1D ggbus, refgen;
+		DoubleMatrix1D Va, ngb, ngg, Qg_tot, Qg_min, Qg_max, Qg_on, Qg_save, Qg;
+		DComplexMatrix1D Sg, Sf, St;
+		SparseRCDoubleMatrix2D Cg, Cmin, Cmax;
 
 		/* initialize return values */
 		bus = bus0.copy();

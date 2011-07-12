@@ -37,11 +37,6 @@ public class Djp_makeSbus {
 
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static int nb, ngon;
-	private static int[] on, gbus;
-	private static DComplexMatrix1D Sg, Sd, Sbus;
-	private static SparseRCDComplexMatrix2D Cg;
-
 	/**
 	 * Returns the vector of complex bus
 	 * power injections, that is, generation minus load. Power is expressed
@@ -55,6 +50,10 @@ public class Djp_makeSbus {
 	 */
 	@SuppressWarnings("static-access")
 	public static DComplexMatrix1D jp_makeSbus(double baseMVA, Djp_bus bus, Djp_gen gen) {
+		int nb, ngon;
+		int[] on, gbus;
+		DComplexMatrix1D Sg, Sd, Sbus;
+		SparseRCDComplexMatrix2D Cg;
 
 		/* generator info */
 		on = Djp_util.nonzero(gen.gen_status);		// which generators are on?

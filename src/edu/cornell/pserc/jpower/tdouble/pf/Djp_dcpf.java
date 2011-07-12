@@ -36,10 +36,6 @@ public class Djp_dcpf {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
-	private static DoubleMatrix1D Va, b;
-	private static DoubleMatrix2D A;
-	private static int[] pvpq;
-
 	/**
 	 * Solves for the bus voltage angles at all but the reference bus.
 	 *
@@ -54,6 +50,9 @@ public class Djp_dcpf {
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D jp_dcpf(DoubleMatrix2D B, DoubleMatrix1D Pbus,
 			DoubleMatrix1D Va0, int ref, int[] pv, int[] pq) {
+		DoubleMatrix1D Va, b;
+		DoubleMatrix2D A;
+		int[] pvpq;
 
 		/* initialize result vector */
 		Va = Va0.copy();

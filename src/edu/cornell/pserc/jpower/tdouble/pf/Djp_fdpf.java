@@ -47,16 +47,6 @@ public class Djp_fdpf {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static double tol, normP, normQ;
-	private static int i, max_it, alg, verbose;
-	private static int[] pvpq;
-	private static boolean converged;
-	private static DComplexMatrix1D V, Va, Vm, mis;
-	private static DoubleMatrix1D P, Q;
-	private static SparseCCDoubleMatrix2D CCBp, CCBpp;
-	private static SparseDoubleLUDecomposition luP, luQ;
-	private static DComplexMatrix1D dVa, dVm;
-
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
 	 * all buses), the complex bus power injection vector (for all buses),
@@ -86,6 +76,15 @@ public class Djp_fdpf {
 	@SuppressWarnings("static-access")
 	public static Object[] jp_fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
 			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
+		double tol, normP, normQ;
+		int i, max_it, alg, verbose;
+		int[] pvpq;
+		boolean converged;
+		DComplexMatrix1D V, Va, Vm, mis;
+		DoubleMatrix1D P, Q;
+		SparseCCDoubleMatrix2D CCBp, CCBpp;
+		SparseDoubleLUDecomposition luP, luQ;
+		DComplexMatrix1D dVa, dVm;
 
 		/* options */
 		tol	= jpopt.get("PF_TOL");

@@ -36,12 +36,6 @@ public class Djp_dSbus_dV {
 
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static int n;
-	private static int[] ib;
-	private static DComplexMatrix1D Ibus, absV;
-	private static DComplexMatrix2D[] dSbus_dV;
-	private static SparseRCDComplexMatrix2D diagV, diagIbus, diagVnorm, rhs, dS_dVa, conjInorm, dS_dVm, addend;
-
 	/**
 	 * Returns two matrices containing
 	 * partial derivatives of the complex bus power injections w.r.t voltage
@@ -78,6 +72,12 @@ public class Djp_dSbus_dV {
 	 */
 	@SuppressWarnings("static-access")
 	public static DComplexMatrix2D[] jp_dSbus_dV(DComplexMatrix2D Ybus, DComplexMatrix1D V) {
+		int n;
+		int[] ib;
+		DComplexMatrix1D Ibus, absV;
+		DComplexMatrix2D[] dSbus_dV;
+		SparseRCDComplexMatrix2D diagV, diagIbus, diagVnorm, rhs, dS_dVa, conjInorm, dS_dVm, addend;
+
 		n = (int) V.size();
 		ib = Djp_util.irange(n);
 		Ibus = Ybus.zMult(V, null);

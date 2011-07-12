@@ -43,15 +43,8 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 public class Djp_makeYbus {
 
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	public static DoubleFunctions dfunc = DoubleFunctions.functions;
+	private static DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-
-	private static int nb, nl;
-	private static int[] i, f, t, il;
-	private static DoubleMatrix1D dstat, Bc, dtap;
-	private static DComplexMatrix1D cstat, Ys, tap, conj_tap, Ytt, Yff, Yft, Ytf, Ysh;
-	private static SparseRCDComplexMatrix2D Cf, Ct, YYff, YYft, YYtf, YYtt, Yf, Yt;
-	private static DComplexMatrix2D diagYsh, Ybr, Ybus;
 
 	/**
 	 * Returns the full
@@ -67,7 +60,14 @@ public class Djp_makeYbus {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix2D[] jp_makeYbus(double baseMVA, Djp_bus bus, Djp_branch branch) {
+	public static DComplexMatrix2D[] jp_makeYbus(double baseMVA, Djp_bus bus,
+			Djp_branch branch) {
+		int nb, nl;
+		int[] i, f, t, il;
+		DoubleMatrix1D dstat, Bc, dtap;
+		DComplexMatrix1D cstat, Ys, tap, conj_tap, Ytt, Yff, Yft, Ytf, Ysh;
+		SparseRCDComplexMatrix2D Cf, Ct, YYff, YYft, YYtf, YYtt, Yf, Yt;
+		DComplexMatrix2D diagYsh, Ybr, Ybus;
 
 		/* constants */
 		nb = bus.size();		// number of buses

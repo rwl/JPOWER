@@ -55,31 +55,6 @@ public class Djp_printpf {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static PrintWriter pw;
-
-	private static int i, k, nb, nl, ng, nout, mini, maxi, a, nxfmr;
-	private static int OUT_ALL, OUT_ALL_LIM, OUT_V_LIM, OUT_LINE_LIM, OUT_PG_LIM, OUT_QG_LIM;
-	private static int[] ties, xfmr, nzld, s_areas, nzsh, allg, ong, onld, out,
-			ib, ig, igon, ildon, inzld, inzsh, ibrch, in_tie, out_tie, g, vg;
-	private static boolean success, isOPF, isDC, anyP, anyQ, anyP_ld, anyQ_ld, anyF;
-	private static boolean OUT_ANY, OUT_SYS_SUM, OUT_AREA_SUM, OUT_BUS, OUT_BRANCH, OUT_GEN, OUT_RAW;
-	private static double baseMVA, et, ptol;
-	private static double[] min, max;
-	private static String str;
-	private static Double f;
-
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-
-	private static IntMatrix1D i2e, e2i, tiesm, ld, sorted_areas, s_areasm, shunt,
-			isload, notload, gs, bs, a_gbus, a_bus, hasload, hasshunt,
-			a_fbus, a_tbus, _g, _vg, rated, Uf, Ut;
-	private static DoubleMatrix1D fchg, tchg, Pinj, Qinj, Ptie, Qtie, Qlim,
-			genlamP, genlamQ, Ff, Ft, F_tol;
-	private static DComplexMatrix1D tap, V, loss, z, br_b, cfchg, ctchg, Sf, St;
-
-
 	public static void jp_printpf(Djp_jpc results) {
 		jp_printpf(results, System.out);
 	}
@@ -109,6 +84,29 @@ public class Djp_printpf {
 
 	@SuppressWarnings("static-access")
 	public static void jp_printpf(Djp_jpc results, OutputStream output, Map<String, Double> jpopt) {
+		PrintWriter pw;
+
+		int i, k, nb, nl, ng, nout, mini, maxi, a, nxfmr;
+		int OUT_ALL, OUT_ALL_LIM, OUT_V_LIM, OUT_LINE_LIM, OUT_PG_LIM, OUT_QG_LIM;
+		int[] ties, xfmr, nzld, s_areas, nzsh, allg, ong, onld, out,
+				ib, ig, igon, ildon, inzld, inzsh, ibrch, in_tie, out_tie, g, vg;
+		boolean success, isOPF, isDC, anyP, anyQ, anyP_ld, anyQ_ld, anyF;
+		boolean OUT_ANY, OUT_SYS_SUM, OUT_AREA_SUM, OUT_BUS, OUT_BRANCH, OUT_GEN, OUT_RAW;
+		double baseMVA, et, ptol;
+		double[] min, max;
+		String str;
+		Double f;
+
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
+
+		IntMatrix1D i2e, e2i, tiesm, ld, sorted_areas, s_areasm, shunt,
+				isload, notload, gs, bs, a_gbus, a_bus, hasload, hasshunt,
+				a_fbus, a_tbus, _g, _vg, rated, Uf, Ut;
+		DoubleMatrix1D fchg, tchg, Pinj, Qinj, Ptie, Qtie, Qlim,
+				genlamP = null, genlamQ = null, Ff, Ft, F_tol;
+		DComplexMatrix1D tap, V, loss, z, br_b, cfchg, ctchg, Sf, St;
 
 		pw = new PrintWriter(output);
 

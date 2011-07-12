@@ -40,12 +40,8 @@ public class Djp_bustypes {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	private static final int REF = Djp_jpc.REF;
-	private static final int PV = Djp_jpc.PV;
-	private static final int PQ = Djp_jpc.PQ;
-
-	private static int nb, ng;
-	private static SparseRCIntMatrix2D Cg;
-	private static IntMatrix1D bus_gen_status, ref_types, ref, pv_types, pv, pq_types, pq;
+	private static final int PV  = Djp_jpc.PV;
+	private static final int PQ  = Djp_jpc.PQ;
 
 	/**
 	 * Generators with "out-of-service" status are treated as PQ buses with
@@ -58,6 +54,9 @@ public class Djp_bustypes {
 	 */
 	@SuppressWarnings("static-access")
 	public static IntMatrix1D[] jp_bustypes(Djp_bus bus, Djp_gen gen) {
+		int nb, ng;
+		SparseRCIntMatrix2D Cg;
+		IntMatrix1D bus_gen_status, ref_types, ref, pv_types, pv, pq_types, pq;
 
 		/* get generator status */
 		nb = bus.size();

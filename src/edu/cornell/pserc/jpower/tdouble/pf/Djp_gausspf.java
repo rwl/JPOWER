@@ -43,13 +43,6 @@ public class Djp_gausspf {
 
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static double tol, normF;
-	public static int i, max_it, verbose, npv;
-	public static int[] pvpq;
-	public static boolean converged;
-	public static DComplexMatrix1D V, /*Va, */Vm, mis, dVpq, dVpv, absV;
-	public static DoubleMatrix1D F;
-
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
 	 * all buses), the complex bus power injection vector (for all buses),
@@ -77,6 +70,13 @@ public class Djp_gausspf {
 	@SuppressWarnings("static-access")
 	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
+		double tol, normF;
+		int i, max_it, verbose, npv;
+		int[] pvpq;
+		boolean converged;
+		DComplexMatrix1D V, /*Va, */Vm, mis, dVpq, dVpv, absV;
+		DoubleMatrix1D F;
+
 
 		/* options */
 		tol	= jpopt.get("PF_TOL");
