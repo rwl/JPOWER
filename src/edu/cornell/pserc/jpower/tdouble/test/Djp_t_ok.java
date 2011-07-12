@@ -50,17 +50,17 @@ public class Djp_t_ok {
 		}
 
 		if (cond) {
-			Djp_t_begin.t_ok_cnt += 1;
+			TestGlobals.t_ok_cnt += 1;
 		} else {
-			Djp_t_begin.t_not_ok_cnt += 1;
-			if (!Djp_t_begin.t_quiet)
+			TestGlobals.t_not_ok_cnt += 1;
+			if (!TestGlobals.t_quiet)
 				System.out.printf("not ");
 		}
 
-		if (!Djp_t_begin.t_quiet)
-			System.out.printf("ok %d%s\n", Djp_t_begin.t_counter, msg);
+		if (!TestGlobals.t_quiet)
+			System.out.printf("ok %d%s\n", TestGlobals.t_counter, msg);
 
-		Djp_t_begin.t_counter += 1;
+		TestGlobals.t_counter += 1;
 	}
 
 }

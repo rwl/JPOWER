@@ -195,37 +195,69 @@ public class Djp_branch {
 	 */
 	public void update(Djp_branch other, int[] indexes) {
 
-		f_bus.viewSelection(indexes).assign(other.f_bus.viewSelection(indexes));
-		t_bus.viewSelection(indexes).assign(other.t_bus.viewSelection(indexes));
-		br_r.viewSelection(indexes).assign(other.br_r.viewSelection(indexes));
-		br_x.viewSelection(indexes).assign(other.br_x.viewSelection(indexes));
-		br_b.viewSelection(indexes).assign(other.br_b.viewSelection(indexes));
-		rate_a.viewSelection(indexes).assign(other.rate_a.viewSelection(indexes));
-		rate_b.viewSelection(indexes).assign(other.rate_b.viewSelection(indexes));
-		rate_c.viewSelection(indexes).assign(other.rate_c.viewSelection(indexes));
-		tap.viewSelection(indexes).assign(other.tap.viewSelection(indexes));
-		shift.viewSelection(indexes).assign(other.shift.viewSelection(indexes));
-		br_status.viewSelection(indexes).assign(other.br_status.viewSelection(indexes));
-		ang_min.viewSelection(indexes).assign(other.ang_min.viewSelection(indexes));
-		ang_max.viewSelection(indexes).assign(other.ang_max.viewSelection(indexes));
+//		f_bus.viewSelection(indexes).assign(other.f_bus.viewSelection(indexes));
+//		t_bus.viewSelection(indexes).assign(other.t_bus.viewSelection(indexes));
+//		br_r.viewSelection(indexes).assign(other.br_r.viewSelection(indexes));
+//		br_x.viewSelection(indexes).assign(other.br_x.viewSelection(indexes));
+//		br_b.viewSelection(indexes).assign(other.br_b.viewSelection(indexes));
+//		rate_a.viewSelection(indexes).assign(other.rate_a.viewSelection(indexes));
+//		rate_b.viewSelection(indexes).assign(other.rate_b.viewSelection(indexes));
+//		rate_c.viewSelection(indexes).assign(other.rate_c.viewSelection(indexes));
+//		tap.viewSelection(indexes).assign(other.tap.viewSelection(indexes));
+//		shift.viewSelection(indexes).assign(other.shift.viewSelection(indexes));
+//		br_status.viewSelection(indexes).assign(other.br_status.viewSelection(indexes));
+//		ang_min.viewSelection(indexes).assign(other.ang_min.viewSelection(indexes));
+//		ang_max.viewSelection(indexes).assign(other.ang_max.viewSelection(indexes));
+//
+//		if (Pf != null)
+//			Pf.viewSelection(indexes).assign(other.Pf.viewSelection(indexes));
+//		if (Qf != null)
+//			Qf.viewSelection(indexes).assign(other.Qf.viewSelection(indexes));
+//		if (Pt != null)
+//			Pt.viewSelection(indexes).assign(other.Pt.viewSelection(indexes));
+//		if (Qt != null)
+//			Qt.viewSelection(indexes).assign(other.Qt.viewSelection(indexes));
+//
+//		if (mu_Sf != null)
+//			mu_Sf.viewSelection(indexes).assign(other.mu_Sf.viewSelection(indexes));
+//		if (mu_St != null)
+//			mu_St.viewSelection(indexes).assign(other.mu_St.viewSelection(indexes));
+//		if (mu_angmin != null)
+//			mu_angmin.viewSelection(indexes).assign(other.mu_angmin.viewSelection(indexes));
+//		if (mu_angmax != null)
+//			mu_angmax.viewSelection(indexes).assign(other.mu_angmax.viewSelection(indexes));
+
+		f_bus.viewSelection(indexes).assign(other.f_bus);
+		t_bus.viewSelection(indexes).assign(other.t_bus);
+		br_r.viewSelection(indexes).assign(other.br_r);
+		br_x.viewSelection(indexes).assign(other.br_x);
+		br_b.viewSelection(indexes).assign(other.br_b);
+		rate_a.viewSelection(indexes).assign(other.rate_a);
+		rate_b.viewSelection(indexes).assign(other.rate_b);
+		rate_c.viewSelection(indexes).assign(other.rate_c);
+		tap.viewSelection(indexes).assign(other.tap);
+		shift.viewSelection(indexes).assign(other.shift);
+		br_status.viewSelection(indexes).assign(other.br_status);
+		ang_min.viewSelection(indexes).assign(other.ang_min);
+		ang_max.viewSelection(indexes).assign(other.ang_max);
 
 		if (Pf != null)
-			Pf.viewSelection(indexes).assign(other.Pf.viewSelection(indexes));
+			Pf.viewSelection(indexes).assign(other.Pf);
 		if (Qf != null)
-			Qf.viewSelection(indexes).assign(other.Qf.viewSelection(indexes));
+			Qf.viewSelection(indexes).assign(other.Qf);
 		if (Pt != null)
-			Pt.viewSelection(indexes).assign(other.Pt.viewSelection(indexes));
+			Pt.viewSelection(indexes).assign(other.Pt);
 		if (Qt != null)
-			Qt.viewSelection(indexes).assign(other.Qt.viewSelection(indexes));
+			Qt.viewSelection(indexes).assign(other.Qt);
 
 		if (mu_Sf != null)
-			mu_Sf.viewSelection(indexes).assign(other.mu_Sf.viewSelection(indexes));
+			mu_Sf.viewSelection(indexes).assign(other.mu_Sf);
 		if (mu_St != null)
-			mu_St.viewSelection(indexes).assign(other.mu_St.viewSelection(indexes));
+			mu_St.viewSelection(indexes).assign(other.mu_St);
 		if (mu_angmin != null)
-			mu_angmin.viewSelection(indexes).assign(other.mu_angmin.viewSelection(indexes));
+			mu_angmin.viewSelection(indexes).assign(other.mu_angmin);
 		if (mu_angmax != null)
-			mu_angmax.viewSelection(indexes).assign(other.mu_angmax.viewSelection(indexes));
+			mu_angmax.viewSelection(indexes).assign(other.mu_angmax);
 	}
 
 	/**

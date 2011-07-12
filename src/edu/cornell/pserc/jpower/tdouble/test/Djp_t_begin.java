@@ -28,14 +28,6 @@ package edu.cornell.pserc.jpower.tdouble.test;
  */
 public class Djp_t_begin {
 
-	public static boolean t_quiet;
-	public static int t_num_of_tests;
-	public static int t_counter;
-	public static int t_ok_cnt;
-	public static int t_not_ok_cnt;
-	public static int t_skip_cnt;
-	public static double t_clock;
-
 	public static void jp_t_begin(int num_of_tests) {
 		jp_t_begin(num_of_tests, false);
 	}
@@ -49,15 +41,15 @@ public class Djp_t_begin {
 	 * @param quiet
 	 */
 	public static void jp_t_begin(int num_of_tests, boolean quiet) {
-		t_quiet = quiet;
-		t_num_of_tests = num_of_tests;
-		t_counter = 1;
-		t_ok_cnt = 0;
-		t_not_ok_cnt = 0;
-		t_skip_cnt = 0;
-		t_clock = System.currentTimeMillis() / 1000F;
+		TestGlobals.t_quiet = quiet;
+		TestGlobals.t_num_of_tests = num_of_tests;
+		TestGlobals.t_counter = 1;
+		TestGlobals.t_ok_cnt = 0;
+		TestGlobals.t_not_ok_cnt = 0;
+		TestGlobals.t_skip_cnt = 0;
+		TestGlobals.t_clock = System.currentTimeMillis();
 
-		if (t_quiet == false)
+		if (TestGlobals.t_quiet == false)
 			System.out.printf("1..%d\n", num_of_tests);
 	}
 }

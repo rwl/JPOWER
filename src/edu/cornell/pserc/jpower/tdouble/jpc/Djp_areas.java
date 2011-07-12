@@ -76,8 +76,11 @@ public class Djp_areas {
 	 */
 	public void update(Djp_areas other, int[] indexes) {
 
-		this.area_i.viewSelection(indexes).assign(other.area_i.viewSelection(indexes));
-		this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus.viewSelection(indexes));
+//		this.area_i.viewSelection(indexes).assign(other.area_i.viewSelection(indexes));
+//		this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus.viewSelection(indexes));
+
+		this.area_i.viewSelection(indexes).assign(other.area_i);
+		this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus);
 	}
 
 	/**

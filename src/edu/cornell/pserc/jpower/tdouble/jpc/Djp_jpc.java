@@ -67,8 +67,10 @@ public class Djp_jpc {
 		cpy.bus = this.bus.copy();
 		cpy.gen = this.gen.copy();
 		cpy.branch = this.branch.copy();
-		cpy.areas = this.areas.copy();
-		cpy.gencost = this.gencost.copy();
+		if (this.areas != null)
+			cpy.areas = this.areas.copy();
+		if (this.gencost != null)
+			cpy.gencost = this.gencost.copy();
 		if (this.A != null)
 			cpy.A = this.A.copy();
 		if (this.N != null)

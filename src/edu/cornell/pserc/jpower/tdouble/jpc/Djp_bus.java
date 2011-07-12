@@ -165,28 +165,51 @@ public class Djp_bus {
 	 */
 	public void update(Djp_bus other, int[] indexes) {
 
-		this.bus_i.viewSelection(indexes).assign(other.bus_i.viewSelection(indexes));
-		this.bus_type.viewSelection(indexes).assign(other.bus_type.viewSelection(indexes));
-		this.Pd.viewSelection(indexes).assign(other.Pd.viewSelection(indexes));
-		this.Qd.viewSelection(indexes).assign(other.Qd.viewSelection(indexes));
-		this.Gs.viewSelection(indexes).assign(other.Gs.viewSelection(indexes));
-		this.Bs.viewSelection(indexes).assign(other.Bs.viewSelection(indexes));
-		this.bus_area.viewSelection(indexes).assign(other.bus_area.viewSelection(indexes));
-		this.Vm.viewSelection(indexes).assign(other.Vm.viewSelection(indexes));
-		this.Va.viewSelection(indexes).assign(other.Va.viewSelection(indexes));
-		this.base_kV.viewSelection(indexes).assign(other.base_kV.viewSelection(indexes));
-		this.zone.viewSelection(indexes).assign(other.zone.viewSelection(indexes));
-		this.Vmax.viewSelection(indexes).assign(other.Vmax.viewSelection(indexes));
-		this.Vmin.viewSelection(indexes).assign(other.Vmin.viewSelection(indexes));
+//		this.bus_i.viewSelection(indexes).assign(other.bus_i.viewSelection(indexes));
+//		this.bus_type.viewSelection(indexes).assign(other.bus_type.viewSelection(indexes));
+//		this.Pd.viewSelection(indexes).assign(other.Pd.viewSelection(indexes));
+//		this.Qd.viewSelection(indexes).assign(other.Qd.viewSelection(indexes));
+//		this.Gs.viewSelection(indexes).assign(other.Gs.viewSelection(indexes));
+//		this.Bs.viewSelection(indexes).assign(other.Bs.viewSelection(indexes));
+//		this.bus_area.viewSelection(indexes).assign(other.bus_area.viewSelection(indexes));
+//		this.Vm.viewSelection(indexes).assign(other.Vm.viewSelection(indexes));
+//		this.Va.viewSelection(indexes).assign(other.Va.viewSelection(indexes));
+//		this.base_kV.viewSelection(indexes).assign(other.base_kV.viewSelection(indexes));
+//		this.zone.viewSelection(indexes).assign(other.zone.viewSelection(indexes));
+//		this.Vmax.viewSelection(indexes).assign(other.Vmax.viewSelection(indexes));
+//		this.Vmin.viewSelection(indexes).assign(other.Vmin.viewSelection(indexes));
+//
+//		if (this.lam_P != null)
+//			this.lam_P.viewSelection(indexes).assign(other.lam_P.viewSelection(indexes));
+//		if (this.lam_Q != null)
+//			this.lam_Q.viewSelection(indexes).assign(other.lam_Q.viewSelection(indexes));
+//		if (this.mu_Vmax != null)
+//			this.mu_Vmax.viewSelection(indexes).assign(other.mu_Vmax.viewSelection(indexes));
+//		if (this.mu_Vmin != null)
+//			this.mu_Vmin.viewSelection(indexes).assign(other.mu_Vmin.viewSelection(indexes));
+
+		this.bus_i.viewSelection(indexes).assign(other.bus_i);
+		this.bus_type.viewSelection(indexes).assign(other.bus_type);
+		this.Pd.viewSelection(indexes).assign(other.Pd);
+		this.Qd.viewSelection(indexes).assign(other.Qd);
+		this.Gs.viewSelection(indexes).assign(other.Gs);
+		this.Bs.viewSelection(indexes).assign(other.Bs);
+		this.bus_area.viewSelection(indexes).assign(other.bus_area);
+		this.Vm.viewSelection(indexes).assign(other.Vm);
+		this.Va.viewSelection(indexes).assign(other.Va);
+		this.base_kV.viewSelection(indexes).assign(other.base_kV);
+		this.zone.viewSelection(indexes).assign(other.zone);
+		this.Vmax.viewSelection(indexes).assign(other.Vmax);
+		this.Vmin.viewSelection(indexes).assign(other.Vmin);
 
 		if (this.lam_P != null)
-			this.lam_P.viewSelection(indexes).assign(other.lam_P.viewSelection(indexes));
+			this.lam_P.viewSelection(indexes).assign(other.lam_P);
 		if (this.lam_Q != null)
-			this.lam_Q.viewSelection(indexes).assign(other.lam_Q.viewSelection(indexes));
+			this.lam_Q.viewSelection(indexes).assign(other.lam_Q);
 		if (this.mu_Vmax != null)
-			this.mu_Vmax.viewSelection(indexes).assign(other.mu_Vmax.viewSelection(indexes));
+			this.mu_Vmax.viewSelection(indexes).assign(other.mu_Vmax);
 		if (this.mu_Vmin != null)
-			this.mu_Vmin.viewSelection(indexes).assign(other.mu_Vmin.viewSelection(indexes));
+			this.mu_Vmin.viewSelection(indexes).assign(other.mu_Vmin);
 	}
 
 	/**

@@ -94,6 +94,10 @@ public class Djp_order {
 			cpy.internal = this.internal.copy();
 		if (this.external != null)
 			cpy.external = this.external.copy();
+		cpy.bus = this.bus.copy();
+		cpy.gen = this.gen.copy();
+		cpy.branch = this.branch.copy();
+		cpy.areas = this.areas.copy();
 
 		return cpy;
 	}

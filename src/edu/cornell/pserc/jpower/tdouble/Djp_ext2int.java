@@ -143,9 +143,9 @@ public class Djp_ext2int {
 			nb = jpc.bus.size();
 			ng = jpc.gen.size();
 			ng0 = ng;
-			if ((jpc.A != null) & (jpc.A.columns() < 2*nb + 2*ng)) {
+			if ((jpc.A != null) && (jpc.A.columns() < 2*nb + 2*ng)) {
 				dc = true;
-			} else if ((jpc.N != null) & (jpc.N.columns() < 2*nb + 2*ng)) {
+			} else if ((jpc.N != null) && (jpc.N.columns() < 2*nb + 2*ng)) {
 				dc = true;
 			} else {
 				dc = false;
@@ -203,6 +203,8 @@ public class Djp_ext2int {
 				int[] prbus = jpc.areas.price_ref_bus.toArray();
 				IntMatrix1D as = bs.viewSelection(n2i.viewSelection(prbus).toArray());
 				o.areas.status.on = Djp_util.nonzero(as);
+				as.assign(ifunc.equals(0));
+				o.areas.status.off = Djp_util.nonzero(as);
 			}
 
 			/* delete stuff that is "out" */
@@ -212,7 +214,7 @@ public class Djp_ext2int {
 				jpc.branch = jpc.branch.copy(o.branch.status.on);
 			if (o.gen.status.off.length > 0)
 				jpc.gen = jpc.gen.copy(o.gen.status.on);
-			if (jpc.areas != null && o.areas.status.off.length > 0)
+			if ((jpc.areas != null) & (o.areas.status.off.length > 0))
 				jpc.areas = jpc.areas.copy(o.areas.status.on);
 
 			/* update size */

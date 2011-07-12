@@ -204,36 +204,67 @@ public class Djp_gen {
 	 */
 	public void update(Djp_gen other, int[] indexes) {
 
-		gen_bus.viewSelection(indexes).assign(other.gen_bus.viewSelection(indexes));
-		Pg.viewSelection(indexes).assign(other.Pg.viewSelection(indexes));
-		Qg.viewSelection(indexes).assign(other.Qg.viewSelection(indexes));
-		Qmax.viewSelection(indexes).assign(other.Qmax.viewSelection(indexes));
-		Qmin.viewSelection(indexes).assign(other.Qmin.viewSelection(indexes));
-		Vg.viewSelection(indexes).assign(other.Vg.viewSelection(indexes));
-		mBase.viewSelection(indexes).assign(other.mBase.viewSelection(indexes));
-		gen_status.viewSelection(indexes).assign(other.gen_status.viewSelection(indexes));
-		Pmax.viewSelection(indexes).assign(other.Pmax.viewSelection(indexes));
-		Pmin.viewSelection(indexes).assign(other.Pmin.viewSelection(indexes));
-		Pc1.viewSelection(indexes).assign(other.Pc1.viewSelection(indexes));
-		Pc2.viewSelection(indexes).assign(other.Pc2.viewSelection(indexes));
-		Qc1min.viewSelection(indexes).assign(other.Qc1min.viewSelection(indexes));
-		Qc1max.viewSelection(indexes).assign(other.Qc1max.viewSelection(indexes));
-		Qc2min.viewSelection(indexes).assign(other.Qc2min.viewSelection(indexes));
-		Qc2max.viewSelection(indexes).assign(other.Qc2max.viewSelection(indexes));
-		ramp_agc.viewSelection(indexes).assign(other.ramp_agc.viewSelection(indexes));
-		ramp_10.viewSelection(indexes).assign(other.ramp_10.viewSelection(indexes));
-		ramp_30.viewSelection(indexes).assign(other.ramp_30.viewSelection(indexes));
-		ramp_q.viewSelection(indexes).assign(other.ramp_q.viewSelection(indexes));
-		apf.viewSelection(indexes).assign(other.apf.viewSelection(indexes));
+//		gen_bus.viewSelection(indexes).assign(other.gen_bus.viewSelection(indexes));
+//		Pg.viewSelection(indexes).assign(other.Pg.viewSelection(indexes));
+//		Qg.viewSelection(indexes).assign(other.Qg.viewSelection(indexes));
+//		Qmax.viewSelection(indexes).assign(other.Qmax.viewSelection(indexes));
+//		Qmin.viewSelection(indexes).assign(other.Qmin.viewSelection(indexes));
+//		Vg.viewSelection(indexes).assign(other.Vg.viewSelection(indexes));
+//		mBase.viewSelection(indexes).assign(other.mBase.viewSelection(indexes));
+//		gen_status.viewSelection(indexes).assign(other.gen_status.viewSelection(indexes));
+//		Pmax.viewSelection(indexes).assign(other.Pmax.viewSelection(indexes));
+//		Pmin.viewSelection(indexes).assign(other.Pmin.viewSelection(indexes));
+//		Pc1.viewSelection(indexes).assign(other.Pc1.viewSelection(indexes));
+//		Pc2.viewSelection(indexes).assign(other.Pc2.viewSelection(indexes));
+//		Qc1min.viewSelection(indexes).assign(other.Qc1min.viewSelection(indexes));
+//		Qc1max.viewSelection(indexes).assign(other.Qc1max.viewSelection(indexes));
+//		Qc2min.viewSelection(indexes).assign(other.Qc2min.viewSelection(indexes));
+//		Qc2max.viewSelection(indexes).assign(other.Qc2max.viewSelection(indexes));
+//		ramp_agc.viewSelection(indexes).assign(other.ramp_agc.viewSelection(indexes));
+//		ramp_10.viewSelection(indexes).assign(other.ramp_10.viewSelection(indexes));
+//		ramp_30.viewSelection(indexes).assign(other.ramp_30.viewSelection(indexes));
+//		ramp_q.viewSelection(indexes).assign(other.ramp_q.viewSelection(indexes));
+//		apf.viewSelection(indexes).assign(other.apf.viewSelection(indexes));
+//
+//		if (mu_Pmax != null)
+//			mu_Pmax.viewSelection(indexes).assign(other.mu_Pmax.viewSelection(indexes));
+//		if (mu_Pmin != null)
+//			mu_Pmin.viewSelection(indexes).assign(other.mu_Pmin.viewSelection(indexes));
+//		if (mu_Qmax != null)
+//			mu_Qmax.viewSelection(indexes).assign(other.mu_Qmax.viewSelection(indexes));
+//		if (mu_Qmin != null)
+//			mu_Qmin.viewSelection(indexes).assign(other.mu_Qmin.viewSelection(indexes));
+
+		gen_bus.viewSelection(indexes).assign(other.gen_bus);
+		Pg.viewSelection(indexes).assign(other.Pg);
+		Qg.viewSelection(indexes).assign(other.Qg);
+		Qmax.viewSelection(indexes).assign(other.Qmax);
+		Qmin.viewSelection(indexes).assign(other.Qmin);
+		Vg.viewSelection(indexes).assign(other.Vg);
+		mBase.viewSelection(indexes).assign(other.mBase);
+		gen_status.viewSelection(indexes).assign(other.gen_status);
+		Pmax.viewSelection(indexes).assign(other.Pmax);
+		Pmin.viewSelection(indexes).assign(other.Pmin);
+		Pc1.viewSelection(indexes).assign(other.Pc1);
+		Pc2.viewSelection(indexes).assign(other.Pc2);
+		Qc1min.viewSelection(indexes).assign(other.Qc1min);
+		Qc1max.viewSelection(indexes).assign(other.Qc1max);
+		Qc2min.viewSelection(indexes).assign(other.Qc2min);
+		Qc2max.viewSelection(indexes).assign(other.Qc2max);
+		ramp_agc.viewSelection(indexes).assign(other.ramp_agc);
+		ramp_10.viewSelection(indexes).assign(other.ramp_10);
+		ramp_30.viewSelection(indexes).assign(other.ramp_30);
+		ramp_q.viewSelection(indexes).assign(other.ramp_q);
+		apf.viewSelection(indexes).assign(other.apf);
 
 		if (mu_Pmax != null)
-			mu_Pmax.viewSelection(indexes).assign(other.mu_Pmax.viewSelection(indexes));
+			mu_Pmax.viewSelection(indexes).assign(other.mu_Pmax);
 		if (mu_Pmin != null)
-			mu_Pmin.viewSelection(indexes).assign(other.mu_Pmin.viewSelection(indexes));
+			mu_Pmin.viewSelection(indexes).assign(other.mu_Pmin);
 		if (mu_Qmax != null)
-			mu_Qmax.viewSelection(indexes).assign(other.mu_Qmax.viewSelection(indexes));
+			mu_Qmax.viewSelection(indexes).assign(other.mu_Qmax);
 		if (mu_Qmin != null)
-			mu_Qmin.viewSelection(indexes).assign(other.mu_Qmin.viewSelection(indexes));
+			mu_Qmin.viewSelection(indexes).assign(other.mu_Qmin);
 	}
 
 	/**

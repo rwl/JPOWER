@@ -70,7 +70,7 @@ public class Djp_t_run_tests {
 		    if (skip_cnt > 0)
 		    	System.out.printf(", %d skipped", skip_cnt);
 		}
-		System.out.printf("\nElapsed time %.2f seconds.\n", (System.currentTimeMillis() - t0));
+		System.out.printf("\nElapsed time %.2f seconds.\n", ((System.currentTimeMillis() - t0) / 1000F));
 	}
 
 }

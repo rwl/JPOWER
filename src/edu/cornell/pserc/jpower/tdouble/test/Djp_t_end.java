@@ -70,7 +70,7 @@ public class Djp_t_end {
 		        }
 		    }
 		    System.out.printf("\nElapsed time %.2f seconds.\n",
-		    		(System.currentTimeMillis() - TestGlobals.t_clock) / 1000F);
+		    		((System.currentTimeMillis() - TestGlobals.t_clock) / 1000F));
 		}
 	}
 

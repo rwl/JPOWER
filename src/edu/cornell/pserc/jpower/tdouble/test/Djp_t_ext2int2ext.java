@@ -38,6 +38,8 @@ public class Djp_t_ext2int2ext {
 		Djp_jpc jpce, jpci, jpc;
 		int[] eVmQgcols, iVmQgcols;
 
+		Djp_t_begin.jp_t_begin(85, quiet);
+
 		int verbose = quiet ? 0 : 1;
 
 		/* -----  jpc = ext2int/int2ext(jpc)  ----- */
