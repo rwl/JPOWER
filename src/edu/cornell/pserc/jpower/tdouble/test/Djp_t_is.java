@@ -20,6 +20,8 @@
 package edu.cornell.pserc.jpower.tdouble.test;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
+import cern.colt.matrix.tdcomplex.algo.DComplexProperty;
+import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
@@ -76,39 +78,43 @@ public class Djp_t_is {
 //		}
 	}
 
-	public static void jp_t_is(DoubleMatrix1D viewSelection, double[] ds, int prec, String msg) {
-		// TODO Auto-generated method stub
-
+	public static void jp_t_is(DoubleMatrix1D got, double[] expected, int prec, String msg) {
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(expected);
+		Djp_t_ok.jp_t_ok(prop.equals(got, expected_matrix), msg);
 	}
 
-	public static void jp_t_is(double d, double e, int prec, String msg) {
-		// TODO Auto-generated method stub
-
+	public static void jp_t_is(double got, double expected, int prec, String msg) {
+		Djp_t_ok.jp_t_ok(got == expected, msg);
 	}
 
 	public static void jp_t_is(Djp_bus got, Djp_bus expected, int prec, String msg) {
-		jp_t_is(got, expected, prec, msg);
-
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		Djp_t_ok.jp_t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void jp_t_is(Djp_branch got, Djp_branch expected, int prec, String msg) {
-		jp_t_is(got, expected, prec, msg);
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		Djp_t_ok.jp_t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void jp_t_is(Djp_gen got, Djp_gen expected, int prec, String msg) {
-		jp_t_is(got, expected, prec, msg);
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		Djp_t_ok.jp_t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void jp_t_is(Djp_gencost got, Djp_gencost expected, int prec, String msg) {
-		jp_t_is(got, expected, prec, msg);
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		Djp_t_ok.jp_t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void jp_t_is(Djp_areas got, Djp_areas expected, int prec, String msg) {
-		jp_t_is(got, expected, prec, msg);
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		Djp_t_ok.jp_t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void jp_t_is(DComplexMatrix2D dSbus_dVm_sp, DComplexMatrix2D num_dSbus_dVm, int prec, String msg) {
-		// TODO Auto-generated method stub
-
+	public static void jp_t_is(DComplexMatrix2D got, DComplexMatrix2D expected, int prec, String msg) {
+		DComplexProperty cprop = new DComplexProperty(Math.pow(10, -prec));
+		Djp_t_ok.jp_t_ok(cprop.equals(got, expected), msg);
 	}
 }
