@@ -20,6 +20,10 @@
 package edu.cornell.pserc.jpower.tdouble.cases;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
@@ -56,7 +60,7 @@ public class Djp_case57 {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus = Djp_bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	3,	55,	17,	0,	0,	1,	1.04,	0,	0,	1,	1.06,	0.94},
 			{2,	2,	3,	88,	0,	0,	1,	1.01,	-1.18,	0,	1,	1.06,	0.94},
 			{3,	2,	41,	21,	0,	0,	1,	0.985,	-5.97,	0,	1,	1.06,	0.94},
@@ -118,7 +122,7 @@ public class Djp_case57 {
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gen = Djp_gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	128.9,	-16.1,	200,	-140,	1.04,	100,	1,	575.88,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{2,	0,	-0.8,	50,	-17,	1.01,	100,	1,	100,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{3,	40,	-1,	60,	-10,	0.985,	100,	1,	140,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
@@ -130,7 +134,7 @@ public class Djp_case57 {
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.branch = Djp_branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	2,	0.0083,	0.028,	0.129,	9900,	0,	0,	0,	0,	1,	-360,	360},
 			{2,	3,	0.0298,	0.085,	0.0818,	9900,	0,	0,	0,	0,	1,	-360,	360},
 			{3,	4,	0.0112,	0.0366,	0.038,	9900,	0,	0,	0,	0,	1,	-360,	360},
@@ -218,7 +222,7 @@ public class Djp_case57 {
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gencost = Djp_gencost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{2,	0,	0,	3,	0.0775795,	20,	0},
 			{2,	0,	0,	3,	0.01,	40,	0},
 			{2,	0,	0,	3,	0.25,	20,	0},
