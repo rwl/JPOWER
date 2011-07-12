@@ -85,7 +85,7 @@ public class Djp_pfsoln {
 		/* ----- update bus voltages ----- */
 		bus.Vm.assign(V.copy().assign(cfunc.abs).getRealPart());
 		Va = V.copy().assign(cfunc.arg).getRealPart();
-		bus.Va.assign(Va.assign(dfunc.mult(Math.PI)).assign(dfunc.div(180)));
+		bus.Va.assign(Va.assign(dfunc.mult(180)).assign(dfunc.div(Math.PI)));
 
 		/* ----- update Qg for all gens and Pg for swing bus ----- */
 		// generator info
@@ -100,7 +100,7 @@ public class Djp_pfsoln {
 
 		/* update Qg for all generators */
 		gen.Qg.assign(0);					// zero out all Qg
-		gen.Qg.viewSelection(on).assign(Sg.getImaginaryPart().assign(dfunc.mult(baseMVA)));	// inj Q
+		gen.Qg.viewSelection(on).assign(Sg.copy().getImaginaryPart().assign(dfunc.mult(baseMVA)));	// inj Q
 		gen.Qg.viewSelection(on).assign(bus.Qd.viewSelection(gbus), dfunc.plus);			// + local Qd
 
 		/* ... at this point any buses with more than one generator will have
@@ -143,7 +143,7 @@ public class Djp_pfsoln {
 			Qg.assign(gen.Qmax.viewSelection(on).copy().assign(gen.Qmin.viewSelection(on), dfunc.minus), dfunc.mult);                    //   ^ avoid div by 0
 			gen.Qg.viewSelection(on).assign(gen.Qmin.viewSelection(on)).assign(Qg, dfunc.plus);
 
-			Qg_on.assign(Qg_save);
+			Qg_on.viewSelection(ig).assign(Qg_save);
 		}				// (terms are mult by 0 anyway)
 
 		// update Pg for swing bus
@@ -176,6 +176,7 @@ public class Djp_pfsoln {
 		branch.Pt.viewSelection(out).assign(0);
 		branch.Qt.viewSelection(out).assign(0);
 
-		return null;
+		return new Object[] {bus, gen, branch};
 	}
+
 }

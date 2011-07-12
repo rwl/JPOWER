@@ -75,7 +75,7 @@ public class Djp_newtonpf {
 	@SuppressWarnings("static-access")
 	public static Object[] jp_newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
-		int i, max_it, verbose, npv, npq;
+		int i, max_it, verbose, npv, npq, j1, j2, j3, j4, j5, j6;
 		int[] pvpq;
 		double tol, normF;
 		boolean converged;
@@ -102,9 +102,9 @@ public class Djp_newtonpf {
 		/* set up indexing for updating V */
 		npv = pv.length;
 		npq = pq.length;
-//		j1 = 0,			j2 = npv;			// j1:j2 - V angle of pv buses
-//		j3 = j2 + 1,	j4 = j2 + npq;		// j3:j4 - V angle of pq buses
-//		j5 = j4 + 1,	j6 = j4 + npq;		// j5:j6 - V mag of pq buses
+		j1 = 0;		j2 = npv;			// j1:j2 - V angle of pv buses
+		j3 = j2;	j4 = j2 + npq;		// j3:j4 - V angle of pq buses
+		j5 = j4;	j6 = j4 + npq;		// j5:j6 - V mag of pq buses
 
 		/* evaluate F(x0) */
 		mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -129,7 +129,7 @@ public class Djp_newtonpf {
 		}
 
 		/* do Newton iterations */
-		while (!converged && i < max_it) {
+		while ((!converged) & (i < max_it)) {
 			/* update iteration counter */
 			i += 1;
 
@@ -153,19 +153,20 @@ public class Djp_newtonpf {
 
 			/* update voltage */
 			if (npv > 0)
-				Va.viewSelection(pv).assign(dxz.viewPart(0, npv), cfunc.plus);
+				Va.viewSelection(pv).assign(dxz.viewSelection(Djp_util.irange(j1, j2)), cfunc.plus);
 			if (npq > 0) {
-				Va.viewSelection(pq).assign(dxz.viewPart(npv, npq), cfunc.plus);
-				Vm.viewSelection(pq).assign(dxz.viewPart(npv + npq, npq), cfunc.plus);
+				Va.viewSelection(pq).assign(dxz.viewSelection(Djp_util.irange(j3, j4)), cfunc.plus);
+				Vm.viewSelection(pq).assign(dxz.viewSelection(Djp_util.irange(j5, j6)), cfunc.plus);
 			}
 
-			V = Djp_util.complex(Vm.getRealPart(), Va.getRealPart());
+			V = Djp_util.polar(Vm.getRealPart(), Va.getRealPart());
 			/* update Vm and Va again in case we wrapped around with a negative Vm */
 			Va = V.copy().assign(cfunc.arg);
 			Vm = V.copy().assign(cfunc.abs);
 
 			/* evalute F(x) */
-			mis = Ybus.zMult(V, null).assign(cfunc.conj).assign(V, cfunc.mult).assign(Sbus, cfunc.minus);
+			mis = Ybus.zMult(V, null).assign(cfunc.conj);
+			mis.assign(V, cfunc.mult).assign(Sbus, cfunc.minus);
 			F = DoubleFactory1D.sparse.make(new DoubleMatrix1D[] {
 					mis.viewSelection(pvpq).getRealPart(),
 					mis.viewSelection(pq).getImaginaryPart() });

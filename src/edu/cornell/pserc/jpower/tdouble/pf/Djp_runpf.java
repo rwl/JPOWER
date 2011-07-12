@@ -99,7 +99,7 @@ public class Djp_runpf {
 		int i, verbose, qlim, ref, refgen, ref0, /*iterations, */k, bi, ref_temp;
 		int[] pv, pq, on, gbus, limited, mx, mn;
 		long t0;
-		boolean dc, success;
+		boolean dc, repeat, success;
 		double baseMVA, Varef0;
 		double[] maxloc;
 		Djp_jpc jpc, results;
@@ -112,7 +112,7 @@ public class Djp_runpf {
 		DoubleMatrix2D B, Bf;
 		AbstractMatrix[] Bdc;
 		DoubleMatrix2D[] BB;
-		DComplexMatrix1D V0, normV0g, cVg, Sbus, V;
+		DComplexMatrix1D V0, Sbus, V;
 		DComplexMatrix2D Ybus, Yf, Yt;
 		DComplexMatrix2D[] Y;
 		Object[] soln, data;
@@ -208,8 +208,8 @@ public class Djp_runpf {
 			/* initial state */
 			//DComplexMatrix1D V0 = DComplexFactory1D.dense.make(bus.size(), new double[] {1, 0});	// flat start
 			V0 = Djp_util.polar(bus.Vm, bus.Va, false);
-			normV0g = V0.viewSelection(gbus).copy().assign(cfunc.abs).assign(V0.viewSelection(gbus), cfunc.mult);
-			cVg = Djp_util.complex(gen.Vg.viewSelection(on), null);
+			DComplexMatrix1D normV0g = V0.viewSelection(gbus).copy().assign(cfunc.abs).assign(V0.viewSelection(gbus), cfunc.mult);
+			DComplexMatrix1D cVg = Djp_util.complex(gen.Vg.viewSelection(on), null);
 			V0.viewSelection(gbus).assign(cVg.assign(normV0g, cfunc.div));
 
 			ref0 = 0;
@@ -221,7 +221,7 @@ public class Djp_runpf {
 				Varef0 = bus.Va.get(ref0);			//   original reference bus
 				fixedQg = DoubleFactory1D.dense.make(gen.size());	// Qg of gens at Q limits
 			}
-			boolean repeat = true;
+			repeat = true;
 			while (repeat) {
 				/* build admittance matrices */
 				Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);

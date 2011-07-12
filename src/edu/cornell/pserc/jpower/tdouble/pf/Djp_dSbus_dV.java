@@ -74,7 +74,7 @@ public class Djp_dSbus_dV {
 	public static DComplexMatrix2D[] jp_dSbus_dV(DComplexMatrix2D Ybus, DComplexMatrix1D V) {
 		int n;
 		int[] ib;
-		DComplexMatrix1D Ibus, absV;
+		DComplexMatrix1D Ibus, absV, Vnorm;
 		DComplexMatrix2D[] dSbus_dV;
 		SparseRCDComplexMatrix2D diagV, diagIbus, diagVnorm, rhs, dS_dVa, conjInorm, dS_dVm, addend;
 
@@ -86,14 +86,14 @@ public class Djp_dSbus_dV {
 		diagIbus = new SparseRCDComplexMatrix2D(n, n, ib, ib, Ibus.toArray(), false, false);
 
 		absV = V.copy().assign(cfunc.abs);
-		absV.assign(V, cfunc.swapArgs(cfunc.div));
-		diagVnorm = new SparseRCDComplexMatrix2D(n, n, ib, ib, absV.toArray(), false, false);
+		Vnorm = V.copy().assign(absV, cfunc.div);
+		diagVnorm = new SparseRCDComplexMatrix2D(n, n, ib, ib, Vnorm.toArray(), false, false);
 
 		rhs = (SparseRCDComplexMatrix2D) Ybus.zMult(diagV, null);
 
 		rhs.assign(diagIbus, cfunc.swapArgs(cfunc.minus)).assign(cfunc.conj);
 		dS_dVa = (SparseRCDComplexMatrix2D) diagV.zMult(rhs, null);
-		dS_dVa.assign( cfunc.mult(new double[] {1, 0}) );
+		dS_dVa.assign( cfunc.mult(new double[] {0, 1}) );
 
 		conjInorm = (SparseRCDComplexMatrix2D) Ybus.zMult(diagVnorm, null);
 		conjInorm.assign(cfunc.conj);

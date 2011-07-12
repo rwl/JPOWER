@@ -637,11 +637,19 @@ public class Djp_util extends Object {
 	 * @return a complex vector
 	 */
 	public static DComplexMatrix1D complex(DoubleMatrix1D real, DoubleMatrix1D imaginary) {
-		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make((int) real.size());
+		int size = 0;
+		if (real != null)
+			size = (int) real.size();
+		if (imaginary != null)
+			size = (int) imaginary.size();
+
+		DComplexMatrix1D cmplx = DComplexFactory1D.dense.make(size);
+
 		if (real != null)
 			cmplx.assignReal(real);
 		if (imaginary != null)
 			cmplx.assignImaginary(imaginary);
+
 		return cmplx;
 	}
 

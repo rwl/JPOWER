@@ -578,7 +578,7 @@ public class Djp_ext2int {
 		IntMatrix1D e2i;
 
 		i2e = bus.bus_i.toArray();
-		e2i = IntFactory1D.sparse.make(Djp_util.max(i2e));
+		e2i = IntFactory1D.sparse.make(Djp_util.max(i2e) + 1);
 		e2i.viewSelection(i2e).assign(Djp_util.irange(bus.size()));
 
 		bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
@@ -589,7 +589,7 @@ public class Djp_ext2int {
 		if (areas != null && areas.size() != 0)
 			areas.price_ref_bus.assign( e2i.viewSelection(areas.price_ref_bus.toArray()) );
 
-		return new Object[] {bus, gen, branch, areas};
+		return new Object[] {i2e, bus, gen, branch, areas};
 	}
 
 }

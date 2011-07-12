@@ -103,7 +103,7 @@ public class Djp_makeYbus {
 		conj_tap = tap.copy().assign(cfunc.conj);
 
 		Ytt = Ys.copy().assign(Djp_util.complex(null, Bc.assign(dfunc.div(2))), cfunc.plus);
-		Yff = Ytt.copy().assign(tap.copy().assign(conj_tap), cfunc.div);
+		Yff = Ytt.copy().assign(tap.copy().assign(conj_tap, cfunc.mult), cfunc.div);
 		Ys.assign(cfunc.neg);
 		Yft = Ys.copy().assign(conj_tap, cfunc.div);
 		Ytf = Ys.assign(tap, cfunc.div);
@@ -129,17 +129,18 @@ public class Djp_makeYbus {
 		 * at each branch's "from" bus, and Yt is the same for the "to" bus end
 		 */
 		// Duplicate entries must be added.
+		// FIXME: removeDuplicates sums duplicate entries
 		YYff = new SparseRCDComplexMatrix2D(nl, nb, il, f, Yff.toArray(), false, false);
 		YYft = new SparseRCDComplexMatrix2D(nl, nb, il, t, Yft.toArray(), false, false);
 		Yf = new SparseRCDComplexMatrix2D(nl, nb);
-		Yf.assign(YYff, DComplexFunctions.plus);
-		Yf.assign(YYft, DComplexFunctions.plus);
+		Yf.assign(YYff, cfunc.plus);
+		Yf.assign(YYft, cfunc.plus);
 
 		YYtf = new SparseRCDComplexMatrix2D(nl, nb, il, f, Ytf.toArray(), false, false);
 		YYtt = new SparseRCDComplexMatrix2D(nl, nb, il, t, Ytt.toArray(), false, false);
 		Yt = new SparseRCDComplexMatrix2D(nl, nb);
-		Yt.assign(YYtf, DComplexFunctions.plus);
-		Yt.assign(YYtt, DComplexFunctions.plus);
+		Yt.assign(YYtf, cfunc.plus);
+		Yt.assign(YYtt, cfunc.plus);
 		//Yf = spdiags(Yff, 0, nl, nl) * Cf + spdiags(Yft, 0, nl, nl) * Ct;
 		//Yt = spdiags(Ytf, 0, nl, nl) * Cf + spdiags(Ytt, 0, nl, nl) * Ct;
 
@@ -148,10 +149,11 @@ public class Djp_makeYbus {
 		diagYsh = DComplexFactory2D.sparse.diagonal(Ysh);
 		// branch admittances
 		Ybr = Cf.getConjugateTranspose().zMult(Yf, null);
-		Ybr.assign(Ct.getConjugateTranspose().zMult(Yt, null));
+		Ybr.assign(Ct.getConjugateTranspose().zMult(Yt, null), cfunc.plus);
 		// bus admittance
 		Ybus = Ybr.assign(diagYsh, cfunc.plus);
 
 		return new DComplexMatrix2D[] {Ybus, Yf, Yt};
 	}
+
 }
