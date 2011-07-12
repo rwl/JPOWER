@@ -90,8 +90,10 @@ public class Djp_order {
 		Djp_order cpy = new Djp_order();
 
 		cpy.state = this.state;
-		cpy.internal = this.internal.copy();
-		cpy.external = this.external.copy();
+		if (this.internal != null)
+			cpy.internal = this.internal.copy();
+		if (this.external != null)
+			cpy.external = this.external.copy();
 
 		return cpy;
 	}

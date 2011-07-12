@@ -43,45 +43,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
  */
 public class Djp_int2ext {
 
-	private static int be, bi, ne, ni, k;
-	private static int[] idx;
-	private static String order;
-
-	private static Djp_order o;
-
-	private static DoubleMatrix1D int_val1, v1, oldv1, new_v1;
-	private static DoubleMatrix2D int_val2, v2, oldv2, new_v2;
-
-	private static Field fld;
-	private static Class<?> type;
-
-	public static Object[] jp_int2ext(IntMatrix1D i2e, Djp_bus bus,
-			Djp_gen gen, Djp_branch branch) {
-		return jp_int2ext(i2e, bus, gen, branch, null);
-	}
-
-	/**
-	 * old form
-	 *
-	 * @param bus
-	 * @param gen
-	 * @param branch
-	 * @param areas
-	 * @return
-	 */
-	public static Object[] jp_int2ext(IntMatrix1D i2e, Djp_bus bus,
-			Djp_gen gen, Djp_branch branch, Djp_areas areas) {
-
-		bus.bus_i.assign( i2e.viewSelection(bus.bus_i.toArray()) );
-		gen.gen_bus.assign( i2e.viewSelection(gen.gen_bus.toArray()) );
-		branch.f_bus.assign( i2e.viewSelection(branch.f_bus.toArray()) );
-		branch.t_bus.assign( i2e.viewSelection(branch.t_bus.toArray()) );
-		if (areas != null)
-			areas.price_ref_bus.assign( i2e.viewSelection(areas.price_ref_bus.toArray()) );
-
-		return new Object[] {bus, gen, branch, areas};
-	}
-
 
 	/**
 	 * If the input is a single JPOWER case object, then it restores all
@@ -94,6 +55,7 @@ public class Djp_int2ext {
 	 * @return
 	 */
 	public static Djp_jpc jp_int2ext(Djp_jpc jpc) {
+		Djp_order o;
 
 		if (jpc.order == null)
 			System.err.println("int2ext: jpc does not have the 'order' set, as required for conversion back to external numbering.");
@@ -121,14 +83,14 @@ public class Djp_int2ext {
 				o.internal.areas = jpc.areas.copy();
 				jpc.areas = o.external.areas.copy();
 			}
-			if (jpc.A != null) {
-				o.internal.A = jpc.A.copy();
-				jpc.A = o.external.A.copy();
-			}
-			if (jpc.N != null) {
-				o.internal.N = jpc.N.copy();
-				jpc.N = o.external.N.copy();
-			}
+//			if (jpc.A != null) {
+//				o.internal.A = jpc.A.copy();
+//				jpc.A = o.external.A.copy();
+//			}
+//			if (jpc.N != null) {
+//				o.internal.N = jpc.N.copy();
+//				jpc.N = o.external.N.copy();
+//			}
 
 			/* update data (in bus, branch and gen only) */
 			jpc.bus.update(o.internal.bus, o.bus.status.on);
@@ -155,17 +117,46 @@ public class Djp_int2ext {
 	}
 
 	public static Djp_jpc jp_int2ext(Djp_jpc jpc, String field, String[] ordering) {
-		int dim = 1;
-		return jp_int2ext(jpc, field, ordering, dim);
+		return jp_int2ext(jpc, field, ordering, 1);
 	}
 
 	public static Djp_jpc jp_int2ext(Djp_jpc jpc, String field, String[] ordering, int dim) {
-		return jp_int2ext(jpc, new String[] {field}, ordering, dim);
+		Field fld;
+		Class<?> type;
+		DoubleMatrix1D val1, oldval1;
+		DoubleMatrix2D val2, oldval2;
+
+		try {
+			fld = jpc.getClass().getField(field);
+			type = fld.getType();
+			if (type == DoubleMatrix1D.class) {
+				val1 = (DoubleMatrix1D) fld.get(jpc);
+				oldval1 = (DoubleMatrix1D) fld.get(jpc.order.external);
+				fld.set(jpc.order.internal, val1.copy());
+				fld.set(jpc, jp_int2ext(jpc, val1, oldval1, ordering, dim));
+			} else if (type == DoubleMatrix2D.class) {
+				val2 = (DoubleMatrix2D) fld.get(jpc);
+				oldval2 = (DoubleMatrix2D) fld.get(jpc.order.external);
+				fld.set(jpc.order.internal, val2.copy());
+				fld.set(jpc, jp_int2ext(jpc, val2, oldval2, ordering, dim));
+			} else {
+				throw new UnsupportedOperationException();
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		return jpc;
 	}
 
 	public static Djp_jpc jp_int2ext(Djp_jpc jpc, String[] field, String[] ordering) {
-		int dim = 1;
-		return jp_int2ext(jpc, field, ordering, dim);
+		return jp_int2ext(jpc, field, ordering, 1);
 	}
 
 	/**
@@ -177,53 +168,76 @@ public class Djp_int2ext {
 	 * @return
 	 */
 	public static Djp_jpc jp_int2ext(Djp_jpc jpc, String[] field, String[] ordering, int dim) {
+		throw new UnsupportedOperationException();
 
-		DoubleMatrix1D val1, oldval1;
-		DoubleMatrix2D val2, oldval2;
-
-		for (String f : field) {
-			try {
-				fld = jpc.getClass().getField(f);
-				type = fld.getType();
-				if (type == DoubleMatrix1D.class) {
-					val1 = (DoubleMatrix1D) fld.get(jpc);
-					oldval1 = (DoubleMatrix1D) fld.get(jpc.order.external);
-					fld.set(jpc.order.internal, val1.copy());
-					fld.set(jpc, jp_int2ext(jpc, val1, oldval1, ordering, dim));
-				} else if (type == DoubleMatrix2D.class) {
-					val2 = (DoubleMatrix2D) fld.get(jpc);
-					oldval2 = (DoubleMatrix2D) fld.get(jpc.order.external);
-					fld.set(jpc.order.internal, val2.copy());
-					fld.set(jpc, jp_int2ext(jpc, val2, oldval2, ordering, dim));
-				} else {
-					throw new UnsupportedOperationException();
-				}
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-		return jpc;
+//		Field fld;
+//		Class<?> type;
+//		DoubleMatrix1D val1, oldval1;
+//		DoubleMatrix2D val2, oldval2;
+//
+//		for (String f : field) {
+//			try {
+//				fld = jpc.getClass().getField(f);
+//				type = fld.getType();
+//				if (type == DoubleMatrix1D.class) {
+//					val1 = (DoubleMatrix1D) fld.get(jpc);
+//					oldval1 = (DoubleMatrix1D) fld.get(jpc.order.external);
+//					fld.set(jpc.order.internal, val1.copy());
+//					fld.set(jpc, jp_int2ext(jpc, val1, oldval1, ordering, dim));
+//				} else if (type == DoubleMatrix2D.class) {
+//					val2 = (DoubleMatrix2D) fld.get(jpc);
+//					oldval2 = (DoubleMatrix2D) fld.get(jpc.order.external);
+//					fld.set(jpc.order.internal, val2.copy());
+//					fld.set(jpc, jp_int2ext(jpc, val2, oldval2, ordering, dim));
+//				} else {
+//					throw new UnsupportedOperationException();
+//				}
+//			} catch (SecurityException e) {
+//				e.printStackTrace();
+//			} catch (NoSuchFieldException e) {
+//				e.printStackTrace();
+//			} catch (IllegalArgumentException e) {
+//				e.printStackTrace();
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return jpc;
 	}
 
 
 	public static DoubleMatrix1D jp_int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String ordering) {
-		int dim = 1;
-		return jp_int2ext(jpc, val, oldval, new String[] {ordering}, dim);
+		return jp_int2ext(jpc, val, oldval, ordering, 1);
 	}
 
 	public static DoubleMatrix1D jp_int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String ordering, int dim) {
-		return jp_int2ext(jpc, val, oldval, new String[] {ordering}, dim);
+		int[] idx;
+		Djp_order o;
+		DoubleMatrix1D int_val1, v1;
+
+		o = jpc.order;
+
+		if (ordering.equals("gen")) {
+			v1 = Djp_get_reorder.jp_get_reorder(val, o.gen.i2e.toArray());
+		} else {
+			v1 = val;
+		}
+		if (ordering.equals("gen")) {
+			idx = o.gen.status.on;
+		} else if (ordering.equals("bus")) {
+			idx = o.bus.status.on;
+		} else if (ordering.equals("branch")) {
+			idx = o.branch.status.on;
+		} else {
+			throw new UnsupportedOperationException();
+		}
+		int_val1 = Djp_set_reorder.jp_set_reorder(oldval, v1, idx);
+
+		return int_val1;
 	}
 
 	public static DoubleMatrix1D jp_int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering) {
-		int dim = 1;
-		return jp_int2ext(jpc, val, oldval, ordering, dim);
+		return jp_int2ext(jpc, val, oldval, ordering, 1);
 	}
 
 	/**
@@ -235,71 +249,98 @@ public class Djp_int2ext {
 	 * @return
 	 */
 	public static DoubleMatrix1D jp_int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering, int dim) {
+		throw new UnsupportedOperationException();
 
-		o = jpc.order;
-
-		if (ordering.length == 1) {		// single set
-			if (ordering.equals("gen")) {
-				v1 = Djp_get_reorder.jp_get_reorder(val, o.gen.i2e.toArray());
-			} else {
-				v1 = val;
-			}
-			if (ordering.equals("gen")) {
-				idx = o.gen.status.on;
-			} else if (ordering.equals("bus")) {
-				idx = o.bus.status.on;
-			} else {					// TODO: enum
-				idx = o.branch.status.on;
-			}
-			int_val1 = Djp_set_reorder.jp_set_reorder(oldval, v1, idx);
-		} else {
-			int_val1 = DoubleFactory1D.dense.make(0);
-			be = 0;		// base, external indexing
-			bi = 0;		// base, internal indexing
-			for (k = 0; k < ordering.length; k++) {
-				order = ordering[k];
-				if (order.equals("gen")) {
-					ne = (int) o.external.gen.size();
-					ni = (int) jpc.gen.size();
-				} else if (order.equals("bus")) {
-					ne = (int) o.external.bus.size();
-					ni = (int) jpc.bus.size();
-				} else {				// branch, TODO: enum
-					ne = (int) o.external.branch.size();
-					ni = (int) jpc.branch.size();
-				}
-				v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
-				oldv1 = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne));
-
-				new_v1 = jp_int2ext(jpc, v1, oldv1, order, dim);
-				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
-				be = be + ne;
-				bi = bi + ni;
-			}
-			ni = (int) val.size();
-			if (ni > bi) {				// the rest
-				new_v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
-				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
-			}
-		}
-		return int_val1;
+//		int be, bi, ne, ni, k;
+//		int[] idx;
+//		String order;
+//		Djp_order o;
+//		DoubleMatrix1D int_val1, v1, oldv1, new_v1;
+//
+//		o = jpc.order;
+//
+//		if (ordering.length == 1) {		// single set
+//			if (ordering.equals("gen")) {
+//				v1 = Djp_get_reorder.jp_get_reorder(val, o.gen.i2e.toArray());
+//			} else {
+//				v1 = val;
+//			}
+//			if (ordering.equals("gen")) {
+//				idx = o.gen.status.on;
+//			} else if (ordering.equals("bus")) {
+//				idx = o.bus.status.on;
+//			} else {					// TODO: enum
+//				idx = o.branch.status.on;
+//			}
+//			int_val1 = Djp_set_reorder.jp_set_reorder(oldval, v1, idx);
+//		} else {
+//			int_val1 = DoubleFactory1D.dense.make(0);
+//			be = 0;		// base, external indexing
+//			bi = 0;		// base, internal indexing
+//			for (k = 0; k < ordering.length; k++) {
+//				order = ordering[k];
+//				if (order.equals("gen")) {
+//					ne = (int) o.external.gen.size();
+//					ni = (int) jpc.gen.size();
+//				} else if (order.equals("bus")) {
+//					ne = (int) o.external.bus.size();
+//					ni = (int) jpc.bus.size();
+//				} else {				// branch, TODO: enum
+//					ne = (int) o.external.branch.size();
+//					ni = (int) jpc.branch.size();
+//				}
+//				v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
+//				oldv1 = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne));
+//
+//				new_v1 = jp_int2ext(jpc, v1, oldv1, order, dim);
+//				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
+//				be = be + ne;
+//				bi = bi + ni;
+//			}
+//			ni = (int) val.size();
+//			if (ni > bi) {				// the rest
+//				new_v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
+//				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
+//			}
+//		}
+//		return int_val1;
 	}
 
 
 
 
 	public static DoubleMatrix2D jp_int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String ordering) {
-		int dim = 1;
-		return jp_int2ext(jpc, val, oldval, new String[] {ordering}, dim);
+		return jp_int2ext(jpc, val, oldval, ordering, 1);
 	}
 
 	public static DoubleMatrix2D jp_int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String ordering, int dim) {
-		return jp_int2ext(jpc, val, oldval, new String[] {ordering}, dim);
+		int[] idx;
+		Djp_order o;
+		DoubleMatrix2D int_val2, v2;
+
+		o = jpc.order;
+
+		if (ordering.equals("gen")) {
+			v2 = Djp_get_reorder.jp_get_reorder(val, o.gen.i2e.toArray(), dim);
+		} else {
+			v2 = val;
+		}
+		if (ordering.equals("gen")) {
+			idx = o.gen.status.on;
+		} else if (ordering.equals("bus")) {
+			idx = o.bus.status.on;
+		} else if (ordering.equals("branch")) {
+			idx = o.branch.status.on;
+		} else {
+			throw new UnsupportedOperationException();
+		}
+		int_val2 = Djp_set_reorder.jp_set_reorder(oldval, v2, idx, dim);
+
+		return int_val2;
 	}
 
 	public static DoubleMatrix2D jp_int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering) {
-		int dim = 1;
-		return jp_int2ext(jpc, val, oldval, ordering, dim);
+		return jp_int2ext(jpc, val, oldval, ordering, 1);
 	}
 
 	/**
@@ -311,72 +352,106 @@ public class Djp_int2ext {
 	 * @return
 	 */
 	public static DoubleMatrix2D jp_int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering, int dim) {
+		throw new UnsupportedOperationException();
 
-		o = jpc.order;
+//		int be, bi, ne, ni, k;
+//		int[] idx;
+//		String order;
+//		Djp_order o;
+//		DoubleMatrix2D int_val2, v2, oldv2, new_v2;
+//
+//		o = jpc.order;
+//
+//		if (ordering.length == 1) {		// single set
+//			if (ordering.equals("gen")) {
+//				v2 = Djp_get_reorder.jp_get_reorder(val, o.gen.i2e.toArray(), dim);
+//			} else {
+//				v2 = val;
+//			}
+//			if (ordering.equals("gen")) {
+//				idx = o.gen.status.on;
+//			} else if (ordering.equals("bus")) {
+//				idx = o.bus.status.on;
+//			} else {					// TODO: enum
+//				idx = o.branch.status.on;
+//			}
+//			int_val2 = Djp_set_reorder.jp_set_reorder(oldval, v2, idx, dim);
+//		} else {
+//			if (dim == 1) {
+//				int_val2 = DoubleFactory2D.dense.make(val.rows(), 0);
+//			} else if (dim == 2) {
+//				int_val2 = DoubleFactory2D.dense.make(0, val.columns());
+//			} else {
+//				throw new UnsupportedOperationException();
+//			}
+//			be = 0;		// base, external indexing
+//			bi = 0;		// base, internal indexing
+//			for (k = 0; k < ordering.length; k++) {
+//				order = ordering[k];
+//				if (order.equals("gen")) {
+//					ne = (int) o.external.gen.size();
+//					ni = (int) jpc.gen.size();
+//				} else if (order.equals("bus")) {
+//					ne = (int) o.external.bus.size();
+//					ni = (int) jpc.bus.size();
+//				} else {				// branch, TODO: enum
+//					ne = (int) o.external.branch.size();
+//					ni = (int) jpc.branch.size();
+//				}
+//				v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
+//				oldv2 = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne), dim);
+//
+//				new_v2 = jp_int2ext(jpc, v2, oldv2, order, dim);
+//				if (dim == 1) {
+//					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
+//				} else if (dim == 2) {
+//					int_val2 = DoubleFactory2D.dense.appendColumns(int_val2, new_v2);
+//				} else {
+//					throw new UnsupportedOperationException();
+//				}
+//				be = be + ne;
+//				bi = bi + ni;
+//			}
+//			ni = (int) val.size();
+//			if (ni > bi) {				// the rest
+//				new_v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
+//				if (dim == 1) {
+//					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
+//				} else if (dim == 2) {
+//					int_val2 = DoubleFactory2D.dense.appendColumns(int_val2, new_v2);
+//				} else {
+//					throw new UnsupportedOperationException();
+//				}
+//			}
+//		}
+//		return int_val2;
+	}
 
-		if (ordering.length == 1) {		// single set
-			if (ordering.equals("gen")) {
-				v2 = Djp_get_reorder.jp_get_reorder(val, o.gen.i2e.toArray(), dim);
-			} else {
-				v2 = val;
-			}
-			if (ordering.equals("gen")) {
-				idx = o.gen.status.on;
-			} else if (ordering.equals("bus")) {
-				idx = o.bus.status.on;
-			} else {					// TODO: enum
-				idx = o.branch.status.on;
-			}
-			int_val2 = Djp_set_reorder.jp_set_reorder(oldval, v2, idx, dim);
-		} else {
-			if (dim == 1) {
-				int_val2 = DoubleFactory2D.dense.make(val.rows(), 0);
-			} else if (dim == 2) {
-				int_val2 = DoubleFactory2D.dense.make(0, val.columns());
-			} else {
-				throw new UnsupportedOperationException();
-			}
-			be = 0;		// base, external indexing
-			bi = 0;		// base, internal indexing
-			for (k = 0; k < ordering.length; k++) {
-				order = ordering[k];
-				if (order.equals("gen")) {
-					ne = (int) o.external.gen.size();
-					ni = (int) jpc.gen.size();
-				} else if (order.equals("bus")) {
-					ne = (int) o.external.bus.size();
-					ni = (int) jpc.bus.size();
-				} else {				// branch, TODO: enum
-					ne = (int) o.external.branch.size();
-					ni = (int) jpc.branch.size();
-				}
-				v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
-				oldv2 = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne), dim);
+	public static Object[] jp_int2ext(IntMatrix1D i2e, Djp_bus bus,
+			Djp_gen gen, Djp_branch branch) {
+		return jp_int2ext(i2e, bus, gen, branch, null);
+	}
 
-				new_v2 = jp_int2ext(jpc, v2, oldv2, order, dim);
-				if (dim == 1) {
-					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
-				} else if (dim == 2) {
-					int_val2 = DoubleFactory2D.dense.appendColumns(int_val2, new_v2);
-				} else {
-					throw new UnsupportedOperationException();
-				}
-				be = be + ne;
-				bi = bi + ni;
-			}
-			ni = (int) val.size();
-			if (ni > bi) {				// the rest
-				new_v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
-				if (dim == 1) {
-					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
-				} else if (dim == 2) {
-					int_val2 = DoubleFactory2D.dense.appendColumns(int_val2, new_v2);
-				} else {
-					throw new UnsupportedOperationException();
-				}
-			}
-		}
-		return int_val2;
+	/**
+	 * old form
+	 *
+	 * @param bus
+	 * @param gen
+	 * @param branch
+	 * @param areas
+	 * @return
+	 */
+	public static Object[] jp_int2ext(IntMatrix1D i2e, Djp_bus bus,
+			Djp_gen gen, Djp_branch branch, Djp_areas areas) {
+
+		bus.bus_i.assign( i2e.viewSelection(bus.bus_i.toArray()) );
+		gen.gen_bus.assign( i2e.viewSelection(gen.gen_bus.toArray()) );
+		branch.f_bus.assign( i2e.viewSelection(branch.f_bus.toArray()) );
+		branch.t_bus.assign( i2e.viewSelection(branch.t_bus.toArray()) );
+		if (areas != null)
+			areas.price_ref_bus.assign( i2e.viewSelection(areas.price_ref_bus.toArray()) );
+
+		return new Object[] {bus, gen, branch, areas};
 	}
 
 }

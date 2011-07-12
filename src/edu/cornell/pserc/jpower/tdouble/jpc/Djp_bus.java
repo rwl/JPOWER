@@ -245,7 +245,8 @@ public class Djp_bus {
 	}
 
 	public DoubleMatrix2D toMatrix() {
-		return toMatrix(true);
+		boolean opf = (lam_P != null);
+		return toMatrix(opf);
 	}
 
 	/**

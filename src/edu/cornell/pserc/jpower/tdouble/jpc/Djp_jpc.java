@@ -69,9 +69,12 @@ public class Djp_jpc {
 		cpy.branch = this.branch.copy();
 		cpy.areas = this.areas.copy();
 		cpy.gencost = this.gencost.copy();
-		cpy.A = this.A.copy();
-		cpy.N = this.N.copy();
-		cpy.userfcn = this.userfcn;
+		if (this.A != null)
+			cpy.A = this.A.copy();
+		if (this.N != null)
+			cpy.N = this.N.copy();
+		if (this.userfcn != null)
+			cpy.userfcn = this.userfcn;
 
 		cpy.version = this.version;
 		cpy.et = this.et;
@@ -79,7 +82,8 @@ public class Djp_jpc {
 
 		cpy.f = this.f;
 
-		cpy.order = this.order.copy();
+		if (this.order != null)
+			cpy.order = this.order.copy();
 
 		return cpy;
 	}

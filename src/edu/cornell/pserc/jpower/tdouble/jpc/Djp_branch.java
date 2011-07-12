@@ -298,7 +298,9 @@ public class Djp_branch {
 	}
 
 	public DoubleMatrix2D toMatrix() {
-		return toMatrix(true, true);
+		boolean pf = (Pf != null);
+		boolean opf = (mu_Sf != null);
+		return toMatrix(pf, opf);
 	}
 
 	/**

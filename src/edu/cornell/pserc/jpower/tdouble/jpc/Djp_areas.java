@@ -18,6 +18,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
@@ -96,6 +97,11 @@ public class Djp_areas {
 		area.price_ref_bus = Djp_util.intm(other.viewColumn(PRICE_REF_BUS));
 
 		return area;
+	}
+
+	public DoubleMatrix1D toMatrix() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

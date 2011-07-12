@@ -312,7 +312,8 @@ public class Djp_gen {
 	}
 
 	public DoubleMatrix2D toMatrix() {
-		return toMatrix(true);
+		boolean opf = (mu_Pmax != null);
+		return toMatrix(opf);
 	}
 
 	/**

@@ -23,6 +23,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
+import cern.jet.math.tint.IntFunctions;
 
 /**
  *
@@ -36,6 +37,8 @@ public class Djp_gencost {
 	private static final int SHUTDOWN	= 2;
 	private static final int NCOST	= 3;
 	private static final int COST		= 4;
+
+	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	/** cost model, 1 = piecewise linear, 2 = polynomial */
 	public IntMatrix1D model;
@@ -125,8 +128,10 @@ public class Djp_gencost {
 	 *
 	 * @return
 	 */
+	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix() {
-		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), Djp_util.max(ncost.toArray()) + 4);
+//		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), ncost.aggregate(ifunc.min, ifunc.identity) + 4);
+		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), this.cost.columns() + 4);
 
 		matrix.viewColumn(MODEL).assign( Djp_util.dblm(this.model) );
 		matrix.viewColumn(MODEL).assign(this.startup);
