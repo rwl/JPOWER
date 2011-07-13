@@ -90,7 +90,7 @@ public class Djp_pfsoln {
 		/* ----- update Qg for all gens and Pg for swing bus ----- */
 		// generator info
 		on = Djp_util.nonzero(gen.gen_status);	// which generators are on?
-		ggbus = gen.gen_bus.viewSelection(on);
+		ggbus = gen.gen_bus.viewSelection(on).copy();
 		gbus = ggbus.toArray();
 		refgen = IntFactory1D.dense.make(Djp_util.nonzero( ggbus.assign(ifunc.equals(ref)) ));
 

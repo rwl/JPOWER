@@ -19,6 +19,10 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
+import cern.colt.matrix.tdouble.DoubleFactory1D;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_loadcase {
@@ -30,7 +34,69 @@ public class Djp_loadcase {
 
 	public static Djp_jpc jp_loadcase(Djp_jpc jpc) {
 		// TODO: -----  check contents of case  -----
+
+		if (jpc.version.equals("1")) {
+			jpc.gen = jpc_1to2(jpc.gen);
+			jpc.branch =  jpc_1to2(jpc.branch);
+		}
+
 		return jpc;
+	}
+
+	private static Djp_gen jpc_1to2(Djp_gen gen) {
+		gen = gen.copy();
+		int ng = gen.size();
+
+		gen.Pc1 = DoubleFactory1D.dense.make(ng);
+		gen.Pc2 = DoubleFactory1D.dense.make(ng);
+		gen.Qc1min = DoubleFactory1D.dense.make(ng);
+		gen.Qc1max = DoubleFactory1D.dense.make(ng);
+		gen.Qc2min = DoubleFactory1D.dense.make(ng);
+		gen.Qc2max = DoubleFactory1D.dense.make(ng);
+		gen.ramp_agc = DoubleFactory1D.dense.make(ng);
+		gen.ramp_10 = DoubleFactory1D.dense.make(ng);
+		gen.ramp_30 = DoubleFactory1D.dense.make(ng);
+		gen.ramp_q = DoubleFactory1D.dense.make(ng);
+		gen.apf = DoubleFactory1D.dense.make(ng);
+
+		if (gen.mu_Pmax != null)
+			gen.mu_Pmax = DoubleFactory1D.dense.make(ng);
+		if (gen.mu_Pmin != null)
+			gen.mu_Pmin = DoubleFactory1D.dense.make(ng);
+		if (gen.mu_Qmax != null)
+			gen.mu_Qmax = DoubleFactory1D.dense.make(ng);
+		if (gen.mu_Qmin != null)
+			gen.mu_Qmin = DoubleFactory1D.dense.make(ng);
+
+		return gen;
+	}
+
+	private static Djp_branch jpc_1to2(Djp_branch branch) {
+		branch = branch.copy();
+		int nl = branch.size();
+
+		branch.ang_min = DoubleFactory1D.dense.make(nl, -360);
+		branch.ang_max = DoubleFactory1D.dense.make(nl,  360);
+
+		if (branch.Pf != null)
+			branch.Pf = DoubleFactory1D.dense.make(nl);
+		if (branch.Qf != null)
+			branch.Qf = DoubleFactory1D.dense.make(nl);
+		if (branch.Pt != null)
+			branch.Pt = DoubleFactory1D.dense.make(nl);
+		if (branch.Qt != null)
+			branch.Qt = DoubleFactory1D.dense.make(nl);
+
+		if (branch.mu_Sf != null)
+			branch.mu_Sf = DoubleFactory1D.dense.make(nl);
+		if (branch.mu_St != null)
+			branch.mu_St = DoubleFactory1D.dense.make(nl);
+		if (branch.mu_angmin != null)
+			branch.mu_angmin = DoubleFactory1D.dense.make(nl);
+		if (branch.mu_angmax != null)
+			branch.mu_angmax = DoubleFactory1D.dense.make(nl);
+
+		return branch;
 	}
 
 }

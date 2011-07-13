@@ -95,7 +95,7 @@ public class Djp_fdpf {
 		pvpq = Djp_util.icat(pv, pq);
 		converged = false;
 		i = 0;
-		V = V0;
+		V = V0.copy();
 		Va = V.copy().assign(cfunc.arg);
 		Vm = V.copy().assign(cfunc.abs);
 
@@ -119,7 +119,7 @@ public class Djp_fdpf {
 			System.out.printf("\n---- ----  -----------  -----------");
 			System.out.printf("\n  -  %3d   %10.3e   %10.3e", i, normP, normQ);
 		}
-		if (normP < tol && normQ < tol) {
+		if ((normP < tol) & (normQ < tol)) {
 			converged = true;
 			if (verbose > 1)
 				System.out.printf("\nConverged!\n");
@@ -137,7 +137,7 @@ public class Djp_fdpf {
 		luQ = SparseDoubleAlgebra.DEFAULT.lu(CCBpp, 0);
 
 		/* do P and Q iterations */
-		while (!converged && i < max_it) {
+		while ((!converged) & (i < max_it)) {
 			/* update iteration counter */
 			i += 1;
 
@@ -147,7 +147,7 @@ public class Djp_fdpf {
 
 			/* update voltage */
 			Va.viewSelection(pvpq).assign(dVa, cfunc.plus);
-			V = Djp_util.complex(Vm.getRealPart(), Va.getRealPart());
+			V = Djp_util.polar(Vm.getRealPart(), Va.getRealPart());
 
 			/* evalute mismatch */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -160,7 +160,7 @@ public class Djp_fdpf {
 			normQ = DenseDoubleAlgebra.DEFAULT.norm(Q, Norm.Infinity);
 			if (verbose > 1)
 				System.out.printf("\n  P  %3d   %10.3e   %10.3e", i, normP, normQ);
-			if (normP < tol && normQ < tol) {
+			if ((normP < tol) & (normQ < tol)) {
 				converged = true;
 				if (verbose > 0)
 					System.out.printf("\nFast-decoupled power flow converged in %d P-iterations and %d Q-iterations.\n", i, i-1);
@@ -169,11 +169,11 @@ public class Djp_fdpf {
 
 			/* -----  do Q iteration, update Vm  ----- */
 			luQ.solve(Q);
-			dVm = Djp_util.complex(P.assign(dfunc.neg), null);
+			dVm = Djp_util.complex(Q.assign(dfunc.neg), null);
 
 			/* update voltage */
 			Vm.viewSelection(pq).assign(dVm, cfunc.plus);
-			V = Djp_util.complex(Vm.getRealPart(), Va.getRealPart());
+			V = Djp_util.polar(Vm.getRealPart(), Va.getRealPart());
 
 			/* evalute mismatch */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj);

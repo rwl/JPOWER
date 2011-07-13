@@ -85,7 +85,9 @@ public class Djp_t_is {
 	}
 
 	public static void jp_t_is(double got, double expected, int prec, String msg) {
-		Djp_t_ok.jp_t_ok(got == expected, msg);
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(1, expected);
+		Djp_t_ok.jp_t_ok(prop.equals(expected_matrix, got), msg);
 	}
 
 	public static void jp_t_is(Djp_bus got, Djp_bus expected, int prec, String msg) {
