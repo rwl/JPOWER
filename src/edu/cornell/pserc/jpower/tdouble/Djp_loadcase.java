@@ -33,6 +33,8 @@ public class Djp_loadcase {
 	}
 
 	public static Djp_jpc jp_loadcase(Djp_jpc jpc) {
+		jpc = jpc.copy();
+
 		// TODO: -----  check contents of case  -----
 
 		if (jpc.version.equals("1")) {

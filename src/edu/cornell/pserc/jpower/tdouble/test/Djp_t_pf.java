@@ -139,45 +139,45 @@ public class Djp_t_pf {
 		r = Djp_runpf.jp_runpf(jpc, jpopt);
 		Djp_t_is.jp_t_is(r.gen.Qg.get(0), 24.07, 2, t + "single gen, Qmin = Qmax");
 
-//		jpc.gen = Djp_gen.fromMatrix( DoubleFactory2D.dense.appendRows(
-//			jpc.gen.toMatrix().viewSelection(new int[] {0}, null),
-//			jpc.gen.toMatrix()
-//		) );
-//		jpc.gen.Qmin.set(0, 10);
-//		jpc.gen.Qmax.set(0, 10);
-//		jpc.gen.Qmin.set(1, 0);
-//		jpc.gen.Qmax.set(1, 50);
-//		r = Djp_runpf.jp_runpf(jpc, jpopt);
-//		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
-//				new double[] {10, 14.07}, 2,
-//				t + "2 gens, Qmin = Qmax for one");
+		jpc.gen = Djp_gen.fromMatrix( DoubleFactory2D.dense.appendRows(
+			jpc.gen.toMatrix().viewSelection(new int[] {0}, null),
+			jpc.gen.toMatrix()
+		) );
+		jpc.gen.Qmin.set(0, 10);
+		jpc.gen.Qmax.set(0, 10);
+		jpc.gen.Qmin.set(1, 0);
+		jpc.gen.Qmax.set(1, 50);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {10, 14.07}, 2,
+				t + "2 gens, Qmin = Qmax for one");
 
-//		jpc.gen.Qmin.set(0, 10);
-//		jpc.gen.Qmax.set(0, 10);
-//		jpc.gen.Qmin.set(1, -50);
-//		jpc.gen.Qmax.set(1, -50);
-//		r = Djp_runpf.jp_runpf(jpc, jpopt);
-//		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
-//				new double[] {12.03, 12.03}, 2,
-//				t + "2 gens, Qmin = Qmax for both");
-//
-//		jpc.gen.Qmin.set(0, 0);
-//		jpc.gen.Qmax.set(0, 50);
-//		jpc.gen.Qmin.set(1, 0);
-//		jpc.gen.Qmax.set(1, 100);
-//		r = Djp_runpf.jp_runpf(jpc, jpopt);
-//		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
-//				new double[] {8.02, 16.05}, 2,
-//				t + "2 gens, proportional");
-//
-//		jpc.gen.Qmin.set(0, -50);
-//		jpc.gen.Qmax.set(0, 0);
-//		jpc.gen.Qmin.set(1, 50);
-//		jpc.gen.Qmax.set(1, 150);
-//		r = Djp_runpf.jp_runpf(jpc, jpopt);
-//		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
-//				new double[] {-50+8.02, 50+16.05}, 2,
-//				t + "2 gens, proportional");
+		jpc.gen.Qmin.set(0, 10);
+		jpc.gen.Qmax.set(0, 10);
+		jpc.gen.Qmin.set(1, -50);
+		jpc.gen.Qmax.set(1, -50);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {12.03, 12.03}, 2,
+				t + "2 gens, Qmin = Qmax for both");
+
+		jpc.gen.Qmin.set(0, 0);
+		jpc.gen.Qmax.set(0, 50);
+		jpc.gen.Qmin.set(1, 0);
+		jpc.gen.Qmax.set(1, 100);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {8.02, 16.05}, 2,
+				t + "2 gens, proportional");
+
+		jpc.gen.Qmin.set(0, -50);
+		jpc.gen.Qmax.set(0, 0);
+		jpc.gen.Qmin.set(1, 50);
+		jpc.gen.Qmax.set(1, 150);
+		r = Djp_runpf.jp_runpf(jpc, jpopt);
+		Djp_t_is.jp_t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
+				new double[] {-50+8.02, 50+16.05}, 2,
+				t + "2 gens, proportional");
 
 		Djp_t_end.jp_t_end();
 	}

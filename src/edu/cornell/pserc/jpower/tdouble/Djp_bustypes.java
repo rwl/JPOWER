@@ -65,11 +65,12 @@ public class Djp_bustypes {
 		/* gen connection matrix, element i, j is 1 if, generator j at bus i is ON */
 		Cg = new SparseRCIntMatrix2D(nb, ng,
 				gen.gen_bus.toArray(), Djp_util.irange(ng),
-				gen.gen_status.assign(ifunc.equals(1)).toArray(), false, false, false);
+				gen.gen_status.copy().assign(ifunc.equals(1)).toArray(), false, false, false);
 
 		/* number of generators at each bus that are ON */
 		bus_gen_status = Cg.zMult(IntFactory1D.dense.make(ng, 1), null);
-		// TODO: check for > 1 gen at bus
+		/* make boolean for 'and' operation */
+		bus_gen_status.assign(ifunc.equals(0)).assign(ifunc.equals(0));
 
 		/* form index lists for slack, PV, and PQ buses */
 		ref_types = bus.bus_type.copy().assign(ifunc.equals(REF));
