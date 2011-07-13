@@ -31,29 +31,29 @@ import cern.colt.util.tdouble.Djp_util;
  */
 public class Djp_branch {
 
-	private static final int F_BUS		= 0;
-	private static final int T_BUS		= 1;
-	private static final int BR_R		= 2;
-	private static final int BR_X		= 3;
-	private static final int BR_B		= 4;
-	private static final int RATE_A		= 5;
-	private static final int RATE_B		= 6;
-	private static final int RATE_C		= 7;
-	private static final int TAP		= 8;
-	private static final int SHIFT		= 9;
-	private static final int BR_STATUS	= 10;
-	private static final int ANGMIN		= 11;
-	private static final int ANGMAX		= 12;
+	public static final int F_BUS		= 0;
+	public static final int T_BUS		= 1;
+	public static final int BR_R		= 2;
+	public static final int BR_X		= 3;
+	public static final int BR_B		= 4;
+	public static final int RATE_A		= 5;
+	public static final int RATE_B		= 6;
+	public static final int RATE_C		= 7;
+	public static final int TAP		= 8;
+	public static final int SHIFT		= 9;
+	public static final int BR_STATUS	= 10;
+	public static final int ANGMIN		= 11;
+	public static final int ANGMAX		= 12;
 
-	private static final int PF			= 13;
-	private static final int QF			= 14;
-	private static final int PT			= 15;
-	private static final int QT			= 16;
+	public static final int PF			= 13;
+	public static final int QF			= 14;
+	public static final int PT			= 15;
+	public static final int QT			= 16;
 
-	private static final int MU_SF		= 17;
-	private static final int MU_ST		= 18;
-	private static final int MU_ANGMIN	= 19;
-	private static final int MU_ANGMAX	= 20;
+	public static final int MU_SF		= 17;
+	public static final int MU_ST		= 18;
+	public static final int MU_ANGMIN	= 19;
+	public static final int MU_ANGMAX	= 20;
 
 	/** f, from bus number */
 	public IntMatrix1D f_bus;
@@ -163,8 +163,11 @@ public class Djp_branch {
 		other.tap = tap.viewSelection(indexes).copy();
 		other.shift = shift.viewSelection(indexes).copy();
 		other.br_status = br_status.viewSelection(indexes).copy();
-		other.ang_min = ang_min.viewSelection(indexes).copy();
-		other.ang_max = ang_max.viewSelection(indexes).copy();
+
+		if (ang_min != null)
+			other.ang_min = ang_min.viewSelection(indexes).copy();
+		if (ang_max != null)
+			other.ang_max = ang_max.viewSelection(indexes).copy();
 
 		if (Pf != null)
 			other.Pf = Pf.viewSelection(indexes).copy();
@@ -238,8 +241,11 @@ public class Djp_branch {
 		tap.viewSelection(indexes).assign(other.tap);
 		shift.viewSelection(indexes).assign(other.shift);
 		br_status.viewSelection(indexes).assign(other.br_status);
-		ang_min.viewSelection(indexes).assign(other.ang_min);
-		ang_max.viewSelection(indexes).assign(other.ang_max);
+
+		if (ang_min != null)
+			ang_min.viewSelection(indexes).assign(other.ang_min);
+		if (ang_max != null)
+			ang_max.viewSelection(indexes).assign(other.ang_max);
 
 		if (Pf != null)
 			Pf.viewSelection(indexes).assign(other.Pf);
@@ -309,8 +315,11 @@ public class Djp_branch {
 		branch.tap = data.viewColumn(TAP);
 		branch.shift = data.viewColumn(SHIFT);
 		branch.br_status = Djp_util.intm(data.viewColumn(BR_STATUS));
-		branch.ang_min = data.viewColumn(ANGMIN);
-		branch.ang_max = data.viewColumn(ANGMAX);
+
+		if (data.columns() > BR_STATUS + 1) {
+			branch.ang_min = data.viewColumn(ANGMIN);
+			branch.ang_max = data.viewColumn(ANGMAX);
+		}
 
 		if (data.columns() > ANGMAX + 1) {
 			branch.Pf = data.viewColumn(PF);
@@ -364,8 +373,11 @@ public class Djp_branch {
 		matrix.viewColumn(TAP).assign(tap);
 		matrix.viewColumn(SHIFT).assign(shift);
 		matrix.viewColumn(BR_STATUS).assign( Djp_util.dblm(br_status) );
-		matrix.viewColumn(ANGMIN).assign(ang_min);
-		matrix.viewColumn(ANGMAX).assign(ang_max);
+
+		if (ang_min != null)
+			matrix.viewColumn(ANGMIN).assign(ang_min);
+		if (ang_max != null)
+			matrix.viewColumn(ANGMAX).assign(ang_max);
 
 		if (pf) {
 			matrix.viewColumn(PF).assign(Pf);
@@ -383,4 +395,10 @@ public class Djp_branch {
 
 		return matrix;
 	}
+
+	@Override
+	public String toString() {
+		return toMatrix().toString();
+	}
+
 }

@@ -31,32 +31,32 @@ import cern.colt.util.tdouble.Djp_util;
  */
 public class Djp_gen {
 
-	private static final int GEN_BUS	= 0;
-	private static final int PG			= 1;
-	private static final int QG			= 2;
-	private static final int QMAX		= 3;
-	private static final int QMIN		= 4;
-	private static final int VG			= 5;
-	private static final int MBASE		= 6;
-	private static final int GEN_STATUS	= 7;
-	private static final int PMAX		= 8;
-	private static final int PMIN		= 9;
-	private static final int PC1		= 10;
-	private static final int PC2		= 11;
-	private static final int QC1MIN		= 12;
-	private static final int QC1MAX		= 13;
-	private static final int QC2MIN		= 14;
-	private static final int QC2MAX		= 15;
-	private static final int RAMP_AGC	= 16;
-	private static final int RAMP_10	= 17;
-	private static final int RAMP_30	= 18;
-	private static final int RAMP_Q		= 19;
-	private static final int APF		= 20;
+	public static final int GEN_BUS	= 0;
+	public static final int PG			= 1;
+	public static final int QG			= 2;
+	public static final int QMAX		= 3;
+	public static final int QMIN		= 4;
+	public static final int VG			= 5;
+	public static final int MBASE		= 6;
+	public static final int GEN_STATUS	= 7;
+	public static final int PMAX		= 8;
+	public static final int PMIN		= 9;
+	public static final int PC1		= 10;
+	public static final int PC2		= 11;
+	public static final int QC1MIN		= 12;
+	public static final int QC1MAX		= 13;
+	public static final int QC2MIN		= 14;
+	public static final int QC2MAX		= 15;
+	public static final int RAMP_AGC	= 16;
+	public static final int RAMP_10	= 17;
+	public static final int RAMP_30	= 18;
+	public static final int RAMP_Q		= 19;
+	public static final int APF		= 20;
 
-	private static final int MU_PMAX	= 21;
-	private static final int MU_PMIN	= 22;
-	private static final int MU_QMAX	= 23;
-	private static final int MU_QMIN	= 24;
+	public static final int MU_PMAX	= 21;
+	public static final int MU_PMIN	= 22;
+	public static final int MU_QMAX	= 23;
+	public static final int MU_QMIN	= 24;
 
 	/** bus number */
 	public IntMatrix1D gen_bus;
@@ -172,17 +172,29 @@ public class Djp_gen {
 		other.gen_status = gen_status.viewSelection(indexes).copy();
 		other.Pmax = Pmax.viewSelection(indexes).copy();
 		other.Pmin = Pmin.viewSelection(indexes).copy();
-		other.Pc1 = Pc1.viewSelection(indexes).copy();
-		other.Pc2 = Pc2.viewSelection(indexes).copy();
-		other.Qc1min = Qc1min.viewSelection(indexes).copy();
-		other.Qc1max = Qc1max.viewSelection(indexes).copy();
-		other.Qc2min = Qc2min.viewSelection(indexes).copy();
-		other.Qc2max = Qc2max.viewSelection(indexes).copy();
-		other.ramp_agc = ramp_agc.viewSelection(indexes).copy();
-		other.ramp_10 = ramp_10.viewSelection(indexes).copy();
-		other.ramp_30 = ramp_30.viewSelection(indexes).copy();
-		other.ramp_q = ramp_q.viewSelection(indexes).copy();
-		other.apf = apf.viewSelection(indexes).copy();
+
+		if (Pc1 != null)
+			other.Pc1 = Pc1.viewSelection(indexes).copy();
+		if (Pc2 != null)
+			other.Pc2 = Pc2.viewSelection(indexes).copy();
+		if (Qc1min != null)
+			other.Qc1min = Qc1min.viewSelection(indexes).copy();
+		if (Qc1max != null)
+			other.Qc1max = Qc1max.viewSelection(indexes).copy();
+		if (Qc2min != null)
+			other.Qc2min = Qc2min.viewSelection(indexes).copy();
+		if (Qc2max != null)
+			other.Qc2max = Qc2max.viewSelection(indexes).copy();
+		if (ramp_agc != null)
+			other.ramp_agc = ramp_agc.viewSelection(indexes).copy();
+		if (ramp_10 != null)
+			other.ramp_10 = ramp_10.viewSelection(indexes).copy();
+		if (ramp_30 != null)
+			other.ramp_30 = ramp_30.viewSelection(indexes).copy();
+		if (ramp_q != null)
+			other.ramp_q = ramp_q.viewSelection(indexes).copy();
+		if (apf != null)
+			other.apf = apf.viewSelection(indexes).copy();
 
 		if (mu_Pmax != null)
 			other.mu_Pmax = mu_Pmax.viewSelection(indexes).copy();
@@ -245,17 +257,29 @@ public class Djp_gen {
 		gen_status.viewSelection(indexes).assign(other.gen_status);
 		Pmax.viewSelection(indexes).assign(other.Pmax);
 		Pmin.viewSelection(indexes).assign(other.Pmin);
-		Pc1.viewSelection(indexes).assign(other.Pc1);
-		Pc2.viewSelection(indexes).assign(other.Pc2);
-		Qc1min.viewSelection(indexes).assign(other.Qc1min);
-		Qc1max.viewSelection(indexes).assign(other.Qc1max);
-		Qc2min.viewSelection(indexes).assign(other.Qc2min);
-		Qc2max.viewSelection(indexes).assign(other.Qc2max);
-		ramp_agc.viewSelection(indexes).assign(other.ramp_agc);
-		ramp_10.viewSelection(indexes).assign(other.ramp_10);
-		ramp_30.viewSelection(indexes).assign(other.ramp_30);
-		ramp_q.viewSelection(indexes).assign(other.ramp_q);
-		apf.viewSelection(indexes).assign(other.apf);
+
+		if (Pc1 != null)
+			Pc1.viewSelection(indexes).assign(other.Pc1);
+		if (Pc2 != null)
+			Pc2.viewSelection(indexes).assign(other.Pc2);
+		if (Qc1min != null)
+			Qc1min.viewSelection(indexes).assign(other.Qc1min);
+		if (Qc1max != null)
+			Qc1max.viewSelection(indexes).assign(other.Qc1max);
+		if (Qc2min != null)
+			Qc2min.viewSelection(indexes).assign(other.Qc2min);
+		if (Qc2max != null)
+			Qc2max.viewSelection(indexes).assign(other.Qc2max);
+		if (ramp_agc != null)
+			ramp_agc.viewSelection(indexes).assign(other.ramp_agc);
+		if (ramp_10 != null)
+			ramp_10.viewSelection(indexes).assign(other.ramp_10);
+		if (ramp_30 != null)
+			ramp_30.viewSelection(indexes).assign(other.ramp_30);
+		if (ramp_q != null)
+			ramp_q.viewSelection(indexes).assign(other.ramp_q);
+		if (apf != null)
+			apf.viewSelection(indexes).assign(other.apf);
 
 		if (mu_Pmax != null)
 			mu_Pmax.viewSelection(indexes).assign(other.mu_Pmax);
@@ -320,17 +344,20 @@ public class Djp_gen {
 		gen.gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
 		gen.Pmax = other.viewColumn(PMAX);
 		gen.Pmin = other.viewColumn(PMIN);
-		gen.Pc1 = other.viewColumn(PC1);
-		gen.Pc2 = other.viewColumn(PC2);
-		gen.Qc1min = other.viewColumn(QC1MIN);
-		gen.Qc1max = other.viewColumn(QC1MAX);
-		gen.Qc2min = other.viewColumn(QC2MIN);
-		gen.Qc2max = other.viewColumn(QC2MAX);
-		gen.ramp_agc = other.viewColumn(RAMP_AGC);
-		gen.ramp_10 = other.viewColumn(RAMP_10);
-		gen.ramp_30 = other.viewColumn(RAMP_30);
-		gen.ramp_q = other.viewColumn(RAMP_Q);
-		gen.apf = other.viewColumn(APF);
+
+		if (other.columns() > PMIN + 1) {
+			gen.Pc1 = other.viewColumn(PC1);
+			gen.Pc2 = other.viewColumn(PC2);
+			gen.Qc1min = other.viewColumn(QC1MIN);
+			gen.Qc1max = other.viewColumn(QC1MAX);
+			gen.Qc2min = other.viewColumn(QC2MIN);
+			gen.Qc2max = other.viewColumn(QC2MAX);
+			gen.ramp_agc = other.viewColumn(RAMP_AGC);
+			gen.ramp_10 = other.viewColumn(RAMP_10);
+			gen.ramp_30 = other.viewColumn(RAMP_30);
+			gen.ramp_q = other.viewColumn(RAMP_Q);
+			gen.apf = other.viewColumn(APF);
+		}
 
 		if (other.columns() > APF + 1) {
 			gen.mu_Pmax = other.viewColumn(MU_PMAX);
@@ -370,17 +397,29 @@ public class Djp_gen {
 		matrix.viewColumn(GEN_STATUS).assign( Djp_util.dblm(gen_status) );
 		matrix.viewColumn(PMAX).assign(Pmax);
 		matrix.viewColumn(PMIN).assign(Pmin);
-		matrix.viewColumn(PC1).assign(Pc1);
-		matrix.viewColumn(PC2).assign(Pc2);
-		matrix.viewColumn(QC1MIN).assign(Qc1min);
-		matrix.viewColumn(QC1MAX).assign(Qc1max);
-		matrix.viewColumn(QC2MIN).assign(Qc2min);
-		matrix.viewColumn(QC2MAX).assign(Qc2max);
-		matrix.viewColumn(RAMP_AGC).assign(ramp_agc);
-		matrix.viewColumn(RAMP_10).assign(ramp_10);
-		matrix.viewColumn(RAMP_30).assign(ramp_30);
-		matrix.viewColumn(RAMP_Q).assign(ramp_q);
-		matrix.viewColumn(APF).assign(apf);
+
+		if (Pc1 != null)
+			matrix.viewColumn(PC1).assign(Pc1);
+		if (Pc2 != null)
+			matrix.viewColumn(PC2).assign(Pc2);
+		if (Qc1min != null)
+			matrix.viewColumn(QC1MIN).assign(Qc1min);
+		if (Qc1max != null)
+			matrix.viewColumn(QC1MAX).assign(Qc1max);
+		if (Qc2min != null)
+			matrix.viewColumn(QC2MIN).assign(Qc2min);
+		if (Qc2max != null)
+			matrix.viewColumn(QC2MAX).assign(Qc2max);
+		if (ramp_agc != null)
+			matrix.viewColumn(RAMP_AGC).assign(ramp_agc);
+		if (ramp_10 != null)
+			matrix.viewColumn(RAMP_10).assign(ramp_10);
+		if (ramp_30 != null)
+			matrix.viewColumn(RAMP_30).assign(ramp_30);
+		if (ramp_q != null)
+			matrix.viewColumn(RAMP_Q).assign(ramp_q);
+		if (apf != null)
+			matrix.viewColumn(APF).assign(apf);
 
 		if (opf) {
 			matrix.viewColumn(MU_PMAX).assign(mu_Pmax);
@@ -390,6 +429,11 @@ public class Djp_gen {
 		}
 
 		return matrix;
+	}
+
+	@Override
+	public String toString() {
+		return toMatrix().toString();
 	}
 
 }

@@ -20,6 +20,9 @@
 package edu.cornell.pserc.jpower.tdouble.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
@@ -36,7 +39,7 @@ public class Djp_t_case9_pf {
 	 *
 	 * @return a 9 bus, 3 generator case, no OPF data.
 	 */
-	public Djp_jpc jp_t_case9_opf() {
+	public static Djp_jpc jp_t_case9_pf() {
 
 		Djp_jpc jpc = new Djp_jpc();
 
@@ -50,7 +53,7 @@ public class Djp_t_case9_pf {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus = Djp_bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	3,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{2,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{30,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
@@ -64,7 +67,7 @@ public class Djp_t_case9_pf {
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gen = Djp_gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	0,	0,	300,	-300,	1,	100,	1,	250,	90},
 			{2,	163,	0,	300,	-300,	1,	100,	1,	300,	10},
 			{30,	85,	0,	300,	-300,	1,	100,	1,	270,	10}
@@ -72,11 +75,11 @@ public class Djp_t_case9_pf {
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
-			{1,	4,	0,	0.0576,	0,	0,	250,	250,	0,	0,	1},
-			{4,	5,	0.017,	0.092,	0.158,	0,	250,	250,	0,	0,	1},
+		jpc.branch = Djp_branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+			{1,	4,	0,	0.0576,	0,	250,	250,	250,	0,	0,	1},
+			{4,	5,	0.017,	0.092,	0.158,	250,	250,	250,	0,	0,	1},
 			{5,	6,	0.039,	0.17,	0.358,	150,	150,	150,	0,	0,	1},
-			{30,	6,	0,	0.0586,	0,	0,	300,	300,	0,	0,	1},
+			{30,	6,	0,	0.0586,	0,	300,	300,	300,	0,	0,	1},
 			{6,	7,	0.0119,	0.1008,	0.209,	40,	150,	150,	0,	0,	1},
 			{7,	8,	0.0085,	0.072,	0.149,	250,	250,	250,	0,	0,	1},
 			{8,	2,	0,	0.0625,	0,	250,	250,	250,	0,	0,	1},

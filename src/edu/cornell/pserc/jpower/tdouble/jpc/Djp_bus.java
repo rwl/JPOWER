@@ -31,24 +31,24 @@ import cern.colt.util.tdouble.Djp_util;
  */
 public class Djp_bus {
 
-	private static final int BUS_I		= 0;
-	private static final int BUS_TYPE	= 1;
-	private static final int PD			= 2;
-	private static final int QD			= 3;
-	private static final int GS			= 4;
-	private static final int BS			= 5;
-	private static final int BUS_AREA	= 6;
-	private static final int VM			= 7;
-	private static final int VA			= 8;
-	private static final int BASE_KV	= 9;
-	private static final int ZONE		= 10;
-	private static final int VMAX		= 11;
-	private static final int VMIN		= 12;
+	public static final int BUS_I		= 0;
+	public static final int BUS_TYPE	= 1;
+	public static final int PD			= 2;
+	public static final int QD			= 3;
+	public static final int GS			= 4;
+	public static final int BS			= 5;
+	public static final int BUS_AREA	= 6;
+	public static final int VM			= 7;
+	public static final int VA			= 8;
+	public static final int BASE_KV	= 9;
+	public static final int ZONE		= 10;
+	public static final int VMAX		= 11;
+	public static final int VMIN		= 12;
 
-	private static final int LAM_P		= 13;
-	private static final int LAM_Q		= 14;
-	private static final int MU_VMAX	= 15;
-	private static final int MU_VMIN	= 16;
+	public static final int LAM_P		= 13;
+	public static final int LAM_Q		= 14;
+	public static final int MU_VMAX	= 15;
+	public static final int MU_VMIN	= 16;
 
 	/** bus number (1 to 29997) */
 	public IntMatrix1D bus_i;
