@@ -18,6 +18,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
@@ -102,9 +103,17 @@ public class Djp_areas {
 		return area;
 	}
 
-	public DoubleMatrix1D toMatrix() {
+	public static Djp_areas fromMatrix(double[][] data) {
+		return fromMatrix(DoubleFactory2D.dense.make(data));
+	}
+
+	public DoubleMatrix2D toMatrix() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public double[][] toArray() {
+		return toMatrix().toArray();
 	}
 
 }

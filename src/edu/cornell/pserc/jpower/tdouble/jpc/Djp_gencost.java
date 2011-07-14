@@ -124,6 +124,10 @@ public class Djp_gencost {
 		return gencost;
 	}
 
+	public static Djp_gencost fromMatrix(double[][] data) {
+		return fromMatrix(DoubleFactory2D.dense.make(data));
+	}
+
 	/**
 	 *
 	 * @return
@@ -140,6 +144,10 @@ public class Djp_gencost {
 		matrix.viewSelection(null, Djp_util.irange(COST, COST + this.cost.columns())).assign(this.cost);
 
 		return matrix;
+	}
+
+	public double[][] toArray() {
+		return toMatrix().toArray();
 	}
 
 }

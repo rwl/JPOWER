@@ -267,6 +267,10 @@ public class Djp_bus {
 		return bus;
 	}
 
+	public static Djp_bus fromMatrix(double[][] data) {
+		return fromMatrix(DoubleFactory2D.dense.make(data));
+	}
+
 	public DoubleMatrix2D toMatrix() {
 		boolean opf = (lam_P != null);
 		return toMatrix(opf);
@@ -307,6 +311,15 @@ public class Djp_bus {
 		}
 
 		return matrix;
+	}
+
+	public double[][] toArray() {
+		boolean opf = (lam_P != null);
+		return toArray(opf);
+	}
+
+	public double[][] toArray(boolean opf) {
+		return toMatrix(opf).toArray();
 	}
 
 	@Override

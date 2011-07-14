@@ -338,6 +338,10 @@ public class Djp_branch {
 		return branch;
 	}
 
+	public static Djp_branch fromMatrix(double[][] data) {
+		return fromMatrix(DoubleFactory2D.dense.make(data));
+	}
+
 	public DoubleMatrix2D toMatrix() {
 		boolean pf = (Pf != null);
 		boolean opf = (mu_Sf != null);
@@ -394,6 +398,16 @@ public class Djp_branch {
 		}
 
 		return matrix;
+	}
+
+	public double[][] toArray() {
+		boolean pf = (Pf != null);
+		boolean opf = (mu_Sf != null);
+		return toArray(pf, opf);
+	}
+
+	public double[][] toArray(boolean pf, boolean opf) {
+		return toMatrix(pf, opf).toArray();
 	}
 
 	@Override

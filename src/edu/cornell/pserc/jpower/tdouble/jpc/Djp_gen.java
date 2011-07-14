@@ -369,6 +369,10 @@ public class Djp_gen {
 		return gen;
 	}
 
+	public static Djp_gen fromMatrix(double[][] data) {
+		return fromMatrix(DoubleFactory2D.dense.make(data));
+	}
+
 	public DoubleMatrix2D toMatrix() {
 		boolean opf = (mu_Pmax != null);
 		return toMatrix(opf);
@@ -429,6 +433,15 @@ public class Djp_gen {
 		}
 
 		return matrix;
+	}
+
+	public double[][] toArray() {
+		boolean opf = (mu_Pmax != null);
+		return toArray(opf);
+	}
+
+	public double[][] toArray(boolean opf) {
+		return toMatrix(opf).toArray();
 	}
 
 	@Override
