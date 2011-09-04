@@ -22,7 +22,9 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.dblm;
 
 /**
  *
@@ -45,10 +47,10 @@ public class Djp_branch {
 	public static final int ANGMIN		= 11;
 	public static final int ANGMAX		= 12;
 
-	public static final int PF			= 13;
-	public static final int QF			= 14;
-	public static final int PT			= 15;
-	public static final int QT			= 16;
+	public static final int PF		= 13;
+	public static final int QF		= 14;
+	public static final int PT		= 15;
+	public static final int QT		= 16;
 
 	public static final int MU_SF		= 17;
 	public static final int MU_ST		= 18;
@@ -272,8 +274,8 @@ public class Djp_branch {
 	 */
 //	public void fromMatrix(DoubleMatrix2D other) {
 //
-//		f_bus = Djp_util.intm(other.viewColumn(F_BUS));
-//		t_bus = Djp_util.intm(other.viewColumn(T_BUS));
+//		f_bus = intm(other.viewColumn(F_BUS));
+//		t_bus = intm(other.viewColumn(T_BUS));
 //		br_r = other.viewColumn(BR_R);
 //		br_x = other.viewColumn(BR_X);
 //		br_b = other.viewColumn(BR_B);
@@ -282,7 +284,7 @@ public class Djp_branch {
 //		rate_c = other.viewColumn(RATE_C);
 //		tap = other.viewColumn(TAP);
 //		shift = other.viewColumn(SHIFT);
-//		br_status = Djp_util.intm(other.viewColumn(BR_STATUS));
+//		br_status = intm(other.viewColumn(BR_STATUS));
 //		ang_min = other.viewColumn(ANGMIN);
 //		ang_max = other.viewColumn(ANGMAX);
 //
@@ -304,8 +306,8 @@ public class Djp_branch {
 	public static Djp_branch fromMatrix(DoubleMatrix2D data) {
 		Djp_branch branch = new Djp_branch();
 
-		branch.f_bus = Djp_util.intm(data.viewColumn(F_BUS));
-		branch.t_bus = Djp_util.intm(data.viewColumn(T_BUS));
+		branch.f_bus = intm(data.viewColumn(F_BUS));
+		branch.t_bus = intm(data.viewColumn(T_BUS));
 		branch.br_r = data.viewColumn(BR_R);
 		branch.br_x = data.viewColumn(BR_X);
 		branch.br_b = data.viewColumn(BR_B);
@@ -314,7 +316,7 @@ public class Djp_branch {
 		branch.rate_c = data.viewColumn(RATE_C);
 		branch.tap = data.viewColumn(TAP);
 		branch.shift = data.viewColumn(SHIFT);
-		branch.br_status = Djp_util.intm(data.viewColumn(BR_STATUS));
+		branch.br_status = intm(data.viewColumn(BR_STATUS));
 
 		if (data.columns() > BR_STATUS + 1) {
 			branch.ang_min = data.viewColumn(ANGMIN);
@@ -366,8 +368,8 @@ public class Djp_branch {
 			matrix = DoubleFactory2D.dense.make(size(), 13);
 		}
 
-		matrix.viewColumn(F_BUS).assign( Djp_util.dblm(f_bus) );
-		matrix.viewColumn(T_BUS).assign( Djp_util.dblm(t_bus) );
+		matrix.viewColumn(F_BUS).assign( dblm(f_bus) );
+		matrix.viewColumn(T_BUS).assign( dblm(t_bus) );
 		matrix.viewColumn(BR_R).assign(br_r);
 		matrix.viewColumn(BR_X).assign(br_x);
 		matrix.viewColumn(BR_B).assign(br_b);
@@ -376,7 +378,7 @@ public class Djp_branch {
 		matrix.viewColumn(RATE_C).assign(rate_c);
 		matrix.viewColumn(TAP).assign(tap);
 		matrix.viewColumn(SHIFT).assign(shift);
-		matrix.viewColumn(BR_STATUS).assign( Djp_util.dblm(br_status) );
+		matrix.viewColumn(BR_STATUS).assign( dblm(br_status) );
 
 		if (ang_min != null)
 			matrix.viewColumn(ANGMIN).assign(ang_min);

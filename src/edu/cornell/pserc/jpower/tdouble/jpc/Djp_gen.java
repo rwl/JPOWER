@@ -22,7 +22,9 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.dblm;
 
 /**
  *
@@ -31,12 +33,12 @@ import cern.colt.util.tdouble.Djp_util;
  */
 public class Djp_gen {
 
-	public static final int GEN_BUS	= 0;
-	public static final int PG			= 1;
-	public static final int QG			= 2;
+	public static final int GEN_BUS		= 0;
+	public static final int PG		= 1;
+	public static final int QG		= 2;
 	public static final int QMAX		= 3;
 	public static final int QMIN		= 4;
-	public static final int VG			= 5;
+	public static final int VG		= 5;
 	public static final int MBASE		= 6;
 	public static final int GEN_STATUS	= 7;
 	public static final int PMAX		= 8;
@@ -48,8 +50,8 @@ public class Djp_gen {
 	public static final int QC2MIN		= 14;
 	public static final int QC2MAX		= 15;
 	public static final int RAMP_AGC	= 16;
-	public static final int RAMP_10	= 17;
-	public static final int RAMP_30	= 18;
+	public static final int RAMP_10		= 17;
+	public static final int RAMP_30		= 18;
 	public static final int RAMP_Q		= 19;
 	public static final int APF		= 20;
 
@@ -334,14 +336,14 @@ public class Djp_gen {
 	public static Djp_gen fromMatrix(DoubleMatrix2D other) {
 		Djp_gen gen = new Djp_gen();
 
-		gen.gen_bus = Djp_util.intm(other.viewColumn(GEN_BUS));
+		gen.gen_bus = intm(other.viewColumn(GEN_BUS));
 		gen.Pg = other.viewColumn(PG);
 		gen.Qg = other.viewColumn(QG);
 		gen.Qmax = other.viewColumn(QMAX);
 		gen.Qmin = other.viewColumn(QMIN);
 		gen.Vg = other.viewColumn(VG);
 		gen.mBase = other.viewColumn(MBASE);
-		gen.gen_status = Djp_util.intm(other.viewColumn(GEN_STATUS));
+		gen.gen_status = intm(other.viewColumn(GEN_STATUS));
 		gen.Pmax = other.viewColumn(PMAX);
 		gen.Pmin = other.viewColumn(PMIN);
 
@@ -391,14 +393,14 @@ public class Djp_gen {
 			matrix = DoubleFactory2D.dense.make(size(), 21);
 		}
 
-		matrix.viewColumn(GEN_BUS).assign( Djp_util.dblm(gen_bus) );
+		matrix.viewColumn(GEN_BUS).assign( dblm(gen_bus) );
 		matrix.viewColumn(PG).assign(Pg);
 		matrix.viewColumn(QG).assign(Qg);
 		matrix.viewColumn(QMAX).assign(Qmax);
 		matrix.viewColumn(QMIN).assign(Qmin);
 		matrix.viewColumn(VG).assign(Vg);
 		matrix.viewColumn(MBASE).assign(mBase);
-		matrix.viewColumn(GEN_STATUS).assign( Djp_util.dblm(gen_status) );
+		matrix.viewColumn(GEN_STATUS).assign( dblm(gen_status) );
 		matrix.viewColumn(PMAX).assign(Pmax);
 		matrix.viewColumn(PMIN).assign(Pmin);
 

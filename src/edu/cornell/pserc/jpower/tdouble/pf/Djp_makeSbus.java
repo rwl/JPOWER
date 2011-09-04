@@ -21,10 +21,14 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 /**
  * Builds the vector of complex bus power injections.
@@ -34,8 +38,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
  *
  */
 public class Djp_makeSbus {
-
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Returns the vector of complex bus
@@ -56,7 +58,7 @@ public class Djp_makeSbus {
 		SparseRCDComplexMatrix2D Cg;
 
 		/* generator info */
-		on = Djp_util.nonzero(gen.gen_status);		// which generators are on?
+		on = nonzero(gen.gen_status);  // which generators are on?
 		gbus = gen.gen_bus.viewSelection(on).toArray();
 
 		/* form net complex bus power injection vector */
@@ -64,13 +66,13 @@ public class Djp_makeSbus {
 		ngon = on.length;
 
 		// connection matrix, element i, j is 1 if gen on(j) at bus i is ON
-		Cg = new SparseRCDComplexMatrix2D(nb, ngon, gbus, Djp_util.irange(ngon), 1, 0, false);
+		Cg = new SparseRCDComplexMatrix2D(nb, ngon, gbus, irange(ngon), 1, 0, false);
 
-		Sg = Djp_util.complex(gen.Pg.viewSelection(on), gen.Qg.viewSelection(on));
-		Sd = Djp_util.complex(bus.Pd, bus.Qd);
-		Sbus = Cg.zMult(Sg, null);	// power injected by generators
-		Sbus.assign(Sd, cfunc.minus);				// plus power injected by loads
-		Sbus.assign(cfunc.div(baseMVA));			// converted to p.u.
+		Sg = complex(gen.Pg.viewSelection(on), gen.Qg.viewSelection(on));
+		Sd = complex(bus.Pd, bus.Qd);
+		Sbus = Cg.zMult(Sg, null);	  // power injected by generators
+		Sbus.assign(Sd, cfunc.minus);	  // plus power injected by loads
+		Sbus.assign(cfunc.div(baseMVA));  // converted to p.u.
 
 		return Sbus;
 	}

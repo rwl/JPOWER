@@ -20,12 +20,15 @@
 package edu.cornell.pserc.jpower.tdouble.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.util.tdouble.Djp_util;
 import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
 import static edu.cornell.pserc.jpower.tdouble.Djp_int2ext.int2ext;
 import static edu.cornell.pserc.jpower.tdouble.Djp_loadcase.loadcase;
+
+import static cern.colt.util.tdouble.Djp_util.icat;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_is.t_is;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_begin.t_begin;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_case_int.t_case_int;
@@ -134,11 +137,11 @@ public class Djp_t_ext2int2ext {
 //		t = "jpc = ext2int(jpc) - A, N are DC sized : ";
 //		jpce = loadcase(Djp_t_case_ext.jp_t_case_ext());
 //		jpci = loadcase(Djp_t_case_int.jp_t_case_int());
-//		eVmQgcols = Djp_util.icat(
+//		eVmQgcols = icat(
 //				Djp_util.irange(10, 20),
 //				Djp_util.irange(24, 28)
 //		);
-//		iVmQgcols = Djp_util.icat(
+//		iVmQgcols = icat(
 //				Djp_util.irange(9, 18),
 //				Djp_util.irange(21, 24)
 //		);

@@ -28,9 +28,15 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.scat;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpver.jpver;
@@ -44,6 +50,9 @@ import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAang.makeAang;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAy.makeAy;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dcopf_solver.dcopf_solver;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_jipsopf_solver.jipsopf_solver;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
@@ -61,14 +70,6 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
  *
  */
 public class Djp_opf {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
-	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
-
-	private static final int REF = Djp_jpc.REF;
 
 	/**
 	 * Returns either a RESULTS struct and an optional SUCCESS flag, or individual
@@ -164,16 +165,16 @@ public class Djp_opf {
 
 			/* reduce A and/or N from AC dimensions to DC dimensions, if needed */
 			if (nusr > 0 || nw > 0) {
-				acc = Djp_util.icat(Djp_util.irange(nb, 2*nb), Djp_util.irange(2*nb+ng, 2*nb+2*ng));
+				acc = icat(irange(nb, 2*nb), irange(2*nb+ng, 2*nb+2*ng));
 				if (nusr > 0 && jpc.A.columns() >= 2*nb + 2*ng) {
 					/* make sure there aren"t any constraints on Vm or Qg */
-					if (Djp_util.any( Djp_util.any(jpc.A.viewSelection(null, acc)) ))
+					if (any( any(jpc.A.viewSelection(null, acc)) ))
 						System.err.println("opf: attempting to solve DC OPF with user constraints on Vm or Qg");
 //					jpc.A = jpc.A.viewSelection(null, acc);	// delete Vm and Qg columns
 				}
 				if (nw > 0 && jpc.N.columns() >= 2*nb + 2*ng) {
 					/* make sure there aren"t any costs on Vm or Qg */
-					if (Djp_util.any( Djp_util.any(jpc.N.viewSelection(null, acc)) ))
+					if (any( any(jpc.N.viewSelection(null, acc)) ))
 						System.err.println("opf: attempting to solve DC OPF with user costs on Vm or Qg");
 //					jpc.N = jpc.N.viewSelection(null, acc);	// delete Vm and Qg columns
 				}
@@ -181,7 +182,7 @@ public class Djp_opf {
 		}
 
 		/* convert single-block piecewise-linear costs into linear polynomial cost */
-		p1 = Djp_util.nonzero( jpc.gencost.model.copy().assign(ifunc.equals(PW_LINEAR)).assign(jpc.gencost.ncost.copy().assign(ifunc.equals(2)), ifunc.and) );
+		p1 = nonzero( jpc.gencost.model.copy().assign(ifunc.equals(PW_LINEAR)).assign(jpc.gencost.ncost.copy().assign(ifunc.equals(2)), ifunc.and) );
 		//p1 = new int[0];
 		if (p1.length > 0) {
 			x0 = jpc.gencost.cost.viewSelection(p1, null).viewColumn(0);
@@ -225,7 +226,7 @@ public class Djp_opf {
 		userfcn = (String) opf_args[16];
 
 		/* warn if there is more than one reference bus */
-		refs = Djp_util.nonzero(bus.bus_type.copy().assign(ifunc.equals(REF)));
+		refs = nonzero(bus.bus_type.copy().assign(ifunc.equals(REF)));
 		if (refs.length > 1 && verbose > 0)
 			System.out.printf("\nopf: Warning: Multiple reference buses.\n" +
 					"     For a system with islands, a reference bus in each island\n" +
@@ -255,12 +256,12 @@ public class Djp_opf {
 			Bf = (DoubleMatrix2D) Bdc[1];
 			Pbusinj = (DoubleMatrix1D) Bdc[2];
 			Pfinj = (DoubleMatrix1D) Bdc[3];
-			neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), Djp_util.irange(ng), -1, false, false);
+			neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), irange(ng), -1, false, false);
 			Amis = DoubleFactory2D.sparse.appendColumns(B, neg_Cg);
 			bmis = bus.Pd.copy().assign(bus.Gs, dfunc.plus).assign(dfunc.neg).assign(dfunc.div(baseMVA)).assign(Pbusinj, dfunc.minus);
 
 			/* branch flow constraints */
-			il  = Djp_util.nonzero( Djp_util.intm(branch.rate_a.assign(dfunc.greater(0))).assign(Djp_util.intm(branch.rate_a.assign(dfunc.less(1e10))), ifunc.and) );
+			il  = nonzero( intm(branch.rate_a.assign(dfunc.greater(0))).assign(intm(branch.rate_a.assign(dfunc.less(1e10))), ifunc.and) );
 			nl2 = il.length;	// number of constrained lines
 			lpf = DoubleFactory1D.dense.make(nl2, Double.NEGATIVE_INFINITY);
 			upf = branch.rate_a.viewSelection(il).copy().assign(dfunc.div(baseMVA)).assign(Pfinj.viewSelection(il), dfunc.minus);
@@ -311,7 +312,7 @@ public class Djp_opf {
 			Ay = DoubleFactory2D.sparse.make(0, ng+nq);
 			by = DoubleFactory1D.dense.make(0);
 		} else {
-			int[] ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
+			int[] ipwl = nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
 			ny = ipwl.length;	// number of piece-wise linear cost vars
 			AbstractMatrix[] Ab_y = makeAy(baseMVA, ng, gencost, 1, q1, ng+nq);
 			Ay = (DoubleMatrix2D) Ab_y[0];
@@ -369,7 +370,7 @@ public class Djp_opf {
 		/* add user vars, constraints and costs (as specified via A, ..., N, ...) */
 		if (nz > 0) {
 			om.add_vars("z", nz, z0, zl, zu);
-			user_vars = Djp_util.scat(user_vars, new String[] {"z"});
+			user_vars = scat(user_vars, new String[] {"z"});
 		}
 		if (nusr > 0)
 			om.add_constraints("usr", jpc.A, lbu, ubu, user_vars);	// nusr

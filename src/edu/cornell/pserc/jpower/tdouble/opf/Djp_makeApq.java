@@ -30,8 +30,10 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 
@@ -45,8 +47,6 @@ import static edu.cornell.pserc.jpower.tdouble.opf.Djp_hasPQcap.hasPQcap;
  *
  */
 public class Djp_makeApq {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 * Constructs the parameters for the following linear constraints
@@ -84,8 +84,8 @@ public class Djp_makeApq {
 		 * (in addition to simple box constraints) on (Pg,Qg) to correctly
 		 * model their PQ capability curves
 		 */
-		ipqh = Djp_util.nonzero( hasPQcap(gen, "U") );
-		ipql = Djp_util.nonzero( hasPQcap(gen, "L") );
+		ipqh = nonzero( hasPQcap(gen, "U") );
+		ipql = nonzero( hasPQcap(gen, "L") );
 		npqh = ipqh.length;		// number of general PQ capability curves (upper)
 		npql = ipql.length;		// number of general PQ capability curves (lower)
 
@@ -107,8 +107,8 @@ public class Djp_makeApq {
 				h.viewRow(i).assign(dfunc.div(tmp));
 				ubpqh.set(i, ubpqh.get(i) / tmp);
 			}
-			Apqh1 = new SparseRCDoubleMatrix2D(npqh, ng, Djp_util.irange(npqh), ipqh, h.viewColumn(0).toArray(), false, false, false);
-			Apqh2 = new SparseRCDoubleMatrix2D(npqh, ng, Djp_util.irange(npqh), ipqh, h.viewColumn(1).toArray(), false, false, false);
+			Apqh1 = new SparseRCDoubleMatrix2D(npqh, ng, irange(npqh), ipqh, h.viewColumn(0).toArray(), false, false, false);
+			Apqh2 = new SparseRCDoubleMatrix2D(npqh, ng, irange(npqh), ipqh, h.viewColumn(1).toArray(), false, false, false);
 			Apqh = DoubleFactory2D.sparse.appendColumns(Apqh1, Apqh2);
 			ubpqh.assign(dfunc.div(baseMVA));
 		} else {
@@ -130,8 +130,8 @@ public class Djp_makeApq {
 				l.viewRow(i).assign(dfunc.div(tmp));
 				ubpql.set(i, ubpql.get(i) / tmp);
 			}
-			Apql1 = new SparseRCDoubleMatrix2D(npql, ng, Djp_util.irange(npqh), ipql, l.viewColumn(0).toArray(), false, false, false);
-			Apql2 = new SparseRCDoubleMatrix2D(npql, ng, Djp_util.irange(npqh), ipql, l.viewColumn(1).toArray(), false, false, false);
+			Apql1 = new SparseRCDoubleMatrix2D(npql, ng, irange(npqh), ipql, l.viewColumn(0).toArray(), false, false, false);
+			Apql2 = new SparseRCDoubleMatrix2D(npql, ng, irange(npqh), ipql, l.viewColumn(1).toArray(), false, false, false);
 			Apql = DoubleFactory2D.sparse.appendColumns(Apql1, Apql2);
 			ubpql.assign(dfunc.div(baseMVA));
 		} else {

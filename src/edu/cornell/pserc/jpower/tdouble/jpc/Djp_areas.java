@@ -19,10 +19,10 @@
 package edu.cornell.pserc.jpower.tdouble.jpc;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+
+import static cern.colt.util.tdouble.Djp_util.intm;
 
 /**
  *
@@ -90,15 +90,15 @@ public class Djp_areas {
 	 */
 //	public void fromMatrix(DoubleMatrix2D other) {
 //
-//		this.area_i = Djp_util.intm(other.viewColumn(AREA_I));
-//		this.price_ref_bus = Djp_util.intm(other.viewColumn(PRICE_REF_BUS));
+//		this.area_i = intm(other.viewColumn(AREA_I));
+//		this.price_ref_bus = intm(other.viewColumn(PRICE_REF_BUS));
 //	}
 
 	public static Djp_areas fromMatrix(DoubleMatrix2D other) {
 		Djp_areas area = new Djp_areas();
 
-		area.area_i = Djp_util.intm(other.viewColumn(AREA_I));
-		area.price_ref_bus = Djp_util.intm(other.viewColumn(PRICE_REF_BUS));
+		area.area_i = intm(other.viewColumn(AREA_I));
+		area.price_ref_bus = intm(other.viewColumn(PRICE_REF_BUS));
 
 		return area;
 	}

@@ -22,11 +22,17 @@ package edu.cornell.pserc.jpower.tdouble;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PV;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PQ;
 
 /**
  * Builds index lists for each type of bus (REF, PV, PQ).
@@ -36,12 +42,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  *
  */
 public class Djp_bustypes {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int REF = Djp_jpc.REF;
-	private static final int PV  = Djp_jpc.PV;
-	private static final int PQ  = Djp_jpc.PQ;
 
 	/**
 	 * Generators with "out-of-service" status are treated as PQ buses with
@@ -64,7 +64,7 @@ public class Djp_bustypes {
 
 		/* gen connection matrix, element i, j is 1 if, generator j at bus i is ON */
 		Cg = new SparseRCIntMatrix2D(nb, ng,
-				gen.gen_bus.toArray(), Djp_util.irange(ng),
+				gen.gen_bus.toArray(), irange(ng),
 				gen.gen_status.copy().assign(ifunc.equals(1)).toArray(), false, false, false);
 
 		/* number of generators at each bus that are ON */
@@ -75,15 +75,15 @@ public class Djp_bustypes {
 		/* form index lists for slack, PV, and PQ buses */
 		ref_types = bus.bus_type.copy().assign(ifunc.equals(REF));
 		ref_types.assign(bus_gen_status, ifunc.and);		// reference bus index
-		ref = IntFactory1D.dense.make(Djp_util.nonzero(ref_types));
+		ref = IntFactory1D.dense.make(nonzero(ref_types));
 
 		pv_types = bus.bus_type.copy().assign(ifunc.equals(PV));
 		pv_types.assign(bus_gen_status, ifunc.and);		// PV bus indices
-		pv = IntFactory1D.dense.make(Djp_util.nonzero(pv_types));
+		pv = IntFactory1D.dense.make(nonzero(pv_types));
 
 		pq_types = bus.bus_type.copy().assign(ifunc.equals(PQ));
 		pq_types.assign(bus_gen_status.assign(ifunc.equals(0)), ifunc.or);
-		pq = IntFactory1D.dense.make(Djp_util.nonzero(pq_types));
+		pq = IntFactory1D.dense.make(nonzero(pq_types));
 
 		/* pick a new reference bus if for some reason there is none (may have been shut down) */
 		if (ref.size() == 0) {

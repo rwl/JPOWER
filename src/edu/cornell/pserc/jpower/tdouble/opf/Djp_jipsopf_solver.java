@@ -29,12 +29,18 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.complex;
 
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus.makeYbus;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
 import static edu.cornell.pserc.jips.tdouble.Dips_jips.jips;
 
 import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
@@ -55,13 +61,6 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
  *
  */
 public class Djp_jipsopf_solver {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-
-	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
-	private static final int REF       = Djp_jpc.REF;
 
 	/**
 	 * Solves AC optimal power flow using JIPS.
@@ -163,20 +162,20 @@ public class Djp_jipsopf_solver {
 
 		/* try to select an interior initial point */
 		lb = xmin.copy(); ub = xmax.copy();
-		lb.viewSelection( Djp_util.intm( xmin.copy().assign(dfunc.equals(Double.NEGATIVE_INFINITY)) ).toArray() ).assign(-1e10);	// replace Inf with numerical proxies
-		ub.viewSelection( Djp_util.intm( xmax.copy().assign(dfunc.equals(Double.POSITIVE_INFINITY)) ).toArray() ).assign( 1e10);
+		lb.viewSelection( intm( xmin.copy().assign(dfunc.equals(Double.NEGATIVE_INFINITY)) ).toArray() ).assign(-1e10);	// replace Inf with numerical proxies
+		ub.viewSelection( intm( xmax.copy().assign(dfunc.equals(Double.POSITIVE_INFINITY)) ).toArray() ).assign( 1e10);
 		x0 = lb.copy().assign(ub, dfunc.plus).assign(dfunc.div(2));
 		Varefs = bus.Va.viewSelection( bus.bus_type.copy().assign(ifunc.equals(REF)).toArray() ).assign(dfunc.mult(Math.PI)).assign(dfunc.div(180));
-		x0.viewSelection(Djp_util.irange(vv.get("Va").i0, vv.get("Va").iN)).assign(Varefs.get(0));	// angles set to first reference angle
+		x0.viewSelection(irange(vv.get("Va").i0, vv.get("Va").iN)).assign(Varefs.get(0));	// angles set to first reference angle
 		if (ny > 0) {
-			ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
+			ipwl = nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
 			c = gencost.cost.viewSelection(ipwl, null).getMaxLocation()[0];		// largest y-value in CCV data
 			// TODO: compute c using sub2ind
 			x0.viewPart(vv.get("y").i0, vv.get("y").N).assign(c + 0.1 * Math.abs(c));
 		}
 
 		/* find branches with flow limits */
-		il = Djp_util.nonzero( Djp_util.intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( branch.rate_a.assign(dfunc.less(1e10)) ), ifunc.and) );
+		il = nonzero( intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(intm( branch.rate_a.assign(dfunc.less(1e10)) ), ifunc.and) );
 		nl2 = il.length;	// number of constrained lines
 
 		/* -----  run opf  ----- */
@@ -197,7 +196,7 @@ public class Djp_jipsopf_solver {
 		Vm = x.viewPart(vv.get("Vm").i0, vv.get("Vm").N).copy();
 		Pg = x.viewPart(vv.get("Pg").i0, vv.get("Pg").N).copy();
 		Qg = x.viewPart(vv.get("Qg").i0, vv.get("Qg").N).copy();
-		V  = Djp_util.complex(Vm, Va);
+		V  = complex(Vm, Va);
 
 		/* -----  calculate return values  ----- */
 
@@ -240,8 +239,8 @@ public class Djp_jipsopf_solver {
 		nlnN = om.getN("nln");
 
 		/* extract multipliers for non-linear constraints */
-		kl = Djp_util.nonzero( Lambda.get("eqnonlin").copy().assign(dfunc.less(0)) );
-		ku = Djp_util.nonzero( Lambda.get("eqnonlin").copy().assign(dfunc.greater(0)) );
+		kl = nonzero( Lambda.get("eqnonlin").copy().assign(dfunc.less(0)) );
+		ku = nonzero( Lambda.get("eqnonlin").copy().assign(dfunc.greater(0)) );
 		nl_mu_l = DoubleFactory1D.dense.make(nlnN);
 		nl_mu_u = DoubleFactory1D.dense.make(new DoubleMatrix1D[] {DoubleFactory1D.dense.make(nb), muSf, muSt});
 		nl_mu_l.viewSelection(kl).assign( Lambda.get("eqnonlin").viewSelection(kl).copy().assign(dfunc.neg) );

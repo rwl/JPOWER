@@ -28,10 +28,15 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.intm;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_bustypes.bustypes;
 import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
@@ -89,10 +94,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  *
  */
 public class Djp_runpf {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 *
@@ -158,7 +159,7 @@ public class Djp_runpf {
 		pq = bustypes[2].toArray();
 
 		/* generator info */
-		on = Djp_util.nonzero(gen.gen_status);     // which generators are on?
+		on = nonzero(gen.gen_status);  // which generators are on?
 		// what buses are they at?
 		gbus = gen.gen_bus.viewSelection(on).toArray();
 
@@ -216,9 +217,9 @@ public class Djp_runpf {
 
 			/* initial state */
 			//DComplexMatrix1D V0 = DComplexFactory1D.dense.make(bus.size(), new double[] {1, 0});	// flat start
-			V0 = Djp_util.polar(bus.Vm, bus.Va, false);
+			V0 = polar(bus.Vm, bus.Va, false);
 			DComplexMatrix1D normV0g = V0.viewSelection(gbus).copy().assign(cfunc.abs).assign(V0.viewSelection(gbus), cfunc.mult);
-			DComplexMatrix1D cVg = Djp_util.complex(gen.Vg.viewSelection(on), null);
+			DComplexMatrix1D cVg = complex(gen.Vg.viewSelection(on), null);
 			V0.viewSelection(gbus).assign(cVg.assign(normV0g, cfunc.div));
 
 			ref0 = 0;
@@ -265,8 +266,8 @@ public class Djp_runpf {
 
 				if (qlim > 0) {		// enforce generator Q limits
 					/* find gens with violated Q constraints */
-					mx = Djp_util.nonzero( gen.gen_status.copy().assign(Djp_util.intm( gen.Qg.copy().assign(gen.Qmax, dfunc.greater) ), ifunc.and) );
-					mn = Djp_util.nonzero( gen.gen_status.copy().assign(Djp_util.intm( gen.Qg.copy().assign(gen.Qmin, dfunc.less) ), ifunc.and) );
+					mx = nonzero( gen.gen_status.copy().assign(intm( gen.Qg.copy().assign(gen.Qmax, dfunc.greater) ), ifunc.and) );
+					mn = nonzero( gen.gen_status.copy().assign(intm( gen.Qg.copy().assign(gen.Qmin, dfunc.less) ), ifunc.and) );
 
 					if (mx.length > 0 || mn.length > 0) {	// we have some Q limit violations
 						if (pv.length == 0) {
@@ -305,7 +306,7 @@ public class Djp_runpf {
 						/* save corresponding limit values */
 						fixedQg.viewSelection(mx).assign(gen.Qmax.viewSelection(mx));
 						fixedQg.viewSelection(mn).assign(gen.Qmin.viewSelection(mn));
-						mx = Djp_util.icat(mx, mn);
+						mx = icat(mx, mn);
 
 						/* convert to PQ bus */
 						gen.Qg.viewSelection(mx).assign(fixedQg.viewSelection(mx));	// set Qg to binding limit
@@ -325,7 +326,7 @@ public class Djp_runpf {
 						pq = bustypes[2].toArray();
 						if (verbose > 0 && ref != ref_temp)
 							System.out.printf("Bus %d is new slack bus\n", ref);
-						limited = Djp_util.icat(limited, mx);
+						limited = icat(limited, mx);
 
 					} else {
 						repeat = false;	// no more generator Q limits violated

@@ -30,9 +30,12 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition;
 import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Djp_util.complex;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 
@@ -44,9 +47,6 @@ import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
  *
  */
 public class Djp_fdpf {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
@@ -93,7 +93,7 @@ public class Djp_fdpf {
 		verbose	= jpopt.get("VERBOSE").intValue();
 
 		/* initialize */
-		pvpq = Djp_util.icat(pv, pq);
+		pvpq = icat(pv, pq);
 		converged = false;
 		i = 0;
 		V = V0.copy();
@@ -144,11 +144,11 @@ public class Djp_fdpf {
 
 			/* -----  do P iteration, update Va  ----- */
 			luP.solve(P);
-			dVa = Djp_util.complex(P.assign(dfunc.neg), null);
+			dVa = complex(P.assign(dfunc.neg), null);
 
 			/* update voltage */
 			Va.viewSelection(pvpq).assign(dVa, cfunc.plus);
-			V = Djp_util.polar(Vm.getRealPart(), Va.getRealPart());
+			V = polar(Vm.getRealPart(), Va.getRealPart());
 
 			/* evalute mismatch */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -170,11 +170,11 @@ public class Djp_fdpf {
 
 			/* -----  do Q iteration, update Vm  ----- */
 			luQ.solve(Q);
-			dVm = Djp_util.complex(Q.assign(dfunc.neg), null);
+			dVm = complex(Q.assign(dfunc.neg), null);
 
 			/* update voltage */
 			Vm.viewSelection(pq).assign(dVm, cfunc.plus);
-			V = Djp_util.polar(Vm.getRealPart(), Va.getRealPart());
+			V = polar(Vm.getRealPart(), Va.getRealPart());
 
 			/* evalute mismatch */
 			mis = Ybus.zMult(V, null).assign(cfunc.conj);

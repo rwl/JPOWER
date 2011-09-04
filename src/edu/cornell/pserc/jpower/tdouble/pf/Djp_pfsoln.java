@@ -26,10 +26,13 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.EPS;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
@@ -43,10 +46,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
  *
  */
 public class Djp_pfsoln {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Updates bus, gen, branch data structures to match power flow soln.
@@ -90,10 +89,10 @@ public class Djp_pfsoln {
 
 		/* ----- update Qg for all gens and Pg for swing bus ----- */
 		// generator info
-		on = Djp_util.nonzero(gen.gen_status);	// which generators are on?
+		on = nonzero(gen.gen_status);	// which generators are on?
 		ggbus = gen.gen_bus.viewSelection(on).copy();
 		gbus = ggbus.toArray();
-		refgen = IntFactory1D.dense.make(Djp_util.nonzero( ggbus.assign(ifunc.equals(ref)) ));
+		refgen = IntFactory1D.dense.make(nonzero( ggbus.assign(ifunc.equals(ref)) ));
 
 		/* compute total injected bus powers */
 		Sg = Ybus.viewSelection(gbus, null).zMult(V, null);
@@ -113,7 +112,7 @@ public class Djp_pfsoln {
 			// build connection matrix, element i, j is 1 if gen on(i) at bus j is ON
 			nb = bus.size();
 			ngon = on.length;
-			Cg = new SparseRCDoubleMatrix2D(ngon, nb, Djp_util.irange(ngon), gbus, 1, false, false);
+			Cg = new SparseRCDoubleMatrix2D(ngon, nb, irange(ngon), gbus, 1, false, false);
 
 			// divide Qg by number of generators at the bus to distribute equally
 			ngb = DoubleFactory1D.sparse.make(nb);
@@ -124,9 +123,9 @@ public class Djp_pfsoln {
 
 			// divide proportionally
 			Cmin = new SparseRCDoubleMatrix2D(ngon, nb,
-					Djp_util.irange(ngon), gbus, gen.Qmin.viewSelection(on).toArray(), false, false, false);
+					irange(ngon), gbus, gen.Qmin.viewSelection(on).toArray(), false, false, false);
 			Cmax = new SparseRCDoubleMatrix2D(ngon, nb,
-					Djp_util.irange(ngon), gbus, gen.Qmax.viewSelection(on).toArray(), false, false, false);
+					irange(ngon), gbus, gen.Qmax.viewSelection(on).toArray(), false, false, false);
 			// nb x 1 vector of total Qg at each bus
 			Qg_tot = Cg.viewDice().zMult(gen.Qg.viewSelection(on), null);
 			Qg_min = DoubleFactory1D.sparse.make(nb);	// nb x 1 vector of min total Qg at each bus
@@ -136,12 +135,12 @@ public class Djp_pfsoln {
 				Qg_max.set(k, Cmax.viewColumn(k).zSum());
 			}
 			// gens at buses with Qg range = 0
-			ig = Djp_util.nonzero( Cg.zMult(Qg_min, null).assign(Cg.zMult(Qg_max, null), dfunc.equals) );
+			ig = nonzero( Cg.zMult(Qg_min, null).assign(Cg.zMult(Qg_max, null), dfunc.equals) );
 			Qg_on = gen.Qg.viewSelection(on);
 			Qg_save = Qg_on.viewSelection(ig).copy();
 
-			Qg = Cg.zMult(Qg_tot.assign(Qg_min, dfunc.minus).assign(Qg_max.assign(Qg_min, dfunc.minus).assign(dfunc.plus(Djp_util.EPS)), dfunc.div), null);
-			Qg.assign(gen.Qmax.viewSelection(on).copy().assign(gen.Qmin.viewSelection(on), dfunc.minus), dfunc.mult);                    //   ^ avoid div by 0
+			Qg = Cg.zMult(Qg_tot.assign(Qg_min, dfunc.minus).assign(Qg_max.assign(Qg_min, dfunc.minus).assign(dfunc.plus(EPS)), dfunc.div), null);
+			Qg.assign(gen.Qmax.viewSelection(on).copy().assign(gen.Qmin.viewSelection(on), dfunc.minus), dfunc.mult);  //   ^ avoid div by 0
 			gen.Qg.viewSelection(on).assign(gen.Qmin.viewSelection(on)).assign(Qg, dfunc.plus);
 
 			Qg_on.viewSelection(ig).assign(Qg_save);
@@ -156,8 +155,8 @@ public class Djp_pfsoln {
 		}
 
 		/* ----- update/compute branch power flows ----- */
-		out = Djp_util.nonzero(branch.br_status.copy().assign(ifunc.equals(0)));	// out-of-service branches
-		br  = Djp_util.nonzero(branch.br_status);									// in-service branches
+		out = nonzero(branch.br_status.copy().assign(ifunc.equals(0)));	// out-of-service branches
+		br  = nonzero(branch.br_status);  // in-service branches
 		// complex power at "from" bus
 		Sf = Yf.viewSelection(br, null).zMult(V, null).assign(cfunc.conj);
 		Sf.assign(V.viewSelection(branch.f_bus.viewSelection(br).toArray()), cfunc.mult);

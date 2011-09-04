@@ -23,9 +23,11 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 
@@ -37,9 +39,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
  *
  */
 public class Djp_polycost {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 *
@@ -61,20 +60,20 @@ public class Djp_polycost {
 
 		/* form coefficient matrix where 1st column is constant term, 2nd linear, etc. */
 		c = DoubleFactory2D.dense.make(ng, maxN);
-		for (int n : Djp_util.irange(minN, maxN)) {
-			k = Djp_util.nonzero( gencost.ncost.copy().assign(ifunc.equals(n)) );	// cost with n coefficients
-			c.viewSelection(k, Djp_util.irange(n)).assign( gencost.cost.viewSelection(k, Djp_util.irange(n - 1, 0, -1)) );
+		for (int n : irange(minN, maxN)) {
+			k = nonzero( gencost.ncost.copy().assign(ifunc.equals(n)) );	// cost with n coefficients
+			c.viewSelection(k, irange(n)).assign( gencost.cost.viewSelection(k, irange(n - 1, 0, -1)) );
 		}
 
 		/* do derivatives */
 		for (int d = 0; d < der; d++) {
 			if (c.columns() >= 2) {
-				c.assign( c.viewSelection(null, Djp_util.irange(1, maxN - d + 1)) );
+				c.assign( c.viewSelection(null, irange(1, maxN - d + 1)) );
 			} else {
 				c = DoubleFactory2D.dense.make(ng, 1);
 				break;
 			}
-			for (int kk : Djp_util.irange(1, maxN - d)) {
+			for (int kk : irange(1, maxN - d)) {
 				c.viewColumn(kk).assign(dfunc.mult(kk));
 			}
 		}
@@ -84,7 +83,7 @@ public class Djp_polycost {
 			f = DoubleFactory1D.dense.make(ng);
 		} else {
 			f = c.viewColumn(0).copy();		// constant term
-			for (int kk : Djp_util.irange(1, c.columns()))
+			for (int kk : irange(1, c.columns()))
 				f.assign(c.viewColumn(kk).assign( Pg.copy().assign(dfunc.pow(kk - 1)), dfunc.mult ), dfunc.plus);
 		}
 		return f;

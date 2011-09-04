@@ -42,10 +42,6 @@ public class Djd_AugYbus {
 
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static DComplexMatrix1D yload, ygen;
-	private static DComplexMatrix2D Ybus;
-	private static DComplexMatrix2D[] Y;
-
 	/**
 	 *
 	 * @param baseMVA power base
@@ -61,6 +57,10 @@ public class Djd_AugYbus {
 //	@SuppressWarnings("static-access")
 //	public static SparseDComplexLUDecomposition jd_AugYbus(double baseMVA, Djp_bus bus, Djp_branch branch,
 //			DoubleMatrix1D xd_tr, int[] gbus, DoubleMatrix1D P, DoubleMatrix1D Q, DComplexMatrix1D U0) {
+//
+//		DComplexMatrix1D yload, ygen;
+//		DComplexMatrix2D Ybus;
+//		DComplexMatrix2D[] Y;
 //
 //		/* Calculate bus admittance matrix */
 //		Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);

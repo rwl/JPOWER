@@ -22,7 +22,9 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
-import cern.jet.math.tdcomplex.DComplexFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.j;
 
 /**
  * Computes 2nd derivatives of complex power flow w.r.t. voltage.
@@ -32,12 +34,6 @@ import cern.jet.math.tdcomplex.DComplexFunctions;
  *
  */
 public class Djp_d2Sbr_dV2 {
-
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-	private static final double[] j = {0.0, 1.0};
-
-	private static DComplexMatrix1D conjV;
-	private static DComplexMatrix2D diaglam, diagV, A, B, D, E, F, G, Haa, Hva, Hav, Hvv;
 
 	/**
 	 * Returns 4 matrices
@@ -56,6 +52,8 @@ public class Djp_d2Sbr_dV2 {
 	@SuppressWarnings("static-access")
 	public static DComplexMatrix2D[] d2Sbr_dV2(DComplexMatrix2D Cbr, DComplexMatrix2D Ybr,
 			DComplexMatrix1D V, DComplexMatrix1D lam) {
+		DComplexMatrix1D conjV;
+		DComplexMatrix2D diaglam, diagV, A, B, D, E, F, G, Haa, Hva, Hav, Hvv;
 
 		diaglam = DComplexFactory2D.sparse.diagonal(lam);
 		diagV = DComplexFactory2D.sparse.diagonal(V);

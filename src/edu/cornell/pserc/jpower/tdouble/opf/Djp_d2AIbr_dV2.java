@@ -23,8 +23,9 @@ import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
 
 /**
  * Computes 2nd derivatives of |complex current|^2 w.r.t. V.
@@ -34,13 +35,6 @@ import cern.jet.math.tdouble.DoubleFunctions;
  *
  */
 public class Djp_d2AIbr_dV2 {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-
-	private static DComplexMatrix2D diaglam, conj_diagIbr, conj_dIbr_dVa, conj_dIbr_dVm, Iaa, Iav, Iva, Ivv;
-	private static DComplexMatrix2D[] d2Ibr_dV2;
-	private static DoubleMatrix2D Haa, Hva, Hav, Hvv;
 
 	/**
 	 * Returns 4 matrices containing the partial derivatives w.r.t. voltage
@@ -61,6 +55,10 @@ public class Djp_d2AIbr_dV2 {
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix2D[] d2AIbr_dV2(DComplexMatrix2D dIbr_dVa, DComplexMatrix2D dIbr_dVm,
 			DComplexMatrix1D Ibr, DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
+
+		DComplexMatrix2D diaglam, conj_diagIbr, conj_dIbr_dVa, conj_dIbr_dVm, Iaa, Iav, Iva, Ivv;
+		DComplexMatrix2D[] d2Ibr_dV2;
+		DoubleMatrix2D Haa, Hva, Hav, Hvv;
 
 		diaglam = DComplexFactory2D.sparse.diagonal(lam);
 		conj_diagIbr = DComplexFactory2D.sparse.diagonal(Ibr.copy().assign(cfunc.conj));

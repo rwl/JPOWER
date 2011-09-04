@@ -25,12 +25,17 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.diff;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.any;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
 
 /**
  * Make the A matrix and RHS for the CCV formulation.
@@ -40,11 +45,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  *
  */
 public class Djp_makeAy {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
 
 	/**
 	 * Constructs the parameters for linear "basin constraints" on Pg, Qg
@@ -80,7 +80,7 @@ public class Djp_makeAy {
 		DoubleMatrix2D Ay;
 
 		/* find all pwl cost rows in gencost, either real or reactive */
-		iycost = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
+		iycost = nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
 
 		/* this is the number of extra "y" variables needed to model those costs */
 		ny = iycost.length;
@@ -115,10 +115,10 @@ public class Djp_makeAy {
 		k = 0;
 		for (int i : iycost) {
 			ns = gencost.ncost.get(i);		// # of cost points; segments = ns-1
-			p = gencost.cost.viewRow(i).copy().viewSelection(Djp_util.irange(0, 2*ns-1, 2));
-			c = gencost.cost.viewRow(i).copy().viewSelection(Djp_util.irange(1, 2*ns, 2));
-			m = Djp_util.diff(c).assign(Djp_util.diff(p), dfunc.div);	// slopes for Pg (or Qg)
-			if (Djp_util.any(Djp_util.diff(p).assign(dfunc.equals(0))))
+			p = gencost.cost.viewRow(i).copy().viewSelection(irange(0, 2*ns-1, 2));
+			c = gencost.cost.viewRow(i).copy().viewSelection(irange(1, 2*ns, 2));
+			m = diff(c).assign(diff(p), dfunc.div);	// slopes for Pg (or Qg)
+			if (any(diff(p).assign(dfunc.equals(0))))
 				System.out.printf("\nmakeAy: bad x axis data in row %i of gencost matrix\n", i);
 			b = m.copy().assign(p.viewPart(0, ns-1), dfunc.mult).assign(c.viewPart(0, ns-1), dfunc.minus);	// and rhs
 			by = DoubleFactory1D.dense.append(by, b);
@@ -127,14 +127,14 @@ public class Djp_makeAy {
 			} else {
 				sidx = pgbas + i - 1;			// this was for a p cost
 			}
-			Ay.viewColumn(sidx).viewSelection(Djp_util.irange(k, k+ns-2)).assign(m);
+			Ay.viewColumn(sidx).viewSelection(irange(k, k+ns-2)).assign(m);
 			k += ns - 1;
 		}
 		/* Now fill the y columns with -1's */
 		k = j = 0;
 		for (int i : iycost) {
 			ns = gencost.ncost.get(i);
-			Ay.viewColumn(ybas+j-1).viewSelection(Djp_util.irange(k, k+ns-2));
+			Ay.viewColumn(ybas+j-1).viewSelection(irange(k, k+ns-2));
 			k += ns - 1;
 			j += 1;
 		}

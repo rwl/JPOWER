@@ -31,6 +31,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
+import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.emory.mathcs.utils.ConcurrencyUtils;
@@ -42,8 +43,11 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  */
 public class Djp_util extends Object {
 
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
+	public static final IntFunctions ifunc = IntFunctions.intFunctions;
+	public static final DoubleFunctions dfunc = DoubleFunctions.functions;
+	public static final DComplexFunctions cfunc = DComplexFunctions.functions;
+
+	public static final double[] j = {0.0, 1.0};
 
 	// singleton
 	public static final Djp_util util = new Djp_util();

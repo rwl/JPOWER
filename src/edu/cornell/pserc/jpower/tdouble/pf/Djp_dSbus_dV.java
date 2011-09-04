@@ -22,8 +22,9 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 /**
  * Computes partial derivatives of power injection w.r.t. voltage.
@@ -33,8 +34,6 @@ import cern.jet.math.tdcomplex.DComplexFunctions;
  *
  */
 public class Djp_dSbus_dV {
-
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Returns two matrices containing
@@ -79,7 +78,7 @@ public class Djp_dSbus_dV {
 		SparseRCDComplexMatrix2D diagV, diagIbus, diagVnorm, rhs, dS_dVa, conjInorm, dS_dVm, addend;
 
 		n = (int) V.size();
-		ib = Djp_util.irange(n);
+		ib = irange(n);
 		Ibus = Ybus.zMult(V, null);
 
 		diagV = new SparseRCDComplexMatrix2D(n, n, ib, ib, V.toArray(), false, false);

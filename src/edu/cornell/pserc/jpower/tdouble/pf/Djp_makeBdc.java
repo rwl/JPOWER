@@ -27,17 +27,19 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.icat;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 
 public class Djp_makeBdc {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 * Builds the B matrices and phase shift injections for DC power flow.
@@ -69,7 +71,7 @@ public class Djp_makeBdc {
 		nl = branch.size();		// number of lines
 
 		/* check that bus numbers are equal to indices to bus (one set of bus numbers) */
-		if ( Djp_util.any( bus.bus_i.copy().assign(IntFactory1D.dense.make(Djp_util.irange(nb)),
+		if ( any( bus.bus_i.copy().assign(IntFactory1D.dense.make(irange(nb)),
 				ifunc.equals).assign(ifunc.equals(0))) )
 			System.err.println("makeBdc: buses must be numbered consecutively in bus matrix");
 			// TODO: throw non consecutive bus numbers exception.
@@ -82,20 +84,20 @@ public class Djp_makeBdc {
 		 * 	| Pt |   | Btf  Btt |   | Vat |   | Ptinj |
 		 */
 		// ones at in-service branches
-		stat = Djp_util.dblm(branch.br_status);
+		stat = dblm(branch.br_status);
 		// series susceptance
 		b = stat.assign(branch.br_x, dfunc.div);
 		// default tap ratio = 1
 		tap = DoubleFactory1D.dense.make(nl, 1);
 		// indices of non-zero tap ratios
-		xfmr = Djp_util.nonzero(branch.tap);
+		xfmr = nonzero(branch.tap);
 		// assign non-zero tap ratios
 		tap.viewSelection(xfmr).assign(branch.tap.viewSelection(xfmr));
 		b.assign(tap, dfunc.div);
 
 		/* build connection matrix Cft = Cf - Ct for line and from - to buses */
 		ft = IntFactory1D.dense.make(new IntMatrix1D[] {branch.f_bus, branch.t_bus}).toArray();
-		il = Djp_util.icat(Djp_util.irange(nl), Djp_util.irange(nl));
+		il = icat(irange(nl), irange(nl));
 		v = DoubleFactory1D.dense.make(new DoubleMatrix1D[] {
 				DoubleFactory1D.dense.make(nl,  1),
 				DoubleFactory1D.dense.make(nl, -1)

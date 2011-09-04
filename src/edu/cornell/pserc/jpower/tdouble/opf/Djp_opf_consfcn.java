@@ -30,9 +30,13 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Djp_util.complex;
 
 import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -52,9 +56,6 @@ import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus.makeSbus;
  *
  */
 public class Djp_opf_consfcn implements ConstraintEvaluator {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	private Djp_opf_model om;
 	private DComplexMatrix2D Ybus;
@@ -81,7 +82,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		this.Yt = Yt;
 		this.jpopt = jpopt;
 		int nl = om.get_jpc().branch.size();	// all lines have limits by default
-		this.il = Djp_util.irange(nl);
+		this.il = irange(nl);
 	}
 
 	/**
@@ -148,7 +149,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		Va = DoubleFactory1D.dense.make(nb);
 		Va.assign(x.viewPart(vv.get("Va").i0, vv.get("Va").N));
 		Vm = x.viewPart(vv.get("Vm").i0, vv.get("Vm").N).copy();
-		V = Djp_util.polar(Vm, Va);
+		V = polar(Vm, Va);
 
 		/* evaluate power flow equations */
 		mis = Ybus.zMult(V, null).assign(cfunc.conj);
@@ -236,27 +237,27 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		Va = DoubleFactory1D.dense.make(nb);
 		Va.assign(x.viewPart(vv.get("Va").i0, vv.get("Va").N));
 		Vm = x.viewPart(vv.get("Vm").i0, vv.get("Vm").N).copy();
-		V = Djp_util.polar(Vm, Va);
+		V = polar(Vm, Va);
 
 
 		/* ----- evaluate partials of constraints ----- */
 
 		/* index ranges */
-		iVa = Djp_util.irange(vv.get("Va").i0, vv.get("Va").iN);
-		iVm = Djp_util.irange(vv.get("Vm").i0, vv.get("Vm").iN);
-		iPg = Djp_util.irange(vv.get("Pg").i0, vv.get("Pg").iN);
-		iQg = Djp_util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
+		iVa = irange(vv.get("Va").i0, vv.get("Va").iN);
+		iVm = irange(vv.get("Vm").i0, vv.get("Vm").iN);
+		iPg = irange(vv.get("Pg").i0, vv.get("Pg").iN);
+		iQg = irange(vv.get("Qg").i0, vv.get("Qg").iN);
 
 		/* compute partials of injected bus powers */
 		dSbus_dV = dSbus_dV(Ybus, V);	// w.r.t. V
 		dSbus_dVm = dSbus_dV[0]; dSbus_dVa = dSbus_dV[1];
 		// Pbus w.r.t. Pg, Qbus w.r.t. Qg
-		neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), Djp_util.irange(ng), -1, false, false);
+		neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), irange(ng), -1, false, false);
 
 		/* construct Jacobian of equality constraints (power flow) and transpose it */
 		dg = DoubleFactory2D.sparse.make(nxyz, 2*nb);
 		dgX1 = DComplexFactory2D.sparse.appendColumns(dSbus_dVa, dSbus_dVm);
-		idg = Djp_util.icat(iVa, Djp_util.icat(iVm, Djp_util.icat(iPg, iQg)));
+		idg = icat(iVa, icat(iVm, icat(iPg, iQg)));
 		dg.viewSelection(idg, null).assign( DoubleFactory2D.sparse.compose(new DoubleMatrix2D[][] {
 				{dgX1.getRealPart(), neg_Cg, DoubleFactory2D.sparse.make(nb, ng)},			// P mismatch w.r.t Va, Vm, Pg, Qg
 				{dgX1.getImaginaryPart(), DoubleFactory2D.sparse.make(nb, ng), neg_Cg} }).viewDice() );	// Q mismatch w.r.t Va, Vm, Pg, Qg
@@ -281,12 +282,12 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 				Ft = (DComplexMatrix1D) dSbr_dV[5];
 			}
 			if (jpopt.get("OPF_FLOW_LIM") == 1) {	// real part of flow (active power)
-				dFf_dVa = Djp_util.complex(dFf_dVa.getRealPart(), null);
-				dFf_dVm = Djp_util.complex(dFf_dVm.getRealPart(), null);
-				dFt_dVa = Djp_util.complex(dFt_dVa.getRealPart(), null);
-				dFt_dVm = Djp_util.complex(dFt_dVm.getRealPart(), null);
-				Ff = Djp_util.complex(Ff.getRealPart(), null);
-				Ft = Djp_util.complex(Ft.getRealPart(), null);
+				dFf_dVa = complex(dFf_dVa.getRealPart(), null);
+				dFf_dVm = complex(dFf_dVm.getRealPart(), null);
+				dFt_dVa = complex(dFt_dVa.getRealPart(), null);
+				dFt_dVm = complex(dFt_dVm.getRealPart(), null);
+				Ff = complex(Ff.getRealPart(), null);
+				Ft = complex(Ft.getRealPart(), null);
 			}
 
 			/* squared magnitude of flow (of complex power or current, or real power) */
@@ -297,7 +298,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 			 * and transpose it so fmincon likes it
 			 */
 			dh = DoubleFactory2D.sparse.make(nxyz, 2 * nl2);
-			dh.viewSelection(Djp_util.icat(iVa, iVm), null).assign(DoubleFactory2D.sparse.compose(new DoubleMatrix2D[][] {
+			dh.viewSelection(icat(iVa, iVm), null).assign(DoubleFactory2D.sparse.compose(new DoubleMatrix2D[][] {
 					{df_dVa, df_dVm},		// "from" flow limit
 					{dt_dVa, dt_dVm}		// "to" flow limit
 			}));

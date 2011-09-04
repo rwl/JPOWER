@@ -28,9 +28,12 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.polar;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
@@ -54,9 +57,6 @@ import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_ok.t_ok;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_end.t_end;
 
 public class Djp_t_jacobian {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	public static void t_jacobian() {
 		t_jacobian(false);
@@ -119,7 +119,7 @@ public class Djp_t_jacobian {
 		Va = DoubleFactory2D.dense.make(
 				bus.Va.copy().assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180))).toArray(),
 				1).viewDice();
-		V = Djp_util.polar(bus.Vm, bus.Va, false);
+		V = polar(bus.Vm, bus.Va, false);
 		V2 = DComplexFactory2D.dense.make((int) V.size(), 1);
 		V2.viewColumn(0).assign(V.toArray());
 		f = branch.f_bus.toArray();       // list of "from" buses
@@ -147,11 +147,11 @@ public class Djp_t_jacobian {
 		DoubleMatrix2D nb1 = DoubleFactory2D.dense.make(1, nb, 1);
 		Vm.zMult(nb1, null).assign(pert_eye, dfunc.plus);
 		Va.zMult(nb1, null);
-		Vmp = Djp_util.polar(Vm.zMult(nb1, null).assign(pert_eye, dfunc.plus),
+		Vmp = polar(Vm.zMult(nb1, null).assign(pert_eye, dfunc.plus),
 				Va.zMult(nb1, null));
 		/** Vmp = (Vm*ones(1,nb) + pert*eye(nb,nb)) .* (exp(1j * Va) * ones(1,nb)); */
 
-		Vap = Djp_util.polar(Vm.zMult(nb1, null),
+		Vap = polar(Vm.zMult(nb1, null),
 				Va.zMult(nb1, null).assign(pert_eye, dfunc.plus));
 		/** Vap = (Vm*ones(1,nb)) .* (exp(1j * (Va*ones(1,nb) + pert*eye(nb,nb)))); */
 

@@ -22,9 +22,12 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 
@@ -36,9 +39,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
  *
  */
 public class Djp_hasPQcap {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	/**
 	 * Returns a column vector of 1's and 0's. The 1's
@@ -73,19 +73,19 @@ public class Djp_hasPQcap {
 		DoubleMatrix1D L, U, Qmin_at_Pmax, Qmax_at_Pmax;
 
 		/* check for errors capability curve data */
-		if ( Djp_util.any(gen.Pc1.copy().assign(gen.Pc2, dfunc.greater)) )
+		if ( any(gen.Pc1.copy().assign(gen.Pc2, dfunc.greater)) )
 			System.err.println("hasPQcap: Pc1 > Pc2");
 			// TODO: throw invalid capability curve data exception
 
-		if ( Djp_util.any(gen.Qc2max.copy().assign(gen.Qc1max, dfunc.greater)) )
+		if ( any(gen.Qc2max.copy().assign(gen.Qc1max, dfunc.greater)) )
 			System.err.println("hasPQcap: Qc2max > Qc1max");
 
-		if ( Djp_util.any(gen.Qc2min.copy().assign(gen.Qc1min, dfunc.less)) )
+		if ( any(gen.Qc2min.copy().assign(gen.Qc1min, dfunc.less)) )
 			System.err.println("hasPQcap: Qc2min < Qc1min");
 
 		L = DoubleFactory1D.dense.make(gen.size());
 		U = DoubleFactory1D.dense.make(gen.size());
-		k = Djp_util.nonzero(Djp_util.intm( gen.Pc1.copy().assign(gen.Pc2, dfunc.equals) ).assign(ifunc.not));
+		k = nonzero(intm( gen.Pc1.copy().assign(gen.Pc2, dfunc.equals) ).assign(ifunc.not));
 
 		if (hilo != "U") {		// include lower constraint
 			Qmin_at_Pmax = gen.Qc2min.viewSelection(k).copy().assign(gen.Qc1min, dfunc.minus);
@@ -105,7 +105,7 @@ public class Djp_hasPQcap {
 			U.viewSelection(k).assign( Qmax_at_Pmax.assign(gen.Qmax.viewSelection(k), dfunc.less) );
 		}
 
-		return Djp_util.intm(L).assign(Djp_util.intm(U), ifunc.or);
+		return intm(L).assign(intm(U), ifunc.or);
 	}
 
 	public static IntMatrix1D hasPQcap(Djp_gen gen) {

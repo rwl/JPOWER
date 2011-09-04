@@ -29,10 +29,22 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
-import edu.cornell.pserc.jips.tdouble.Dips_qps_jips;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.ones;
+import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.intm;
+
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
+
+import static edu.cornell.pserc.jips.tdouble.Dips_qps_jips.qps_jips;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
@@ -50,44 +62,6 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
  */
 public class Djp_dcopf_solver {
 
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
-	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
-	private static final int REF = Djp_jpc.REF;
-
-	private static int verbose, alg, nb, nl, nw, ny, nxyz, any_pwl, npol, nnw, info;
-	private static int[] ipol, ipwl, iqdr, ilin, il;
-	private static double baseMVA, C0, c, feastol, gradtol, comptol, costtol, max_it, max_red, f;
-	private static boolean success;
-	private static Djp_jpc jpc;
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-	private static Djp_gencost gencost;
-	private static Cost cp;
-
-	private static Map<String, Set>[] idx;
-	private static Map<String, Set> vv, ll;
-	private static Map<String, Object> opt, raw, output;
-	private static Map<String, Double> jips_opt;
-	private static Map<String, DoubleMatrix1D> lambda;
-	private static Map<String, Map<String, DoubleMatrix1D>> mu;
-	private static Map<String, DoubleMatrix1D> var, lin;
-
-	private static AbstractMatrix[] Alu;
-
-	private static DoubleMatrix1D Cw, Pfinj, l, u, x0, xmin, xmax, Cpwl, Cpol, CCw,
-		MR, HMR, CC, Varefs, lb, ub, x, Va, Pg, mu_l, mu_u, muLB, muUB, pimul;
-
-	private static DoubleMatrix2D N, H, fparm, Bf, A, Npwl, Hpwl, fparm_pwl,
-		polycf, Npol, Hpol, fparm_pol, NN, HHw, ffparm, M, MN, HH;
-
-	private static DoubleMatrix1D[] xx;
-
-	private static Object[] qps;
-
 	/**
 	 *
 	 * @param om an OPF model object
@@ -98,6 +72,36 @@ public class Djp_dcopf_solver {
 	 */
 	@SuppressWarnings("static-access")
 	public static Object[] dcopf_solver(Djp_opf_model om, Map<String, Double> jpopt, Map<String, AbstractMatrix> out_opt) {
+		int verbose, alg, nb, nl, nw, ny, nxyz, any_pwl, npol, nnw, info;
+		int[] ipol, ipwl, iqdr, ilin, il;
+		double baseMVA, C0, c, feastol, gradtol, comptol, costtol, max_it, max_red, f;
+		boolean success;
+		Djp_jpc jpc;
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
+		Djp_gencost gencost;
+		Cost cp;
+
+		Map<String, Set>[] idx;
+		Map<String, Set> vv, ll;
+		Map<String, Object> opt, raw, output;
+		Map<String, Double> jips_opt;
+		Map<String, DoubleMatrix1D> lambda;
+		Map<String, Map<String, DoubleMatrix1D>> mu;
+		Map<String, DoubleMatrix1D> var, lin;
+
+		AbstractMatrix[] Alu;
+
+		DoubleMatrix1D Cw, Pfinj, l, u, x0, xmin, xmax, Cpwl, Cpol, CCw,
+			MR, HMR, CC, Varefs, lb, ub, x, Va, Pg, mu_l, mu_u, muLB, muUB, pimul;
+
+		DoubleMatrix2D N, H, fparm, Bf, A, Npwl, Hpwl, fparm_pwl,
+			polycf, Npol, Hpol, fparm_pol, NN, HHw, ffparm, M, MN, HH;
+
+		DoubleMatrix1D[] xx;
+
+		Object[] qps;
 
 		/* ----- initialization ----- */
 
@@ -129,8 +133,8 @@ public class Djp_dcopf_solver {
 		vv = idx[0]; ll = idx[1];
 
 		/* problem dimensions */
-		ipol = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)) );	// polynomial costs
-		ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
+		ipol = nonzero( gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)) );	// polynomial costs
+		ipwl = nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
 		nb = bus.size();	// number of buses
 		nl = branch.size();	// number of branches
 		nw = N.rows();		// number of general cost vars, w
@@ -155,7 +159,7 @@ public class Djp_dcopf_solver {
 		/* piece-wise linear costs */
 		any_pwl = (ny > 0) ? 1 : 0;
 		if (any_pwl > 0) {
-			Npwl = new SparseRCDoubleMatrix2D(1, nxyz, Djp_util.ones(ny),
+			Npwl = new SparseRCDoubleMatrix2D(1, nxyz, ones(ny),
 					IntFactory1D.dense.make(ipwl).assign(ifunc.plus(vv.get("y").i0)).toArray(), 1, false, false);	// sum of y vars
 			Hpwl = DoubleFactory2D.sparse.make(1, 1);
 			Cpwl = DoubleFactory1D.dense.make(1, 1);
@@ -169,20 +173,20 @@ public class Djp_dcopf_solver {
 
 		/* quadratic costs */
 		npol = ipol.length;
-		if (Djp_util.any( Djp_util.nonzero(Djp_util.dblm(gencost.ncost.viewSelection(ipol)).assign(dfunc.greater(3))) ))
+		if (any( nonzero(dblm(gencost.ncost.viewSelection(ipol)).assign(dfunc.greater(3))) ))
 			System.err.println("DC opf cannot handle polynomial costs with higher than quadratic order.");
 			// TODO: throw invalid cost exception
 
-		iqdr = Djp_util.nonzero( gencost.ncost.viewSelection(ipol).copy().assign(ifunc.equals(3)) );
-		ilin = Djp_util.nonzero( gencost.ncost.viewSelection(ipol).copy().assign(ifunc.equals(2)) );
+		iqdr = nonzero( gencost.ncost.viewSelection(ipol).copy().assign(ifunc.equals(3)) );
+		ilin = nonzero( gencost.ncost.viewSelection(ipol).copy().assign(ifunc.equals(2)) );
 		polycf = DoubleFactory2D.dense.make(npol, 3);	// quadratic coeffs for Pg
 		if (iqdr.length > 0)
-			polycf.viewSelection(iqdr, null).assign( gencost.cost.viewSelection(ipol, null).viewSelection(iqdr, Djp_util.irange(0, 2)) );
-		polycf.viewSelection(ilin, Djp_util.irange(1, 2)).assign( gencost.cost.viewSelection(ipol, null).viewSelection(ilin, Djp_util.irange(0, 2)) );
+			polycf.viewSelection(iqdr, null).assign( gencost.cost.viewSelection(ipol, null).viewSelection(iqdr, irange(0, 2)) );
+		polycf.viewSelection(ilin, irange(1, 2)).assign( gencost.cost.viewSelection(ipol, null).viewSelection(ilin, irange(0, 2)) );
 		polycf.assign(DoubleFactory2D.dense.diagonal(new double[] {Math.pow(baseMVA, 2), baseMVA, 1}), dfunc.mult);	// convert to p.u.
-		Npol = new SparseRCDoubleMatrix2D(npol, nxyz, Djp_util.irange(npol),
+		Npol = new SparseRCDoubleMatrix2D(npol, nxyz, irange(npol),
 				IntFactory1D.dense.make(ipol).assign(ifunc.plus(vv.get("Pg").i0)).toArray(), 1, false, false);
-		Hpol = new SparseRCDoubleMatrix2D(npol, npol, Djp_util.irange(npol), Djp_util.irange(npol),
+		Hpol = new SparseRCDoubleMatrix2D(npol, npol, irange(npol), irange(npol),
 				polycf.viewColumn(0).copy().assign(dfunc.mult(2)).toArray(), false, false, false);
 		Cpol = polycf.viewColumn(1);
 		fparm_pol = DoubleFactory2D.dense.repeat(DoubleFactory2D.dense.make(new double[][] {{1, 0, 0, 1}}), 0, npol);
@@ -199,7 +203,7 @@ public class Djp_dcopf_solver {
 
 		/* transform quadratic coefficients for w into coefficients for X */
 		nnw = any_pwl + npol + nw;
-		M = new SparseRCDoubleMatrix2D(nnw, nnw, Djp_util.irange(nnw), Djp_util.irange(nnw), ffparm.viewColumn(3).toArray(), false, false, false);
+		M = new SparseRCDoubleMatrix2D(nnw, nnw, irange(nnw), irange(nnw), ffparm.viewColumn(3).toArray(), false, false, false);
 		MR = M.zMult(ffparm.viewColumn(1), null);
 		HMR = HHw.zMult(MR, null);
 		MN = M.zMult(NN, null);
@@ -217,12 +221,12 @@ public class Djp_dcopf_solver {
 
 			Varefs = bus.Va.viewSelection( bus.bus_type.copy().assign(ifunc.equals(REF)).toArray() ).assign(dfunc.mult(Math.PI)).assign(dfunc.div(180));
 			lb = xmin.copy(); ub = xmax.copy();
-			lb.viewSelection( Djp_util.intm( xmin.copy().assign(dfunc.equals(Double.NEGATIVE_INFINITY)) ).toArray() ).assign(-1e10);	// replace Inf with numerical proxies
-			ub.viewSelection( Djp_util.intm( xmax.copy().assign(dfunc.equals(Double.POSITIVE_INFINITY)) ).toArray() ).assign( 1e10);
+			lb.viewSelection( intm( xmin.copy().assign(dfunc.equals(Double.NEGATIVE_INFINITY)) ).toArray() ).assign(-1e10);	// replace Inf with numerical proxies
+			ub.viewSelection( intm( xmax.copy().assign(dfunc.equals(Double.POSITIVE_INFINITY)) ).toArray() ).assign( 1e10);
 			x0 = lb.copy().assign(ub, dfunc.plus).assign(dfunc.div(2));
-			x0.viewSelection(Djp_util.irange(vv.get("Va").i0, vv.get("Va").iN)).assign(Varefs.get(0));	// angles set to first reference angle
+			x0.viewSelection(irange(vv.get("Va").i0, vv.get("Va").iN)).assign(Varefs.get(0));	// angles set to first reference angle
 			if (ny > 0) {
-				ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
+				ipwl = nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
 				c = gencost.cost.viewSelection(ipwl, null).getMaxLocation()[0];		// largest y-value in CCV data
 				// TODO: compute c using sub2ind
 				x0.viewPart(vv.get("y").i0, vv.get("y").N).assign(c + 0.1 * Math.abs(c));
@@ -249,7 +253,7 @@ public class Djp_dcopf_solver {
 
 		/* -----  run opf  ----- */
 
-		qps = Dips_qps_jips.qps_jips(HH, CC, A, l, u, xmin, xmax, x0, jips_opt);
+		qps = qps_jips(HH, CC, A, l, u, xmin, xmax, x0, jips_opt);
 		x = (DoubleMatrix1D) qps[0];
 		f = (Double) qps[1];
 		info = (Integer) qps[2];
@@ -282,7 +286,7 @@ public class Djp_dcopf_solver {
 		muUB = lambda.get("upper");
 
 		/* update Lagrange multipliers */
-		il = Djp_util.nonzero( Djp_util.intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( branch.rate_a.assign(dfunc.less(1e10)) ), ifunc.and) );
+		il = nonzero( intm( branch.rate_a.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(intm( branch.rate_a.assign(dfunc.less(1e10)) ), ifunc.and) );
 		bus.lam_P = DoubleFactory1D.dense.make(nb);
 		bus.lam_Q = DoubleFactory1D.dense.make(nb);
 		bus.mu_Vmin = DoubleFactory1D.dense.make(nb);

@@ -32,9 +32,15 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Djp_util.intm;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_polycost.polycost;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_d2Sbus_dV2.d2Sbus_dV2;
@@ -42,6 +48,7 @@ import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dIbr_dV.dIbr_dV;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_d2AIbr_dV2.d2AIbr_dV2;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dSbr_dV.dSbr_dV;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_d2ASbr_dV2.d2ASbr_dV2;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
 
 import edu.cornell.pserc.jips.tdouble.HessianEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -61,11 +68,6 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
  */
 public class Djp_opf_hessfcn implements HessianEvaluator {
 
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
-
 	private Djp_opf_model om;
 	private DComplexMatrix2D Ybus;
 	private DComplexMatrix2D Yf;
@@ -77,7 +79,7 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 	public Djp_opf_hessfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
 			Map<String, Double> jpopt) {
 		// all lines have limits by default
-		this(om, Ybus, Yf, Yt, jpopt, Djp_util.irange(om.get_jpc().branch.size()));
+		this(om, Ybus, Yf, Yt, jpopt, irange(om.get_jpc().branch.size()));
 	}
 
 	public Djp_opf_hessfcn(Djp_opf_model om, DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt,
@@ -158,24 +160,24 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		Va = DoubleFactory1D.dense.make(nb);
 		Va.assign(x.viewPart(vv.get("Va").i0, vv.get("Va").N));
 		Vm = x.viewPart(vv.get("Vm").i0, vv.get("Vm").N).copy();
-		V = Djp_util.polar(Vm, Va);
+		V = polar(Vm, Va);
 		nxtra = nxyz - 2*nb;
-		pcost = gencost.copy(Djp_util.irange(ng));
+		pcost = gencost.copy(irange(ng));
 		qcost = null;
 		if (gencost.size() > ng)
-			qcost = gencost.copy(Djp_util.irange(ng, 2*ng));
+			qcost = gencost.copy(irange(ng, 2*ng));
 
 		/* ----- evaluate d2f ----- */
 
 		d2f_dPg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Pg
 		d2f_dQg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Qg
-		ipolp = Djp_util.nonzero(pcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
+		ipolp = nonzero(pcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 		d2f_dPg2.assign( polycost(pcost.copy(ipolp), Pg.viewSelection(ipolp).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
 		if (qcost != null) {	// Qg is not free
-			ipolq = Djp_util.nonzero(qcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
+			ipolq = nonzero(qcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 			d2f_dQg2.assign( polycost(qcost.copy(ipolq), Qg.viewSelection(ipolq).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
 		}
-		i = Djp_util.icat(Djp_util.irange(vv.get("Pg").i0, vv.get("Pg").iN), Djp_util.irange(vv.get("Qg").i0, vv.get("Qg").iN));
+		i = icat(irange(vv.get("Pg").i0, vv.get("Pg").iN), irange(vv.get("Qg").i0, vv.get("Qg").iN));
 		d2f = new SparseRCDoubleMatrix2D(nxyz, nxyz, i, i,
 				DoubleFactory1D.sparse.append(d2f_dPg2, d2f_dQg2).toArray(), false, false, false);
 
@@ -183,12 +185,12 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		if (N != null) {
 			nw = N.rows();
 			r = N.zMult(x, null).assign(rh, dfunc.minus);	// generalized cost
-			iLT = Djp_util.nonzero(r.copy().assign(kk.copy().assign(dfunc.neg), dfunc.less));	// below dead zone
-			iEQ = Djp_util.nonzero( Djp_util.intm(r.copy().assign(dfunc.equals(0))).assign(Djp_util.intm(kk.copy().assign(dfunc.equals(0))), ifunc.and) );	// dead zone doesn't exist
-			iGT = Djp_util.nonzero(r.copy().assign(kk, dfunc.less));	// above dead zone
-			iND = Djp_util.icat(iLT, Djp_util.icat(iEQ, iGT));			// rows that are Not in the Dead region
-			iL  = Djp_util.nonzero(dd.copy().assign(dfunc.equals(1)));	// rows using linear function
-			iQ  = Djp_util.nonzero(dd.copy().assign(dfunc.equals(2)));	// rows using quadratic function
+			iLT = nonzero(r.copy().assign(kk.copy().assign(dfunc.neg), dfunc.less));	// below dead zone
+			iEQ = nonzero( intm(r.copy().assign(dfunc.equals(0))).assign(intm(kk.copy().assign(dfunc.equals(0))), ifunc.and) );	// dead zone doesn't exist
+			iGT = nonzero(r.copy().assign(kk, dfunc.less));	// above dead zone
+			iND = icat(iLT, icat(iEQ, iGT));			// rows that are Not in the Dead region
+			iL  = nonzero(dd.copy().assign(dfunc.equals(1)));	// rows using linear function
+			iQ  = nonzero(dd.copy().assign(dfunc.equals(2)));	// rows using quadratic function
 			LL = new SparseRCDoubleMatrix2D(nw, nw, iL, iL, 1, false, false);
 			QQ = new SparseRCDoubleMatrix2D(nw, nw, iQ, iQ, 1, false, false);
 			kbar_v = new DoubleMatrix1D[] {
@@ -216,9 +218,9 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		nlam = (int) (lambda.get("eqnonlin").size() / 2);
 		lamP = lambda.get("eqnonlin").viewPart(0, nlam);
 		lamQ = lambda.get("eqnonlin").viewPart(nlam, nlam);
-		Gp = d2Sbus_dV2(Ybus, V, Djp_util.complex(lamP, null));
+		Gp = d2Sbus_dV2(Ybus, V, complex(lamP, null));
 		Gpaa = Gp[0]; Gpav = Gp[1]; Gpva = Gp[2]; Gpvv = Gp[3];
-		Gq = d2Sbus_dV2(Ybus, V, Djp_util.complex(lamQ, null));
+		Gq = d2Sbus_dV2(Ybus, V, complex(lamQ, null));
 		Gqaa = Gq[0]; Gqav = Gq[1]; Gqva = Gq[2]; Gqvv = Gq[3];
 
 		d2G_p = DComplexFactory2D.sparse.compose(new DComplexMatrix2D[][] {{Gpaa, Gpav}, {Gpva, Gpvv}}).getRealPart();
@@ -231,8 +233,8 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		/* ----- evaluate Hessian of flow constraints ----- */
 
 		nmu = (int) lambda.get("ineqnonlin").size() / 2;
-		muF = Djp_util.complex(lambda.get("ineqnonlin").viewPart(0, nmu), null);
-		muT = Djp_util.complex(lambda.get("ineqnonlin").viewPart(nmu, nmu), null);
+		muF = complex(lambda.get("ineqnonlin").viewPart(0, nmu), null);
+		muT = complex(lambda.get("ineqnonlin").viewPart(nmu, nmu), null);
 		if (jpopt.get("OPF_FLOW_LIM") == 2) {	// current
 			dIbr_dV = dIbr_dV(branch.copy(il), Yf, Yt, V);
 			dIf_dVa = (DComplexMatrix2D) dIbr_dV[0];
@@ -246,8 +248,8 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		} else {
 			f = branch.f_bus.viewSelection(il);	// list of "from" buses
 			t = branch.t_bus.viewSelection(il);	// list of "to" buses
-			Cf = new SparseRCDComplexMatrix2D(nl2, nb, Djp_util.irange(nl2), f.toArray(), new double[] {1, 0}, false, false);
-			Ct = new SparseRCDComplexMatrix2D(nl2, nb, Djp_util.irange(nl2), t.toArray(), new double[] {1, 0}, false, false);
+			Cf = new SparseRCDComplexMatrix2D(nl2, nb, irange(nl2), f.toArray(), new double[] {1, 0}, false, false);
+			Ct = new SparseRCDComplexMatrix2D(nl2, nb, irange(nl2), t.toArray(), new double[] {1, 0}, false, false);
 			dSbr_dV = dSbr_dV(branch.copy(il), Yf, Yt, V);
 			dSf_dVa = (DComplexMatrix2D) dSbr_dV[0];
 			dSf_dVm = (DComplexMatrix2D) dSbr_dV[1];
@@ -256,10 +258,10 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 			Sf = (DComplexMatrix1D) dSbr_dV[4];
 			St = (DComplexMatrix1D) dSbr_dV[5];
 			if (jpopt.get("OPF_FLOW_LIM") == 1) {	// real power
-				Hf = d2ASbr_dV2(Djp_util.complex(dSf_dVa.getRealPart(), null),
-						Djp_util.complex(dSf_dVm.getRealPart(), null), Djp_util.complex(Sf.getRealPart(), null), Cf, Yf, V, muF);
-				Ht = d2ASbr_dV2(Djp_util.complex(dSt_dVa.getRealPart(), null),
-						Djp_util.complex(dSt_dVm.getRealPart(), null), Djp_util.complex(St.getRealPart(), null), Ct, Yt, V, muT);
+				Hf = d2ASbr_dV2(complex(dSf_dVa.getRealPart(), null),
+						complex(dSf_dVm.getRealPart(), null), complex(Sf.getRealPart(), null), Cf, Yf, V, muF);
+				Ht = d2ASbr_dV2(complex(dSt_dVa.getRealPart(), null),
+						complex(dSt_dVm.getRealPart(), null), complex(St.getRealPart(), null), Ct, Yt, V, muT);
 			} else {	// apparent power
 				Hf = d2ASbr_dV2(dSf_dVa, dSf_dVm, Sf, Cf, Yf, V, muF);
 				Ht = d2ASbr_dV2(dSt_dVa, dSt_dVm, St, Ct, Yt, V, muT);

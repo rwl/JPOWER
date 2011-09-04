@@ -31,9 +31,15 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.all;
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.EPS;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.any;
 
 /**
  * Java Interior Point Solver.
@@ -44,49 +50,47 @@ import cern.jet.math.tint.IntFunctions;
  */
 public class Dips_jips {
 
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-
-	private static int i, j, nx, nA, eflag, neq, niq, neqnln, niqnln, nlt, ngt, nbx;
-	private static int[] ieq, igt, ilt, ibx, k, kl, ku;
-	private static boolean nonlinear, converged, sc;
-	private static double xi, sigma, z0, alpha_min, rho_min, rho_max, mu_threshold,
-			f, gamma, f0, L, normG, maxH, normX, normZ, feascond, normLx, normLam, normMu,
-			gradcond, compcond, costcond, f1, feascond1, gradcond1, alpha, L1, rho, alphap, alphad, norm_dx;
-	private static String s;
-
-	private static Map<Integer, Map<String, Double>> hist;
-	private static Map<String, Double> history;
-	private static Map<String, String> v;
-	private static Map<String, DoubleMatrix1D> lambda;
-	private static Map<String, Object> output;
-
-	private static IntMatrix1D igt_u, igt_l, ilt_l, ilt_u, non;
-
-	private static DoubleMatrix1D ll, uu, diff, be, bi, x, df, gn, hn, h, g, lam, z, mu, e, Lx,
-			egamma, N, dx, dlam, dz, dmu, bbb, dxdlam, gn1, hn1, h1, g1, x1, df1,
-			Lx1, dx1, hz, zk, muk, lam_lin, mu_lin, mu_l, mu_u;
-
-	private static DoubleMatrix1D[] bi_p, gh, gh1;
-
-	private static DoubleMatrix2D eyex, AA, Ae, Ai, dh, dg, dhn, dgn, Lxx, zinvdiag, mudiag,
-			dh_zinv, M, AAA, dh1, dg1, dhn1, dgn1;
-
-	private static DoubleMatrix2D[] dgh, dgh1;
-
-	private static DoubleMatrix2D[][] Ai_p, AAA_p;
-
 	@SuppressWarnings("static-access")
 	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u, DoubleMatrix1D xmin, DoubleMatrix1D xmax,
 			ConstraintEvaluator gh_fcn, HessianEvaluator hess_fcn, Map<String, Double> opt) {
 
+		int i, j, nx, nA, eflag, neq, niq, neqnln, niqnln, nlt, ngt, nbx;
+		int[] ieq, igt, ilt, ibx, k, kl, ku;
+		boolean nonlinear, converged, sc;
+		double xi, sigma, z0, alpha_min, rho_min, rho_max, mu_threshold,
+				f, gamma, f0, L, normG, maxH, normX, normZ, feascond, normLx, normLam, normMu,
+				gradcond, compcond, costcond, f1, feascond1, gradcond1, alpha, L1, rho, alphap, alphad, norm_dx;
+		String s;
+
+		Map<Integer, Map<String, Double>> hist;
+		Map<String, Double> history;
+		Map<String, String> v;
+		Map<String, DoubleMatrix1D> lambda;
+		Map<String, Object> output;
+
+		IntMatrix1D igt_u, igt_l, ilt_l, ilt_u, non;
+
+		DoubleMatrix1D ll, uu, diff, be, bi, x, df, gn = null, hn = null, h, g, lam, z, mu, e, Lx,
+				egamma, N, dx, dlam, dz, dmu, bbb, dxdlam, gn1, hn1, h1, g1, x1, df1,
+				Lx1, dx1, hz, zk, muk, lam_lin, mu_lin, mu_l, mu_u;
+
+		DoubleMatrix1D[] bi_p, gh, gh1;
+
+		DoubleMatrix2D eyex, AA, Ae, Ai, dh, dg, dhn, dgn, Lxx, zinvdiag, mudiag,
+				dh_zinv, M, AAA, dh1, dg1, dhn1, dgn1;
+
+		DoubleMatrix2D[] dgh, dgh1;
+
+		DoubleMatrix2D[][] Ai_p, AAA_p;
+
+
 		nx = (int) x0.size();		// number of optimization variables
 
 		/* set default argument values if missing */
 		if (A.size() > 0 &&
-				(l.size() == 0 || Djp_util.all(l.copy().assign(dfunc.equals(Double.NEGATIVE_INFINITY)))) &&
-				(u.size() == 0 || Djp_util.all(u.copy().assign(dfunc.equals(Double.POSITIVE_INFINITY)))) ) {
+				(l.size() == 0 || all(l.copy().assign(dfunc.equals(Double.NEGATIVE_INFINITY)))) &&
+				(u.size() == 0 || all(u.copy().assign(dfunc.equals(Double.POSITIVE_INFINITY)))) ) {
 			A = DoubleFactory2D.sparse.make(0, nx);	// no limits => no linear constraints
 		}
 		nA = A.rows();							// number of original linear constraints
@@ -151,17 +155,17 @@ public class Dips_jips {
 		/* split up linear constraints */
 		// equality
 		diff = uu.copy().assign(ll, dfunc.chain(dfunc.abs, dfunc.minus));
-		ieq = Djp_util.nonzero( diff.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.greater(Djp_util.EPS))) );
+		ieq = nonzero( diff.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.greater(EPS))) );
 		// greater than, unbounded above
-		igt_u = Djp_util.intm( uu.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.less(1e10))) );
-		igt_l = Djp_util.intm( ll.copy().assign(dfunc.greater(-1e10)) );
-		igt = Djp_util.nonzero( igt_u.assign(igt_l, ifunc.and) );
+		igt_u = intm( uu.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.less(1e10))) );
+		igt_l = intm( ll.copy().assign(dfunc.greater(-1e10)) );
+		igt = nonzero( igt_u.assign(igt_l, ifunc.and) );
 		// less than, unbounded below
-		ilt_l = Djp_util.intm( ll.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.greater(-1e10))) );
-		ilt_u = Djp_util.intm( uu.copy().assign(dfunc.less(1e10)) );
-		ilt = Djp_util.nonzero( ilt_l.assign(ilt_u, ifunc.and) );
+		ilt_l = intm( ll.copy().assign(dfunc.chain(dfunc.equals(0), dfunc.greater(-1e10))) );
+		ilt_u = intm( uu.copy().assign(dfunc.less(1e10)) );
+		ilt = nonzero( ilt_l.assign(ilt_u, ifunc.and) );
 		// box constraints
-		ibx = Djp_util.nonzero( Djp_util.intm(diff.assign(dfunc.greater(Djp_util.EPS))).assign(ilt_u, ifunc.and).assign(igt_l, ifunc.and) );
+		ibx = nonzero( intm(diff.assign(dfunc.greater(EPS))).assign(ilt_u, ifunc.and).assign(igt_l, ifunc.and) );
 
 		Ae = AA.viewSelection(ieq, null).copy();
 		be = uu.viewSelection(ieq).copy();
@@ -221,9 +225,9 @@ public class Dips_jips {
 		lam = DoubleFactory1D.dense.make(neq);
 		z = DoubleFactory1D.dense.make(niq, z0);
 		mu = z.copy();
-		k = Djp_util.nonzero(h.copy().assign(dfunc.less(-z0)));
+		k = nonzero(h.copy().assign(dfunc.less(-z0)));
 		z.viewSelection(k).assign(h.viewSelection(k).copy().assign(dfunc.neg));
-		k = Djp_util.nonzero( z.copy().assign(dfunc.chain(dfunc.inv, dfunc.div(gamma))).assign(dfunc.greater(z0)) );
+		k = nonzero( z.copy().assign(dfunc.chain(dfunc.inv, dfunc.div(gamma))).assign(dfunc.greater(z0)) );
 		// (seems k is always empty if gamma = z0 = 1)
 		if (k.length > 0)
 			mu.viewSelection(k).assign( z.viewSelection(k).copy().assign(dfunc.chain(dfunc.inv, dfunc.div(gamma))) );
@@ -410,12 +414,12 @@ public class Dips_jips {
 			}
 
 			/* do the update */
-			k = Djp_util.nonzero(dz.copy().assign(dfunc.less(0)));
+			k = nonzero(dz.copy().assign(dfunc.less(0)));
 			zk = z.viewSelection(k).copy();
 			zk.assign(dz.viewSelection(k).copy().assign(dfunc.neg), dfunc.div);
 			alphap = dfunc.min.apply(xi * zk.aggregate(dfunc.min, dfunc.identity), 1);
 
-			k = Djp_util.nonzero(dmu.copy().assign(dfunc.less(0)));
+			k = nonzero(dmu.copy().assign(dfunc.less(0)));
 			muk = mu.viewSelection(k).copy();
 			muk.assign(dmu.viewSelection(k).copy().assign(dfunc.neg), dfunc.div);
 			alphad = dfunc.min.apply(xi * muk.aggregate(dfunc.min, dfunc.identity), 1);
@@ -495,8 +499,8 @@ public class Dips_jips {
 				if (opt.get("verbose") > 0)
 						System.out.printf("\nConverged!\n");
 			} else {
-				if (Djp_util.any(x.copy().assign(dfunc.equals(Double.NaN))) || alphap < alpha_min || alphad < alpha_min ||
-						gamma < Djp_util.EPS || gamma > 1 / Djp_util.EPS) {
+				if (any(x.copy().assign(dfunc.equals(Double.NaN))) || alphap < alpha_min || alphad < alpha_min ||
+						gamma < EPS || gamma > 1 / EPS) {
 					if (opt.get("verbose") > 0)
 						System.out.printf("\nNumerically Failed\n");
 					eflag = -1;
@@ -529,8 +533,8 @@ public class Dips_jips {
 		}
 
 		/* zero out multipliers on non-binding constraints */
-		non = Djp_util.intm( h.copy().assign(dfunc.less(-opt.get("feastol"))) ).assign(
-				Djp_util.intm( mu.copy().assign(dfunc.less(mu_threshold)) ), ifunc.and);
+		non = intm( h.copy().assign(dfunc.less(-opt.get("feastol"))) ).assign(
+				intm( mu.copy().assign(dfunc.less(mu_threshold)) ), ifunc.and);
 		mu.viewSelection(non.toArray()).assign(0);
 
 		/* un-scale cost and prices */
@@ -539,10 +543,10 @@ public class Dips_jips {
 		mu.assign(dfunc.div(opt.get("cost_mult")));
 
 		/* re-package multipliers into struct */
-		lam_lin = lam.viewSelection(Djp_util.irange(neqnln, neq));	// lambda for linear constraints
-		mu_lin = mu.viewSelection(Djp_util.irange(niqnln, niq));		// mu for linear constraints
-		kl = Djp_util.nonzero(lam_lin.copy().assign(dfunc.less(0)));			// lower bound binding
-		ku = Djp_util.nonzero(mu_lin.copy().assign(dfunc.less(0)));			// upper bound binding
+		lam_lin = lam.viewSelection(irange(neqnln, neq));	// lambda for linear constraints
+		mu_lin = mu.viewSelection(irange(niqnln, niq));		// mu for linear constraints
+		kl = nonzero(lam_lin.copy().assign(dfunc.less(0)));			// lower bound binding
+		ku = nonzero(mu_lin.copy().assign(dfunc.less(0)));			// upper bound binding
 
 		mu_l = DoubleFactory1D.dense.make(nx + nA);
 		mu_l.viewSelection(ieq).viewSelection(kl).assign(lam_lin.copy().viewSelection(kl).assign(dfunc.neg));
@@ -573,7 +577,7 @@ public class Dips_jips {
 		DoubleMatrix2D A;
 		DoubleMatrix1D l, u;
 
-		nx = (int) x0.size();
+		int nx = (int) x0.size();
 		A = DoubleFactory2D.sparse.make(0, nx);
 		l = DoubleFactory1D.dense.make(0);
 		u = DoubleFactory1D.dense.make(0);
@@ -585,7 +589,7 @@ public class Dips_jips {
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u) {
 		DoubleMatrix1D xmin, xmax;
 
-		nx = (int) x0.size();
+		int nx = (int) x0.size();
 		xmin = DoubleFactory1D.dense.make(nx, Double.NEGATIVE_INFINITY);
 		xmax = DoubleFactory1D.dense.make(nx, Double.POSITIVE_INFINITY);
 

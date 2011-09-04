@@ -22,8 +22,10 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.dblm;
 
 /**
  *
@@ -32,13 +34,11 @@ import cern.jet.math.tint.IntFunctions;
  */
 public class Djp_gencost {
 
-	private static final int MODEL	= 0;
-	private static final int STARTUP	= 1;
-	private static final int SHUTDOWN	= 2;
-	private static final int NCOST	= 3;
-	private static final int COST		= 4;
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
+	private static final int MODEL    = 0;
+	private static final int STARTUP  = 1;
+	private static final int SHUTDOWN = 2;
+	private static final int NCOST    = 3;
+	private static final int COST     = 4;
 
 	/** cost model, 1 = piecewise linear, 2 = polynomial */
 	public IntMatrix1D model;
@@ -115,11 +115,11 @@ public class Djp_gencost {
 	public static Djp_gencost fromMatrix(DoubleMatrix2D other) {
 		Djp_gencost gencost = new Djp_gencost();
 
-		gencost.model = Djp_util.intm(other.viewColumn(MODEL));
+		gencost.model = intm(other.viewColumn(MODEL));
 		gencost.startup = other.viewColumn(STARTUP);
 		gencost.shutdown = other.viewColumn(SHUTDOWN);
-		gencost.ncost = Djp_util.intm(other.viewColumn(NCOST));
-		gencost.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
+		gencost.ncost = intm(other.viewColumn(NCOST));
+		gencost.cost = other.viewSelection(null, irange(COST, other.columns()));
 
 		return gencost;
 	}
@@ -132,16 +132,15 @@ public class Djp_gencost {
 	 *
 	 * @return
 	 */
-	@SuppressWarnings("static-access")
 	public DoubleMatrix2D toMatrix() {
 //		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), ncost.aggregate(ifunc.min, ifunc.identity) + 4);
 		DoubleMatrix2D matrix = DoubleFactory2D.dense.make(size(), this.cost.columns() + 4);
 
-		matrix.viewColumn(MODEL).assign( Djp_util.dblm(this.model) );
+		matrix.viewColumn(MODEL).assign( dblm(this.model) );
 		matrix.viewColumn(MODEL).assign(this.startup);
 		matrix.viewColumn(SHUTDOWN).assign(this.shutdown);
-		matrix.viewColumn(NCOST).assign( Djp_util.dblm(this.ncost) );
-		matrix.viewSelection(null, Djp_util.irange(COST, COST + this.cost.columns())).assign(this.cost);
+		matrix.viewColumn(NCOST).assign( dblm(this.ncost) );
+		matrix.viewSelection(null, irange(COST, COST + this.cost.columns())).assign(this.cost);
 
 		return matrix;
 	}

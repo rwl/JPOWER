@@ -22,7 +22,9 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.dblm;
 
 /**
  *
@@ -33,14 +35,14 @@ public class Djp_bus {
 
 	public static final int BUS_I		= 0;
 	public static final int BUS_TYPE	= 1;
-	public static final int PD			= 2;
-	public static final int QD			= 3;
-	public static final int GS			= 4;
-	public static final int BS			= 5;
+	public static final int PD		= 2;
+	public static final int QD		= 3;
+	public static final int GS		= 4;
+	public static final int BS		= 5;
 	public static final int BUS_AREA	= 6;
-	public static final int VM			= 7;
-	public static final int VA			= 8;
-	public static final int BASE_KV	= 9;
+	public static final int VM		= 7;
+	public static final int VA		= 8;
+	public static final int BASE_KV		= 9;
 	public static final int ZONE		= 10;
 	public static final int VMAX		= 11;
 	public static final int VMIN		= 12;
@@ -218,17 +220,17 @@ public class Djp_bus {
 	 */
 //	public void fromMatrix(DoubleMatrix2D bus) {
 //
-//		this.bus_i = Djp_util.intm(bus.viewColumn(BUS_I));
-//		this.bus_type = Djp_util.intm(bus.viewColumn(BUS_TYPE));
+//		this.bus_i = intm(bus.viewColumn(BUS_I));
+//		this.bus_type = intm(bus.viewColumn(BUS_TYPE));
 //		this.Pd = bus.viewColumn(PD);
 //		this.Qd = bus.viewColumn(QD);
 //		this.Gs = bus.viewColumn(GS);
 //		this.Bs = bus.viewColumn(BS);
-//		this.bus_area = Djp_util.intm(bus.viewColumn(BUS_AREA));
+//		this.bus_area = intm(bus.viewColumn(BUS_AREA));
 //		this.Vm = bus.viewColumn(VM);
 //		this.Va = bus.viewColumn(VA);
 //		this.base_kV = bus.viewColumn(BASE_KV);
-//		this.zone = Djp_util.intm(bus.viewColumn(ZONE));
+//		this.zone = intm(bus.viewColumn(ZONE));
 //		this.Vmax = bus.viewColumn(VMAX);
 //		this.Vmin = bus.viewColumn(VMIN);
 //
@@ -243,17 +245,17 @@ public class Djp_bus {
 	public static Djp_bus fromMatrix(DoubleMatrix2D data) {
 		Djp_bus bus = new Djp_bus();
 
-		bus.bus_i = Djp_util.intm(data.viewColumn(BUS_I));
-		bus.bus_type = Djp_util.intm(data.viewColumn(BUS_TYPE));
+		bus.bus_i = intm(data.viewColumn(BUS_I));
+		bus.bus_type = intm(data.viewColumn(BUS_TYPE));
 		bus.Pd = data.viewColumn(PD);
 		bus.Qd = data.viewColumn(QD);
 		bus.Gs = data.viewColumn(GS);
 		bus.Bs = data.viewColumn(BS);
-		bus.bus_area = Djp_util.intm(data.viewColumn(BUS_AREA));
+		bus.bus_area = intm(data.viewColumn(BUS_AREA));
 		bus.Vm = data.viewColumn(VM);
 		bus.Va = data.viewColumn(VA);
 		bus.base_kV = data.viewColumn(BASE_KV);
-		bus.zone = Djp_util.intm(data.viewColumn(ZONE));
+		bus.zone = intm(data.viewColumn(ZONE));
 		bus.Vmax = data.viewColumn(VMAX);
 		bus.Vmin = data.viewColumn(VMIN);
 
@@ -289,17 +291,17 @@ public class Djp_bus {
 			matrix = DoubleFactory2D.dense.make(size(), 13);
 		}
 
-		matrix.viewColumn(BUS_I).assign( Djp_util.dblm(this.bus_i) );
-		matrix.viewColumn(BUS_TYPE).assign( Djp_util.dblm(this.bus_type) );
+		matrix.viewColumn(BUS_I).assign( dblm(this.bus_i) );
+		matrix.viewColumn(BUS_TYPE).assign( dblm(this.bus_type) );
 		matrix.viewColumn(PD).assign(this.Pd);
 		matrix.viewColumn(QD).assign(this.Qd);
 		matrix.viewColumn(GS).assign(this.Gs);
 		matrix.viewColumn(BS).assign(this.Bs);
-		matrix.viewColumn(BUS_AREA).assign( Djp_util.dblm(this.bus_area) );
+		matrix.viewColumn(BUS_AREA).assign( dblm(this.bus_area) );
 		matrix.viewColumn(VM).assign(this.Vm);
 		matrix.viewColumn(VA).assign(this.Va);
 		matrix.viewColumn(BASE_KV).assign(this.base_kV);
-		matrix.viewColumn(ZONE).assign( Djp_util.dblm(this.zone) );
+		matrix.viewColumn(ZONE).assign( dblm(this.zone) );
 		matrix.viewColumn(VMAX).assign(this.Vmax);
 		matrix.viewColumn(VMIN).assign(this.Vmin);
 

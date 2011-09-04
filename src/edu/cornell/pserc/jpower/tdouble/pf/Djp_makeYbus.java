@@ -26,10 +26,16 @@ import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
@@ -42,10 +48,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
  *
  */
 public class Djp_makeYbus {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-	private static DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Returns the full
@@ -75,7 +77,7 @@ public class Djp_makeYbus {
 		nl = branch.size();		// number of lines
 
 		/* check that bus numbers are equal to indices to bus (one set of bus numbers) */
-		if ( Djp_util.any( bus.bus_i.copy().assign(IntFactory1D.dense.make(Djp_util.irange(nb)),
+		if ( any( bus.bus_i.copy().assign(IntFactory1D.dense.make(irange(nb)),
 				ifunc.equals).assign(ifunc.equals(0))) )
 			System.err.println("makeYbus: buses must appear in order by bus number");
 			// TODO: throw non consecutive bus numbers exception.
@@ -87,23 +89,23 @@ public class Djp_makeYbus {
 		 *		| It |   | Ytf  Ytt |   | Vt |
 		 */
 		// ones at in-service branches
-		dstat = Djp_util.dblm(branch.br_status);
-		cstat = Djp_util.complex(dstat, null);
+		dstat = dblm(branch.br_status);
+		cstat = complex(dstat, null);
 		// series admittance
-		Ys = cstat.assign( Djp_util.complex(branch.br_r, branch.br_x), cfunc.div);
+		Ys = cstat.assign( complex(branch.br_r, branch.br_x), cfunc.div);
 		// line charging susceptance
 		Bc = dstat.assign(branch.br_b, dfunc.mult);
 		// default tap ratio = 1
 		dtap = DoubleFactory1D.dense.make(nl, 1);
 		// indices of non-zero tap ratios
-		i = Djp_util.nonzero(branch.tap);
+		i = nonzero(branch.tap);
 		// assign non-zero tap ratios
 		dtap.viewSelection(i).assign(branch.tap.viewSelection(i));
 		// add phase shifters
-		tap = Djp_util.polar(dtap, branch.shift, false);
+		tap = polar(dtap, branch.shift, false);
 		conj_tap = tap.copy().assign(cfunc.conj);
 
-		Ytt = Ys.copy().assign(Djp_util.complex(null, Bc.assign(dfunc.div(2))), cfunc.plus);
+		Ytt = Ys.copy().assign(complex(null, Bc.assign(dfunc.div(2))), cfunc.plus);
 		Yff = Ytt.copy().assign(tap.copy().assign(conj_tap, cfunc.mult), cfunc.div);
 		Ys.assign(cfunc.neg);
 		Yft = Ys.copy().assign(conj_tap, cfunc.div);
@@ -114,12 +116,12 @@ public class Djp_makeYbus {
 		and Qsh is the reactive power injected by the shunt at V = 1.0 p.u.
 		then Psh - j Qsh = V * conj(Ysh * V) = conj(Ysh) = Gs - j Bs,
 		i.e. Ysh = Psh + j Qsh */
-		Ysh = Djp_util.complex(bus.Gs, bus.Bs).assign(cfunc.div(baseMVA));
+		Ysh = complex(bus.Gs, bus.Bs).assign(cfunc.div(baseMVA));
 
 		// build connection matrices
 		f = branch.f_bus.toArray();		// list of "from" buses
 		t = branch.t_bus.toArray();		// list of "to" buses
-		il = Djp_util.irange(nl);
+		il = irange(nl);
 
 		// connection matrix for line & from buses
 		Cf = new SparseRCDComplexMatrix2D(nl, nb, il, f, 1, 0, false);

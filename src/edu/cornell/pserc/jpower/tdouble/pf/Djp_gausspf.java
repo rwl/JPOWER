@@ -27,8 +27,9 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.icat;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 
@@ -41,8 +42,6 @@ import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
  *
  */
 public class Djp_gausspf {
-
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
@@ -85,7 +84,7 @@ public class Djp_gausspf {
 		verbose	= jpopt.get("VERBOSE").intValue();
 
 		/* initialize */
-		pvpq = Djp_util.icat(pv, pq);
+		pvpq = icat(pv, pq);
 		converged = false;
 		i = 0;
 		V = V0;

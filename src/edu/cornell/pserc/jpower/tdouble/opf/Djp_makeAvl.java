@@ -26,9 +26,13 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 
@@ -42,9 +46,6 @@ import static edu.cornell.pserc.jpower.tdouble.opf.Djp_jp_isload.isload;
  *
  */
 public class Djp_makeAvl {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	/**
 	 * Constructs parameters for the following linear constraint enforcing a
@@ -84,11 +85,11 @@ public class Djp_makeAvl {
 		 * without the need for an additional constraint.
 		 */
 
-		ivl = Djp_util.nonzero( isload(gen).assign(Djp_util.intm( Qmax.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( Qmin.copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.or), ifunc.and) );
+		ivl = nonzero( isload(gen).assign(intm( Qmax.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(intm( Qmin.copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.or), ifunc.and) );
 		nvl = ivl.length;	// number of dispatchable loads
 
 		/* at least one of the Q limits must be zero (corresponding to Pmax == 0) */
-		if (Djp_util.any( Djp_util.intm( Qmin.viewSelection(ivl).copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( Qmax.viewSelection(ivl).copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.and) ));
+		if (any( intm( Qmin.viewSelection(ivl).copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(intm( Qmax.viewSelection(ivl).copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.and) ));
 			System.err.println("makeAvl: either Qmin or Qmax must be equal to zero for each dispatchable load.");
 			// TODO: throw invalid value exception
 
@@ -103,7 +104,7 @@ public class Djp_makeAvl {
 		Qlim.assign(Qmax.viewSelection(ivl).copy().assign(dfunc.equals(0)).assign(Qmin.viewSelection(ivl), dfunc.mult), dfunc.plus);
 
 
-		if (Djp_util.any(Qg.viewSelection(ivl).copy().assign(Pg.viewSelection(ivl), dfunc.minus).assign(Qlim.copy().assign(Pmin.viewSelection(ivl), dfunc.div), dfunc.mult).assign(dfunc.abs)))
+		if (any(Qg.viewSelection(ivl).copy().assign(Pg.viewSelection(ivl), dfunc.minus).assign(Qlim.copy().assign(Pmin.viewSelection(ivl), dfunc.div), dfunc.mult).assign(dfunc.abs)))
 			System.out.println("makeAvl: %s\n" +
 					"For a dispatchable load, PG and QG must be consistent" +
 					"with the power factor defined by PMIN and the Q limits.");
@@ -116,8 +117,8 @@ public class Djp_makeAvl {
 			pc = pftheta.copy().assign(dfunc.sin);
 			qc = pftheta.copy().assign(dfunc.cos).assign(dfunc.neg);
 
-			Avl1 = new SparseRCDoubleMatrix2D(nvl, ng, Djp_util.irange(nvl), ivl, pc.toArray(), false, false, false);
-			Avl2 = new SparseRCDoubleMatrix2D(nvl, ng, Djp_util.irange(nvl), ivl, qc.toArray(), false, false, false);
+			Avl1 = new SparseRCDoubleMatrix2D(nvl, ng, irange(nvl), ivl, pc.toArray(), false, false, false);
+			Avl2 = new SparseRCDoubleMatrix2D(nvl, ng, irange(nvl), ivl, qc.toArray(), false, false, false);
 			Avl = DoubleFactory2D.sparse.appendColumns(Avl1, Avl2);
 			lvl = DoubleFactory1D.dense.make(nvl);
 			uvl = lvl.copy();

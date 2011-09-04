@@ -26,20 +26,19 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.any;
 
 public class Dips_qps_jips {
-
-	private static int nx;
 
 	public static Object[] qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0, Map<String, Double> opt) {
 
 		/* define nx, set default values for H and c */
-		nx = 0;
-		if (H == null || H.size() == 0 || !Djp_util.any(Djp_util.any(H))) {
+		int nx = 0;
+		if (H == null || H.size() == 0 || !any(any(H))) {
 			if (A == null || A.size() == 0 && xmin == null ||
 					xmin.size() == 0 && xmax == null || xmax.size() == 0) {
 				System.err.println("qps_mips: LP problem must include constraints or variable bounds");
@@ -78,7 +77,7 @@ public class Dips_qps_jips {
 			}
 
 			public DoubleMatrix1D df(DoubleMatrix1D x) {
-				return H.zMult(x, null).assign(c, DoubleFunctions.plus);
+				return H.zMult(x, null).assign(c, dfunc.plus);
 			}
 
 			public DoubleMatrix2D d2f(DoubleMatrix1D x) {

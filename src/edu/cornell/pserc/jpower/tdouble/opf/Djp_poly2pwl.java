@@ -25,9 +25,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_totcost.totcost;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
  * Converts polynomial cost variable to piecewise linear.
@@ -37,8 +37,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  *
  */
 public class Djp_poly2pwl {
-
-	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
 
 	/**
 	 * Converts the polynomial
@@ -62,8 +60,8 @@ public class Djp_poly2pwl {
 		pwlcost = polycost.copy();
 		m = polycost.size();
 
-		pwlcost.model.assign(PW_LINEAR);	// change cost model
-		pwlcost.cost = DoubleFactory2D.dense.make(m, 2 * npts + 1);	// zero out old data
+		pwlcost.model.assign(PW_LINEAR);  // change cost model
+		pwlcost.cost = DoubleFactory2D.dense.make(m, 2 * npts + 1);  // zero out old data
 		pwlcost.ncost.assign(npts);			// change number of data points
 
 		for (i = 0; i < m; i++) {

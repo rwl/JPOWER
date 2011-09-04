@@ -23,7 +23,9 @@ import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
-import cern.jet.math.tdcomplex.DComplexFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 
 /**
@@ -34,11 +36,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
  *
  */
 public class Djp_dIbr_dV {
-
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-
-	private static DComplexMatrix1D Vnorm, If, It;
-	private static DComplexMatrix2D diagV, diagVnorm, dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm;
 
 	/**
 	 * Returns four matrices containing partial derivatives of the complex
@@ -70,6 +67,8 @@ public class Djp_dIbr_dV {
 	 */
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] dIbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
+		DComplexMatrix1D Vnorm, If, It;
+		DComplexMatrix2D diagV, diagVnorm, dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm;
 
 		Vnorm = V.copy().assign(cfunc.abs).assign(V, cfunc.swapArgs(cfunc.div));
 		diagV = DComplexFactory2D.sparse.diagonal(V);

@@ -23,8 +23,11 @@ import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.j;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 
 /**
@@ -36,15 +39,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
  */
 public class Djp_dSbr_dV {
 
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-	private static final double[] j = {0.0, 1.0};
-
-	private static int nl, nb;
-	private static int[] f, t, il, ib;
-	private static DComplexMatrix1D If, It, Vnorm, Sf, St;
-	private static SparseRCDComplexMatrix2D diagVf, diagVt, diagIf, diagIt,
-			diagV, diagVnorm, Vf, Vt, dSf_dVa, diagIf2, dSt_dVa, diagIt2,
-			Vfnorm, Vtnorm, Ifnorm, dSf_dVm, Itnorm, dSt_dVm;
 
 	/**
 	 * Returns four matrices containing partial derivatives of the complex
@@ -93,14 +87,20 @@ public class Djp_dSbr_dV {
 	 */
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] dSbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
+		int nl, nb;
+		int[] f, t, il, ib;
+		DComplexMatrix1D If, It, Vnorm, Sf, St;
+		SparseRCDComplexMatrix2D diagVf, diagVt, diagIf, diagIt,
+				diagV, diagVnorm, Vf, Vt, dSf_dVa, diagIf2, dSt_dVa, diagIt2,
+				Vfnorm, Vtnorm, Ifnorm, dSf_dVm, Itnorm, dSt_dVm;
 
 		/* define */
 		f = branch.f_bus.toArray();		// list of "from" buses
 		t = branch.t_bus.toArray();		// list of "to" buses
 		nl = branch.size();
 		nb = (int) V.size();
-		il = Djp_util.irange(nl);
-		ib = Djp_util.irange(nb);
+		il = irange(nl);
+		ib = irange(nb);
 
 		/* compute currents */
 		If = Yf.zMult(V, null);

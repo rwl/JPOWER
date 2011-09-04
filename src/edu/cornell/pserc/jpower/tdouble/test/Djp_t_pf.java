@@ -23,18 +23,21 @@ import java.util.Map;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_mm;
+
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 import static edu.cornell.pserc.jpower.tdouble.Djp_loadcase.loadcase;
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf.runpf;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import static edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf.runpf;
 
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_begin.t_begin;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_case9_pf.t_case9_pf;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_is.t_is;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_ok.t_ok;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_end.t_end;
+
+import static cern.colt.util.tdouble.Djp_mm.readMatrix;
 
 /**
  * Tests for power flow solvers.
@@ -75,9 +78,9 @@ public class Djp_t_pf {
 		jpopt = jpoption("OUT_ALL", 0.0, "VERBOSE", quiet ? 0.0 : 1.0);
 
 		/* get solved AC power flow case from MatrixMarket file. */
-		bus_soln = (DoubleMatrix2D) Djp_mm.readMatrix(Djp_t_pf.class.getResource(BUS_SOLN9).getFile());
-		gen_soln = (DoubleMatrix2D) Djp_mm.readMatrix(Djp_t_pf.class.getResource(GEN_SOLN9).getFile());
-		branch_soln = (DoubleMatrix2D) Djp_mm.readMatrix(Djp_t_pf.class.getResource(BRANCH_SOLN9).getFile());
+		bus_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(BUS_SOLN9).getFile());
+		gen_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(GEN_SOLN9).getFile());
+		branch_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(BRANCH_SOLN9).getFile());
 
 		/* run Newton PF */
 		t = "Newton PF : ";

@@ -20,9 +20,11 @@
 package edu.cornell.pserc.jpower.tdouble.opf;
 
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.intm;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 
 /**
@@ -33,9 +35,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
  *
  */
 public class Djp_jp_isload {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	/**
 	 * Returns a column vector of 1's and 0's. The 1's
@@ -50,7 +49,7 @@ public class Djp_jp_isload {
 	@SuppressWarnings("static-access")
 	public static IntMatrix1D isload(Djp_gen gen) {
 
-		return Djp_util.intm( gen.Pmin.copy().assign(dfunc.less(0)) ).assign(Djp_util.intm( gen.Pmax.copy().assign(dfunc.equals(0)) ), ifunc.and);
+		return intm( gen.Pmin.copy().assign(dfunc.less(0)) ).assign(intm( gen.Pmax.copy().assign(dfunc.equals(0)) ), ifunc.and);
 	}
 
 }

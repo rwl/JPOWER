@@ -22,11 +22,16 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.Polynomial;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
 
 /**
  * Computes total cost for generators at given output level.
@@ -36,11 +41,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  *
  */
 public class Djp_totcost {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
-	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 
 	/**
 	 * Computes total cost for generators at given output level.
@@ -61,16 +61,16 @@ public class Djp_totcost {
 
 		totalcost = DoubleFactory1D.dense.make(ng);
 
-		ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
-		ipol = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)) );
+		ipwl = nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );
+		ipol = nonzero( gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)) );
 
 		if (ipwl.length != 0) {
 			ncost = gencost.cost.columns();
-			p = gencost.cost.viewSelection(null, Djp_util.irange(0, ncost - 1, 2));
-			c = gencost.cost.viewSelection(null, Djp_util.irange(1, ncost, 2));
+			p = gencost.cost.viewSelection(null, irange(0, ncost - 1, 2));
+			c = gencost.cost.viewSelection(null, irange(1, ncost, 2));
 			for (int i : ipwl) {
 				ncost = gencost.ncost.get(i);
-				for (int k : Djp_util.irange(1, ncost - 1, 2)) {
+				for (int k : irange(1, ncost - 1, 2)) {
 					p1 = p.get(i, k); p2 = p.get(i, k + 1);
 					c1 = c.get(i, k); c2 = c.get(i, k + 1);
 					m = (c2 - c1) / (p2 - p1);

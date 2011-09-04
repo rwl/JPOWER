@@ -23,7 +23,8 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
 
 /**
  * Partial derivatives of squared flow magnitudes w.r.t voltage.
@@ -33,10 +34,6 @@ import cern.jet.math.tdouble.DoubleFunctions;
  *
  */
 public class Djp_dAbr_dV {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-
-	private static DoubleMatrix2D dAf_dPf, dAf_dQf, dAt_dPt, dAt_dQt, dAf_dVa, dAt_dVa, dAf_dVm, dAt_dVm;
 
 	/**
 	 * Returns four matrices containing partial derivatives of the square of
@@ -78,6 +75,8 @@ public class Djp_dAbr_dV {
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix2D[] dAbr_dV(DComplexMatrix2D dSf_dVa, DComplexMatrix2D dSf_dVm,
 			DComplexMatrix2D dSt_dVa, DComplexMatrix2D dSt_dVm, DComplexMatrix1D Sf, DComplexMatrix1D St) {
+
+		DoubleMatrix2D dAf_dPf, dAf_dQf, dAt_dPt, dAt_dQt, dAf_dVa, dAt_dVa, dAf_dVm, dAt_dVm;
 
 		dAf_dPf = DoubleFactory2D.sparse.diagonal(Sf.getRealPart().assign(dfunc.mult(2)));
 		dAf_dQf = DoubleFactory2D.sparse.diagonal(Sf.getImaginaryPart().assign(dfunc.mult(2)));

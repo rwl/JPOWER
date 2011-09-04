@@ -26,12 +26,18 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.ones;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Djp_util.icat;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_totcost.totcost;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_polycost.polycost;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
 
 import edu.cornell.pserc.jips.tdouble.ObjectiveEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
@@ -48,11 +54,6 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
  *
  */
 public class Djp_opf_costfcn implements ObjectiveEvaluator {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 
 	private boolean numericalCheck;
 
@@ -105,7 +106,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		/* polynomial cost of P and Q */
 		// use totcost only on polynomial cost; in the minimization problem
 		// formulation, pwl cost is the sum of the y variables.
-		ipol = Djp_util.nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));	// poly MW and MVAr costs
+		ipol = nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));	// poly MW and MVAr costs
 		xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
 		f = 0;
 		if (ipol.length > 0)
@@ -114,8 +115,8 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		/* piecewise linear cost of P and Q */
 //		DoubleMatrix1D ccost;
 		if (ny > 0) {
-			ccost = DoubleFactory1D.dense.make(new SparseRCDoubleMatrix2D(1, nxyz, Djp_util.ones(ny),
-					Djp_util.irange(vv.get("y").i0, vv.get("y").iN), 1, false, false).viewRow(0).toArray());
+			ccost = DoubleFactory1D.dense.make(new SparseRCDoubleMatrix2D(1, nxyz, ones(ny),
+					irange(vv.get("y").i0, vv.get("y").iN), 1, false, false).viewRow(0).toArray());
 			f += ccost.zDotProduct(x);
 		} else {
 			ccost = DoubleFactory1D.dense.make(nxyz);
@@ -126,13 +127,13 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 //		DoubleMatrix2D diagrr = null, LL = null, QQ = null, M = null;
 		if (N != null) {
 			nw = N.rows();
-			r = N.zMult(x, null).assign(rh, dfunc.minus);	// generalized cost
-			iLT = Djp_util.nonzero(r.copy().assign(kk.copy().assign(dfunc.neg), dfunc.less));	// below dead zone
-			iEQ = Djp_util.nonzero( Djp_util.intm(r.copy().assign(dfunc.equals(0))).assign(Djp_util.intm(kk.copy().assign(dfunc.equals(0))), ifunc.and) );	// dead zone doesn't exist
-			iGT = Djp_util.nonzero(r.copy().assign(kk, dfunc.less));	// above dead zone
-			iND = Djp_util.icat(iLT, Djp_util.icat(iEQ, iGT));			// rows that are Not in the Dead region
-			iL  = Djp_util.nonzero(dd.copy().assign(dfunc.equals(1)));	// rows using linear function
-			iQ  = Djp_util.nonzero(dd.copy().assign(dfunc.equals(2)));	// rows using quadratic function
+			r = N.zMult(x, null).assign(rh, dfunc.minus);  // generalized cost
+			iLT = nonzero(r.copy().assign(kk.copy().assign(dfunc.neg), dfunc.less));  // below dead zone
+			iEQ = nonzero( intm(r.copy().assign(dfunc.equals(0))).assign(intm(kk.copy().assign(dfunc.equals(0))), ifunc.and) );  // dead zone doesn't exist
+			iGT = nonzero(r.copy().assign(kk, dfunc.less));	// above dead zone
+			iND = icat(iLT, icat(iEQ, iGT));			// rows that are Not in the Dead region
+			iL  = nonzero(dd.copy().assign(dfunc.equals(1)));	// rows using linear function
+			iQ  = nonzero(dd.copy().assign(dfunc.equals(2)));	// rows using quadratic function
 			LL = new SparseRCDoubleMatrix2D(nw, nw, iL, iL, 1, false, false);
 			QQ = new SparseRCDoubleMatrix2D(nw, nw, iQ, iQ, 1, false, false);
 			kbar_v = new DoubleMatrix1D[] {
@@ -192,12 +193,12 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		/* ----- evaluate cost gradient ----- */
 
 		/* index ranges */
-		iPg = Djp_util.irange(vv.get("Pg").i0, vv.get("Pg").iN);
-		iQg = Djp_util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
+		iPg = irange(vv.get("Pg").i0, vv.get("Pg").iN);
+		iQg = irange(vv.get("Qg").i0, vv.get("Qg").iN);
 
 		/* polynomial cost of P and Q */
 		df_dPgQg = DoubleFactory1D.dense.make(2 * ng);
-		ipol = Djp_util.nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
+		ipol = nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 		xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
 		df_dPgQg.viewSelection(ipol).assign( polycost(gencost.copy(ipol), xx.viewSelection(ipol), 1).assign(dfunc.mult(baseMVA)) );
 		df = DoubleFactory1D.dense.make(nxyz);
@@ -226,7 +227,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 				df_diff = ddff.copy().assign(df, dfunc.minus).assign(dfunc.abs);
 				df_diff_max = df_diff.aggregate(dfunc.max, dfunc.identity);
 				if (df_diff_max > tol) {
-					idx = Djp_util.nonzero( df_diff.assign(dfunc.equals(df_diff_max)) );
+					idx = nonzero( df_diff.assign(dfunc.equals(df_diff_max)) );
 					System.out.printf("\nMismatch in gradient\n");
 					System.out.printf("idx             df(num)         df              diff\n");
 					for (int k = 0; k < df.size(); k++)
@@ -275,26 +276,26 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		Qg = x.viewPart(vv.get("Qg").i0, vv.get("Qg").N);	// reactive generation in p.u.
 
 		/* index ranges */
-		iPg = Djp_util.irange(vv.get("Pg").i0, vv.get("Pg").iN);
-		iQg = Djp_util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
+		iPg = irange(vv.get("Pg").i0, vv.get("Pg").iN);
+		iQg = irange(vv.get("Qg").i0, vv.get("Qg").iN);
 
 		/* ----- evaluate cost Hessian ----- */
 
-		pcost = gencost.copy(Djp_util.irange(ng));
+		pcost = gencost.copy(irange(ng));
 		qcost = null;
 		if (gencost.size() > ng)
-			qcost = gencost.copy(Djp_util.irange(ng, 2*ng));
+			qcost = gencost.copy(irange(ng, 2*ng));
 
 		/* polynomial generator costs */
 		d2f_dPg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Pg
 		d2f_dQg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Qg
-		ipolp = Djp_util.nonzero(pcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
+		ipolp = nonzero(pcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 		d2f_dPg2.assign( Djp_polycost.polycost(pcost.copy(ipolp), Pg.viewSelection(ipolp).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
 		if (qcost != null) {	// Qg is not free
-			ipolq = Djp_util.nonzero(qcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
+			ipolq = nonzero(qcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 			d2f_dQg2.assign( Djp_polycost.polycost(qcost.copy(ipolq), Qg.viewSelection(ipolq).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
 		}
-		i = Djp_util.icat(iPg, iQg);
+		i = icat(iPg, iQg);
 		d2f = new SparseRCDoubleMatrix2D(nxyz, nxyz, i, i,
 				DoubleFactory1D.sparse.append(d2f_dPg2, d2f_dQg2).toArray(), false, false, false);
 

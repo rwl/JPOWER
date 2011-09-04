@@ -23,8 +23,9 @@ import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
 
 /**
  * Computes 2nd derivatives of |complex power flow|^2 w.r.t. V.
@@ -34,13 +35,6 @@ import cern.jet.math.tdouble.DoubleFunctions;
  *
  */
 public class Djp_d2ASbr_dV2 {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
-
-	private static DComplexMatrix2D diaglam, conj_diagSbr, Saa, Sav, Sva, Svv, conj_dSbr_dVa, conj_dSbr_dVm;
-	private static DComplexMatrix2D[] d2Sbr_dV2;
-	private static DoubleMatrix2D Haa, Hva, Hav, Hvv;
 
 	/**
 	 * Returns 4 matrices containing the partial derivatives w.r.t. voltage
@@ -63,6 +57,10 @@ public class Djp_d2ASbr_dV2 {
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix2D[] d2ASbr_dV2(DComplexMatrix2D dSbr_dVa, DComplexMatrix2D dSbr_dVm,
 			DComplexMatrix1D Sbr, DComplexMatrix2D Cbr, DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
+
+		DComplexMatrix2D diaglam, conj_diagSbr, Saa, Sav, Sva, Svv, conj_dSbr_dVa, conj_dSbr_dVm;
+		DComplexMatrix2D[] d2Sbr_dV2;
+		DoubleMatrix2D Haa, Hva, Hav, Hvv;
 
 		diaglam = DComplexFactory2D.sparse.diagonal(lam);
 		conj_diagSbr = DComplexFactory2D.sparse.diagonal(Sbr.copy().assign(cfunc.conj));

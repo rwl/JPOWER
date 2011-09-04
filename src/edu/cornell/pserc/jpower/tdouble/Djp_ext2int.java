@@ -21,16 +21,19 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.lang.reflect.Field;
 
-import cern.colt.matrix.tdouble.DoubleFactory1D;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseCCIntMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tint.IntFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
+import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Djp_util.max;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.zeros;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
@@ -38,6 +41,11 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
+
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PV;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PQ;
+import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.NONE;
 
 /**
  * Converts external to internal indexing.
@@ -113,13 +121,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
  */
 public class Djp_ext2int {
 
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static final int REF  = Djp_jpc.REF;
-	private static final int PV   = Djp_jpc.PV;
-	private static final int PQ   = Djp_jpc.PQ;
-	private static final int NONE = Djp_jpc.NONE;
-
 	/**
 	 *
 	 * @param jpc
@@ -171,23 +172,23 @@ public class Djp_ext2int {
 
 			/* determine which buses, branches, gens are connected & in-service */
 			int[] bi = jpc.bus.bus_i.toArray();
-			n2i = new SparseCCIntMatrix2D(Djp_util.max(bi) + 1, 1,
-					bi, Djp_util.zeros(nb), Djp_util.irange(nb), false, false, false).viewColumn(0);
+			n2i = new SparseCCIntMatrix2D(max(bi) + 1, 1,
+					bi, zeros(nb), irange(nb), false, false, false).viewColumn(0);
 
 			/* bus status */
 			IntMatrix1D bs = jpc.bus.bus_type.copy().assign(ifunc.equals(NONE));
-			o.bus.status.off = Djp_util.nonzero(bs);	// isolated
+			o.bus.status.off = nonzero(bs);	// isolated
 			bs.assign(ifunc.equals(0));
-			o.bus.status.on = Djp_util.nonzero(bs);		// connected
+			o.bus.status.on = nonzero(bs);		// connected
 
 			/* gen status */
 			IntMatrix1D gs = jpc.gen.gen_status.copy();
 			int[] gbus = jpc.gen.gen_bus.toArray();
 			gs.assign(ifunc.equals(1));				// assume boolean status
 			gs.assign(bs.viewSelection(n2i.viewSelection(gbus).toArray()), ifunc.and);
-			o.gen.status.on = Djp_util.nonzero(gs);		// on and connected
+			o.gen.status.on = nonzero(gs);		// on and connected
 			gs.assign(ifunc.equals(0));
-			o.gen.status.off = Djp_util.nonzero(gs);	// off or isolated
+			o.gen.status.off = nonzero(gs);	// off or isolated
 
 			/* branch status */
 			IntMatrix1D brs = jpc.branch.br_status.copy();
@@ -195,16 +196,16 @@ public class Djp_ext2int {
 			int[] tbus = jpc.branch.t_bus.toArray();
 			brs.assign(bs.viewSelection(n2i.viewSelection(fbus).toArray()), ifunc.and);
 			brs.assign(bs.viewSelection(n2i.viewSelection(tbus).toArray()), ifunc.and);
-			o.branch.status.on = Djp_util.nonzero(brs);	// on and connected
+			o.branch.status.on = nonzero(brs);	// on and connected
 			brs.assign(ifunc.equals(0));
-			o.branch.status.off = Djp_util.nonzero(brs);
+			o.branch.status.off = nonzero(brs);
 
 			if (jpc.areas != null) {
 				int[] prbus = jpc.areas.price_ref_bus.toArray();
 				IntMatrix1D as = bs.viewSelection(n2i.viewSelection(prbus).toArray());
-				o.areas.status.on = Djp_util.nonzero(as);
+				o.areas.status.on = nonzero(as);
 				as.assign(ifunc.equals(0));
-				o.areas.status.off = Djp_util.nonzero(as);
+				o.areas.status.off = nonzero(as);
 			}
 
 			/* delete stuff that is "out" */
@@ -223,7 +224,7 @@ public class Djp_ext2int {
 			/* apply consecutive bus numbering */
 			o.bus.i2e = jpc.bus.bus_i.copy();
 			o.bus.e2i = IntFactory1D.sparse.make(o.bus.i2e.aggregate(ifunc.max, ifunc.identity) + 1);
-			o.bus.e2i.viewSelection( o.bus.i2e.toArray() ).assign(Djp_util.irange(nb));
+			o.bus.e2i.viewSelection( o.bus.i2e.toArray() ).assign(irange(nb));
 			jpc.bus.bus_i.assign( o.bus.e2i.viewSelection(jpc.bus.bus_i.toArray()) );
 			jpc.gen.gen_bus.assign( o.bus.e2i.viewSelection(jpc.gen.gen_bus.toArray()) );
 			jpc.branch.f_bus.assign( o.bus.e2i.viewSelection( jpc.branch.f_bus.toArray()) );
@@ -432,14 +433,14 @@ public class Djp_ext2int {
 //				} else {				// TODO: enum
 //					n= o.external.branch.size();
 //				}
-//				v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b + n));
+//				v1 = Djp_get_reorder.jp_get_reorder(val, irange(b, b + n));
 //				new_v1 = jp_ext2int(jpc, v1, ordering[k], dim);
 //				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
 //				b += n;
 //			}
 //			n = (int) val.size();
 //			if (n > b) {				// the rest
-//				new_v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b + n));
+//				new_v1 = Djp_get_reorder.jp_get_reorder(val, irange(b, b + n));
 //				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
 //			}
 //		}
@@ -526,7 +527,7 @@ public class Djp_ext2int {
 //				} else {	// TODO: enum
 //					n = o.external.branch.size();
 //				}
-//				v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b + n), dim);
+//				v2 = Djp_get_reorder.jp_get_reorder(val, irange(b, b + n), dim);
 //				new_v2 = jp_ext2int(jpc, v2, ordering[k], dim);
 //				if (dim == 1) {
 //					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
@@ -539,7 +540,7 @@ public class Djp_ext2int {
 //			}
 //			n = (int) val.size();
 //			if (n > b) {				// the rest
-//				new_v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(b, b+n), dim);
+//				new_v2 = Djp_get_reorder.jp_get_reorder(val, irange(b, b+n), dim);
 //				if (dim == 1) {
 //					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
 //				} else if (dim == 2) {
@@ -578,8 +579,8 @@ public class Djp_ext2int {
 		IntMatrix1D e2i;
 
 		i2e = bus.bus_i.toArray();
-		e2i = IntFactory1D.sparse.make(Djp_util.max(i2e) + 1);
-		e2i.viewSelection(i2e).assign(Djp_util.irange(bus.size()));
+		e2i = IntFactory1D.sparse.make(max(i2e) + 1);
+		e2i.viewSelection(i2e).assign(irange(bus.size()));
 
 		bus.bus_i.assign( e2i.viewSelection(bus.bus_i.toArray()) );
 		gen.gen_bus.assign( e2i.viewSelection(gen.gen_bus.toArray()) );

@@ -21,12 +21,10 @@ package edu.cornell.pserc.jpower.tdouble;
 
 import java.lang.reflect.Field;
 
-import cern.colt.matrix.tdouble.DoubleFactory1D;
-import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
@@ -290,8 +288,8 @@ public class Djp_int2ext {
 //					ne = (int) o.external.branch.size();
 //					ni = (int) jpc.branch.size();
 //				}
-//				v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
-//				oldv1 = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne));
+//				v1 = Djp_get_reorder.jp_get_reorder(val, irange(bi, bi + ni));
+//				oldv1 = Djp_get_reorder.jp_get_reorder(oldval, irange(be, be + ne));
 //
 //				new_v1 = jp_int2ext(jpc, v1, oldv1, order, dim);
 //				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
@@ -300,7 +298,7 @@ public class Djp_int2ext {
 //			}
 //			ni = (int) val.size();
 //			if (ni > bi) {				// the rest
-//				new_v1 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni));
+//				new_v1 = Djp_get_reorder.jp_get_reorder(val, irange(bi, bi + ni));
 //				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
 //			}
 //		}
@@ -399,8 +397,8 @@ public class Djp_int2ext {
 //					ne = (int) o.external.branch.size();
 //					ni = (int) jpc.branch.size();
 //				}
-//				v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
-//				oldv2 = Djp_get_reorder.jp_get_reorder(oldval, Djp_util.irange(be, be + ne), dim);
+//				v2 = Djp_get_reorder.jp_get_reorder(val, irange(bi, bi + ni), dim);
+//				oldv2 = Djp_get_reorder.jp_get_reorder(oldval, irange(be, be + ne), dim);
 //
 //				new_v2 = jp_int2ext(jpc, v2, oldv2, order, dim);
 //				if (dim == 1) {
@@ -415,7 +413,7 @@ public class Djp_int2ext {
 //			}
 //			ni = (int) val.size();
 //			if (ni > bi) {				// the rest
-//				new_v2 = Djp_get_reorder.jp_get_reorder(val, Djp_util.irange(bi, bi + ni), dim);
+//				new_v2 = Djp_get_reorder.jp_get_reorder(val, irange(bi, bi + ni), dim);
 //				if (dim == 1) {
 //					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
 //				} else if (dim == 2) {

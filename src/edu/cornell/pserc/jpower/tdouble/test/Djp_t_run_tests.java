@@ -4,19 +4,16 @@ import java.util.List;
 
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.jet.math.tint.IntFunctions;
 
-import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_quiet;
 import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_num_of_tests;
 import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_counter;
 import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_ok_cnt;
 import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_not_ok_cnt;
 import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_skip_cnt;
-import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_clock;
+
+import static cern.colt.util.tdouble.Djp_util.ifunc;
 
 public class Djp_t_run_tests {
-
-	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	public static void t_run_tests(List<String> test_names) {
 		t_run_tests(test_names, false);

@@ -60,38 +60,38 @@ public class Djd_rundyn {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	private static long t0;
-	private static int method, ngen, nbus;
-	private static int[] on, gbus, type1, type2;
-	private static double tol, minstepsize, maxstepsize, freq, stepsize, stoptime, baseMVA;
-	private static double[] dyn;
-	private static boolean output, plots;
-
-	private static Djd_gen Pgen0, Efd0, Xgen0;
-	private static Djd_exc Pexc0, Xexc0;
-	private static Djd_gov Pgov0;
-	private static Djd_event event;
-	private static Djd_buschange buschange;
-	private static Djd_linechange linechange;
-
-	private static Djd_gen[] gen0;
-	private static Djd_exc[] exe0;
-
-	private static IntMatrix1D genmodel, excmodel, govmodel;
-	private static DoubleMatrix1D Pl, Ql, xd_tr, Id0, Iq0, Pe0, Vexc0, Pm0;
-	private static DComplexMatrix1D U0, U00;
-	private static DoubleMatrix1D[] I;
-
-	private static Map<String, Double> jpopt;
-	private static Djp_jpc jpc;
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-
 //	private static SparseDComplexLUDecomposition invYbus;
 
 	@SuppressWarnings("static-access")
 	public static Object[] jd_rundyn(String casefile_pf, String casefile_dyn, String casefile_ev, DoubleMatrix1D jdopt) {
+
+		long t0;
+		int method, ngen, nbus;
+		int[] on, gbus, type1, type2;
+		double tol, minstepsize, maxstepsize, freq, stepsize, stoptime, baseMVA;
+		double[] dyn;
+		boolean output, plots;
+
+		Djd_gen Pgen0, Efd0, Xgen0;
+		Djd_exc Pexc0, Xexc0;
+		Djd_gov Pgov0;
+		Djd_event event;
+		Djd_buschange buschange;
+		Djd_linechange linechange;
+
+		Djd_gen[] gen0;
+		Djd_exc[] exe0;
+
+		IntMatrix1D genmodel, excmodel, govmodel;
+		DoubleMatrix1D Pl, Ql, xd_tr, Id0, Iq0, Pe0, Vexc0, Pm0;
+		DComplexMatrix1D U0, U00;
+		DoubleMatrix1D[] I;
+
+		Map<String, Double> jpopt;
+		Djp_jpc jpc;
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
 
 		/* Begin timing */
 		t0 = System.currentTimeMillis();
@@ -196,7 +196,7 @@ public class Djd_rundyn {
 		Pexc0 = exe0[1];
 
 		/* Governor initial conditions */
-		DoubleMatrix1D Pm0 = Pe0.copy();
+		Pm0 = Pe0.copy();
 //		Djd_gov[] gov0 = Djd_GovernorInit.jd_GovernorInit(Pm0, Pgov0, omega0, govmodel);
 //		Djd_gov Xgov0 = gov0[0];
 //		Pgov0 = gov0[1];

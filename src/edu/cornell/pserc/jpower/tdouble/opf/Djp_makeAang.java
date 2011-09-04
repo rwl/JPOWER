@@ -29,8 +29,11 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 
@@ -42,8 +45,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
  *
  */
 public class Djp_makeAang {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
 	/**
 	 * Constructs the parameters for the following linear constraint limiting
@@ -81,23 +82,23 @@ public class Djp_makeAang {
 		} else {
 			iang_min = new int[0]; iang_max = new int[0];
 			if (branch.ang_min != null)
-				iang_min = Djp_util.nonzero(branch.ang_min.copy().assign(dfunc.greater(-360)));
+				iang_min = nonzero(branch.ang_min.copy().assign(dfunc.greater(-360)));
 			if (branch.ang_max != null)
-				iang_max = Djp_util.nonzero(branch.ang_max.copy().assign(dfunc.less(360)));
+				iang_max = nonzero(branch.ang_max.copy().assign(dfunc.less(360)));
 
-			iang_a = Djp_util.icat(iang_min, iang_max);
+			iang_a = icat(iang_min, iang_max);
 			iang = IntFactory1D.dense.make(iang_a);
 
 			iangl = new int[0]; iangh = new int[0];
 			if (branch.ang_min != null)
-				iangl = Djp_util.nonzero(branch.ang_min.viewSelection(iang_a));
+				iangl = nonzero(branch.ang_min.viewSelection(iang_a));
 			if (branch.ang_max != null)
-				iangh = Djp_util.nonzero(branch.ang_max.viewSelection(iang_a));
+				iangh = nonzero(branch.ang_max.viewSelection(iang_a));
 			nang = iang_a.length;
 
 			if (nang > 0) {
-				ii = Djp_util.icat(Djp_util.irange(nang), Djp_util.irange(nang));
-				jj = Djp_util.icat(branch.f_bus.viewSelection(iang_a).toArray(), branch.t_bus.viewSelection(iang_a).toArray());
+				ii = icat(irange(nang), irange(nang));
+				jj = icat(branch.f_bus.viewSelection(iang_a).toArray(), branch.t_bus.viewSelection(iang_a).toArray());
 				v = DoubleFactory1D.dense.append(DoubleFactory1D.dense.make(nang, 1), DoubleFactory1D.dense.make(nang, -1));
 				Aang = new SparseRCDoubleMatrix2D(nang, nb, ii, jj, v.toArray(), false, false, false);
 				uang = DoubleFactory1D.dense.make(nang, Double.POSITIVE_INFINITY);

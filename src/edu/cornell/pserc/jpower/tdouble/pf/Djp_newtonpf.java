@@ -31,9 +31,13 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_util;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
+
+import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Djp_util.irange;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV.dSbus_dV;
@@ -46,9 +50,6 @@ import static edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV.dSbus_dV;
  *
  */
 public class Djp_newtonpf {
-
-	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
 	/**
 	 * Solves for bus voltages given the full system admittance matrix (for
@@ -94,7 +95,7 @@ public class Djp_newtonpf {
 		verbose	= jpopt.get("VERBOSE").intValue();
 
 		/* initialize */
-		pvpq = Djp_util.icat(pv, pq);
+		pvpq = icat(pv, pq);
 		converged = false;
 		i = 0;
 		V = V0;
@@ -151,17 +152,17 @@ public class Djp_newtonpf {
 			JJ.assign(J);
 
 			dx = SparseDoubleAlgebra.DEFAULT.solve(JJ, F).assign(dfunc.neg);
-			dxz = Djp_util.complex(dx, null);
+			dxz = complex(dx, null);
 
 			/* update voltage */
 			if (npv > 0)
-				Va.viewSelection(pv).assign(dxz.viewSelection(Djp_util.irange(j1, j2)), cfunc.plus);
+				Va.viewSelection(pv).assign(dxz.viewSelection(irange(j1, j2)), cfunc.plus);
 			if (npq > 0) {
-				Va.viewSelection(pq).assign(dxz.viewSelection(Djp_util.irange(j3, j4)), cfunc.plus);
-				Vm.viewSelection(pq).assign(dxz.viewSelection(Djp_util.irange(j5, j6)), cfunc.plus);
+				Va.viewSelection(pq).assign(dxz.viewSelection(irange(j3, j4)), cfunc.plus);
+				Vm.viewSelection(pq).assign(dxz.viewSelection(irange(j5, j6)), cfunc.plus);
 			}
 
-			V = Djp_util.polar(Vm.getRealPart(), Va.getRealPart());
+			V = polar(Vm.getRealPart(), Va.getRealPart());
 			/* update Vm and Va again in case we wrapped around with a negative Vm */
 			Va = V.copy().assign(cfunc.arg);
 			Vm = V.copy().assign(cfunc.abs);

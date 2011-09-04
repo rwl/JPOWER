@@ -3,6 +3,8 @@ package edu.cornell.pserc.jpower.tdouble.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_run_tests.t_run_tests;
+
 public class Djp_test_jpower {
 
 	public static void test_jpower() {
@@ -17,7 +19,7 @@ public class Djp_test_jpower {
 		tests.add("t_jacobian");
 		tests.add("t_pf");
 
-		Djp_t_run_tests.t_run_tests(tests, verbose);
+		t_run_tests(tests, verbose);
 	}
 
 	public static void main(String[] args) {
