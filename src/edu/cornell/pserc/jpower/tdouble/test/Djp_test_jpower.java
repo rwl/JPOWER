@@ -17,7 +17,7 @@ public class Djp_test_jpower {
 		tests.add("t_jacobian");
 		tests.add("t_pf");
 
-		Djp_t_run_tests.jp_t_run_tests(tests, verbose);
+		Djp_t_run_tests.t_run_tests(tests, verbose);
 	}
 
 	public static void main(String[] args) {

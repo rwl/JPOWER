@@ -28,7 +28,7 @@ import edu.cornell.pserc.jpower.tdouble.cases.Djp_case4gs;
 public class Djp_ext2int_test extends edu.cornell.pserc.jpower.tdouble.Djp_ext2int_test {
 
 	public Djp_ext2int_test(String name) {
-		super(name, "case4gs", Djp_case4gs.jp_case4gs());
+		super(name, "case4gs", Djp_case4gs.case4gs());
 	}
 
 }

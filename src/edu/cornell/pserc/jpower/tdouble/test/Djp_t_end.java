@@ -19,58 +19,60 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_quiet;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_num_of_tests;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_counter;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_not_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_skip_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_clock;
+
 public class Djp_t_end {
 
-	public static void jp_t_end() {
+	public static void t_end() {
 		boolean all_ok;
 
-		TestGlobals.t_counter = TestGlobals.t_counter - 1;
+		t_counter = t_counter - 1;
 
-		if ((TestGlobals.t_counter == TestGlobals.t_num_of_tests) &
-				(TestGlobals.t_counter == TestGlobals.t_ok_cnt + TestGlobals.t_skip_cnt) &
-		        (TestGlobals.t_not_ok_cnt == 0)) {
-		    all_ok = true;
+		if ((t_counter == t_num_of_tests) & (t_counter == t_ok_cnt + t_skip_cnt) &
+			(t_not_ok_cnt == 0)) {
+		all_ok = true;
 		} else {
-		    all_ok = false;
+		all_ok = false;
 		}
 
-		if (TestGlobals.t_quiet) {
-		    if (all_ok) {
-		    	System.out.print("ok");
-		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.printf(" (%d of %d skipped)",
-		        			TestGlobals.t_skip_cnt,
-		        			TestGlobals.t_num_of_tests);
-		        }
-		    } else {
-		    	System.out.print("not ok\n");
-		    	System.out.printf("\t#####  Ran %d of %d tests: %d passed, %d failed",
-		    			TestGlobals.t_counter, TestGlobals.t_num_of_tests,
-		    			TestGlobals.t_ok_cnt, TestGlobals.t_not_ok_cnt);
-		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.printf(", %d skipped", TestGlobals.t_skip_cnt);
-		        }
-		    }
-		    System.out.print("\n");
+		if (t_quiet) {
+		if (all_ok) {
+			System.out.print("ok");
+			if (t_skip_cnt > 0) {
+				System.out.printf(" (%d of %d skipped)", t_skip_cnt, t_num_of_tests);
+			}
 		} else {
-		    if (all_ok) {
-		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.printf("All tests successful (%d passed, %d skipped of %d)",
-		            		TestGlobals.t_ok_cnt, TestGlobals.t_skip_cnt, TestGlobals.t_num_of_tests);
-		        } else {
-		        	System.out.printf("All tests successful (%d of %d)",
-		        			TestGlobals.t_ok_cnt, TestGlobals.t_num_of_tests);
-		        }
-		    } else {
-		    	System.out.printf("Ran %d of %d tests: %d passed, %d failed",
-		        		TestGlobals.t_counter, TestGlobals.t_num_of_tests,
-		        		TestGlobals.t_ok_cnt, TestGlobals.t_not_ok_cnt);
-		        if (TestGlobals.t_skip_cnt > 0) {
-		        	System.out.printf(", %d skipped", TestGlobals.t_skip_cnt);
-		        }
-		    }
-		    System.out.printf("\nElapsed time %.2f seconds.\n",
-		    		((System.currentTimeMillis() - TestGlobals.t_clock) / 1000F));
+			System.out.print("not ok\n");
+			System.out.printf("\t#####  Ran %d of %d tests: %d passed, %d failed",
+					t_counter, t_num_of_tests, t_ok_cnt, t_not_ok_cnt);
+			if (t_skip_cnt > 0) {
+				System.out.printf(", %d skipped", t_skip_cnt);
+			}
+		}
+		System.out.print("\n");
+		} else {
+		if (all_ok) {
+			if (t_skip_cnt > 0) {
+				System.out.printf("All tests successful (%d passed, %d skipped of %d)",
+					t_ok_cnt, t_skip_cnt, t_num_of_tests);
+			} else {
+				System.out.printf("All tests successful (%d of %d)", t_ok_cnt, t_num_of_tests);
+			}
+		} else {
+			System.out.printf("Ran %d of %d tests: %d passed, %d failed",
+					t_counter, t_num_of_tests, t_ok_cnt, t_not_ok_cnt);
+			if (t_skip_cnt > 0) {
+				System.out.printf(", %d skipped", t_skip_cnt);
+			}
+		}
+			System.out.printf("\nElapsed time %.2f seconds.\n",
+				((System.currentTimeMillis() - t_clock) / 1000F));
 		}
 	}
 

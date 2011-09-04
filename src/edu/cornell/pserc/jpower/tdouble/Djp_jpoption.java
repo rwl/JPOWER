@@ -171,40 +171,40 @@ public class Djp_jpoption {
 	 * @param tuples odd elements option names, even elements are new option values
 	 * @return the default options vector with new values for the given options
 	 */
-	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6, String name7, Double value7) {
-		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, name7, value7);
+	public static Map<String, Double> jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6, String name7, Double value7) {
+		return jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, name7, value7);
 	}
 
-	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6) {
-		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, null, null);
+	public static Map<String, Double> jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6) {
+		return jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5) {
-		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, null, null, null, null);
+	public static Map<String, Double> jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5) {
+		return jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4) {
-		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4) {
+		return jpoption(null, name1, value1, name2, value2, name3, value3, name4, value4, null, null, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3) {
-		return jp_jpoption(null, name1, value1, name2, value2, name3, value3, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(String name1, Double value1, String name2, Double value2, String name3, Double value3) {
+		return jpoption(null, name1, value1, name2, value2, name3, value3, null, null, null, null, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(String name1, Double value1, String name2, Double value2) {
-		return jp_jpoption(null, name1, value1, name2, value2, null, null, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(String name1, Double value1, String name2, Double value2) {
+		return jpoption(null, name1, value1, name2, value2, null, null, null, null, null, null, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(String name1, Double value1) {
-		return jp_jpoption(null, name1, value1, null, null, null, null, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(String name1, Double value1) {
+		return jpoption(null, name1, value1, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	/**
 	 *
 	 * @return the default options vector.
 	 */
-	public static Map<String, Double> jp_jpoption() {
-		return jp_jpoption(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption() {
+		return jpoption(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class Djp_jpoption {
 	 * @param specified odd elements option names, even elements are new option values
 	 * @return the base options map with new values for the given options
 	 */
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6, String name7, Double value7) {
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6, String name7, Double value7) {
 		if (options == null) {
 
 			/* use defaults for base options vector */
@@ -300,28 +300,28 @@ public class Djp_jpoption {
 		return options;
 	}
 
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6) {
-		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, null, null);
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5, String name6, Double value6) {
+		return jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, name6, value6, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5) {
-		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, null, null, null, null);
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4, String name5, Double value5) {
+		return jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, name5, value5, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4) {
-		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3, String name4, Double value4) {
+		return jpoption(options, name1, value1, name2, value2, name3, value3, name4, value4, null, null, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3) {
-		return jp_jpoption(options, name1, value1, name2, value2, name3, value3, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2, String name3, Double value3) {
+		return jpoption(options, name1, value1, name2, value2, name3, value3, null, null, null, null, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2) {
-		return jp_jpoption(options, name1, value1, name2, value2, null, null, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1, String name2, Double value2) {
+		return jpoption(options, name1, value1, name2, value2, null, null, null, null, null, null, null, null, null, null);
 	}
 
-	public static Map<String, Double> jp_jpoption(Map<String, Double> options, String name1, Double value1) {
-		return jp_jpoption(options, name1, value1, null, null, null, null, null, null, null, null, null, null, null, null);
+	public static Map<String, Double> jpoption(Map<String, Double> options, String name1, Double value1) {
+		return jpoption(options, name1, value1, null, null, null, null, null, null, null, null, null, null, null, null);
 	}
 
 }

@@ -74,7 +74,7 @@ public class Djp_fdpf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
+	public static Object[] fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
 			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
 		double tol, normP, normQ;
 		int i, max_it, alg, verbose;
@@ -201,9 +201,9 @@ public class Djp_fdpf {
 		return new Object[] {V, converged, i};
 	}
 
-	public static Object[] jp_fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
+	public static Object[] fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
 			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq) {
-		return jp_fdpf(Ybus, Sbus, V0, Bp, Bpp, ref, pv, pq, Djp_jpoption.jp_jpoption());
+		return fdpf(Ybus, Sbus, V0, Bp, Bpp, ref, pv, pq, Djp_jpoption.jpoption());
 	}
 
 }

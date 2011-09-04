@@ -47,35 +47,35 @@ public class Djp_runopf {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Djp_jpc jp_runopf(Djp_jpc casedata, Map<String, Double> jpopt,
+	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
 		/* -----  run the optimal power flow  ----- */
-		r = Djp_opf.jp_opf(casedata, jpopt);
+		r = Djp_opf.opf(casedata, jpopt);
 
 		/* -----  output results  ----- */
 		if (fname != "")
-			Djp_printpf.jp_printpf(r, fname, jpopt);
+			Djp_printpf.printpf(r, fname, jpopt);
 
-		Djp_printpf.jp_printpf(r, System.out, jpopt);
+		Djp_printpf.printpf(r, System.out, jpopt);
 
 		/* save solved case */
 		if (solvedcase != "")
-			Djp_savecase.jp_savecase(solvedcase, r);
+			Djp_savecase.savecase(solvedcase, r);
 
 		return r;
 	}
 
-	public static Djp_jpc jp_runopf(Djp_jpc casedata) {
-		return jp_runopf(casedata, Djp_jpoption.jp_jpoption());
+	public static Djp_jpc runopf(Djp_jpc casedata) {
+		return runopf(casedata, Djp_jpoption.jpoption());
 	}
 
-	public static Djp_jpc jp_runopf(Djp_jpc casedata, Map<String, Double> jpopt) {
-		return jp_runopf(casedata, jpopt, "");
+	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt) {
+		return runopf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc jp_runopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
-		return jp_runopf(casedata, jpopt, fname, "");
+	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+		return runopf(casedata, jpopt, fname, "");
 	}
 
 }

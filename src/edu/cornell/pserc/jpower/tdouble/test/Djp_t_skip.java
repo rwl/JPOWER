@@ -21,8 +21,8 @@ package edu.cornell.pserc.jpower.tdouble.test;
 
 public class Djp_t_skip {
 
-	public static void jp_t_skip(int cnt) {
-		jp_t_skip(cnt, "");
+	public static void t_skip(int cnt) {
+		t_skip(cnt, "");
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class Djp_t_skip {
 	 * @param cnt
 	 * @param msg
 	 */
-	public static void jp_t_skip(int cnt, String msg) {
+	public static void t_skip(int cnt, String msg) {
 		if (msg.length() > 0)
 			msg = " : " + msg;
 

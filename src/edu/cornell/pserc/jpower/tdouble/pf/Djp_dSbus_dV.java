@@ -71,7 +71,7 @@ public class Djp_dSbus_dV {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix2D[] jp_dSbus_dV(DComplexMatrix2D Ybus, DComplexMatrix1D V) {
+	public static DComplexMatrix2D[] dSbus_dV(DComplexMatrix2D Ybus, DComplexMatrix1D V) {
 		int n;
 		int[] ib;
 		DComplexMatrix1D Ibus, absV, Vnorm;
@@ -107,4 +107,5 @@ public class Djp_dSbus_dV {
 
 		return dSbus_dV;
 	}
+
 }

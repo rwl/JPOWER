@@ -52,12 +52,12 @@ public class Djp_t_jacobian {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static void jp_t_jacobian() {
-		jp_t_jacobian(false);
+	public static void t_jacobian() {
+		t_jacobian(false);
 	}
 
 	@SuppressWarnings("static-access")
-	public static void jp_t_jacobian(boolean quiet) {
+	public static void t_jacobian(boolean quiet) {
 		Map<String, Double> opt;
 		Djp_jpc jpc, r;
 		DComplexMatrix2D[] Y, dSbus_dV;
@@ -86,21 +86,21 @@ public class Djp_t_jacobian {
 		int nl, nb;
 		AbstractMatrix[] dSbr_dV, dIbr_dV;
 
-		Djp_t_begin.jp_t_begin(28, quiet);
+		Djp_t_begin.t_begin(28, quiet);
 
 		// run powerflow to get solved case
-		opt = Djp_jpoption.jp_jpoption("VERBOSE", 0.0, "OUT_ALL", 0.0);
-		jpc = Djp_loadcase.jp_loadcase(Djp_case30.jp_case30());
-		r = Djp_runpf.jp_runpf(jpc, opt);
+		opt = Djp_jpoption.jpoption("VERBOSE", 0.0, "OUT_ALL", 0.0);
+		jpc = Djp_loadcase.loadcase(Djp_case30.case30());
+		r = Djp_runpf.runpf(jpc, opt);
 
 		// switch to internal bus numbering and build admittance matrices
-		Object[] internal = Djp_ext2int.jp_ext2int(r.bus, r.gen, r.branch);
+		Object[] internal = Djp_ext2int.ext2int(r.bus, r.gen, r.branch);
 		//int[] i2e = (int[]) internal[0];
 		Djp_bus bus = (Djp_bus) internal[1];
 		//Djp_gen gen = (Djp_gen) internal[2];
 		Djp_branch branch = (Djp_branch) internal[3];
 
-		Y = Djp_makeYbus.jp_makeYbus(r.baseMVA, bus, branch);
+		Y = Djp_makeYbus.makeYbus(r.baseMVA, bus, branch);
 		Ybus = Y[0];
 		Yf = Y[1];
 		Yt = Y[2];
@@ -129,7 +129,7 @@ public class Djp_t_jacobian {
 //		dSbus_dVa_full = dSbus_dV[1];
 
 		// sparse matrices
-		dSbus_dV = Djp_dSbus_dV.jp_dSbus_dV(Ybus, V);
+		dSbus_dV = Djp_dSbus_dV.dSbus_dV(Ybus, V);
 		dSbus_dVm = dSbus_dV[0];
 		dSbus_dVa = dSbus_dV[1];
 		dSbus_dVm_sp = DComplexFactory2D.dense.make(dSbus_dVm.toArray());
@@ -163,8 +163,8 @@ public class Djp_t_jacobian {
 		num_dSbus_dVa = arg1.assign(arg3.assign(Vsq, cfunc.mult), cfunc.minus).assign(cfunc.div(pert));
 		/** num_dSbus_dVa = full( (Vap .* conj(Ybus * Vap) - V*ones(1,nb) .* conj(Ybus * V*ones(1,nb))) / pert ); */
 
-		Djp_t_is.jp_t_is(dSbus_dVm_sp, num_dSbus_dVm, 5, "dSbus_dVm (sparse)");
-		Djp_t_is.jp_t_is(dSbus_dVa_sp, num_dSbus_dVa, 5, "dSbus_dVa (sparse)");
+		Djp_t_is.t_is(dSbus_dVm_sp, num_dSbus_dVm, 5, "dSbus_dVm (sparse)");
+		Djp_t_is.t_is(dSbus_dVa_sp, num_dSbus_dVa, 5, "dSbus_dVa (sparse)");
 //		Djp_t_is.jp_t_is(dSbus_dVm_full, num_dSbus_dVm, 5, "dSbus_dVm (full)");
 //		Djp_t_is.jp_t_is(dSbus_dVa_full, num_dSbus_dVa, 5, "dSbus_dVa (full)");
 
@@ -292,11 +292,11 @@ public class Djp_t_jacobian {
 //		Djp_t_is.jp_t_is(dIt_dVm_full, num_dIt_dVm, 5, "dIt_dVm (full)");
 //		Djp_t_is.jp_t_is(dIt_dVa_full, num_dIt_dVa, 5, "dIt_dVa (full)");
 
-		Djp_t_end.jp_t_end();
+		Djp_t_end.t_end();
 	}
 
 	public static void main(String[] args) {
-		jp_t_jacobian(false);
+		t_jacobian(false);
 	}
 
 }

@@ -40,7 +40,7 @@ public class Djp_get_reorder {
 	 * @param dim 1 - index rows, 2 - index columns.
 	 * @return a copy of A indexed in dimension dim.
 	 */
-	public static DoubleMatrix2D jp_get_reorder(DoubleMatrix2D A, int[] idx, int dim) {
+	public static DoubleMatrix2D get_reorder(DoubleMatrix2D A, int[] idx, int dim) {
 		if (dim == 1) {
 			return A.viewSelection(idx, null).copy();
 		} else if (dim == 2) {
@@ -58,7 +58,7 @@ public class Djp_get_reorder {
 	 * @param idx
 	 * @return an indexed copy of A.
 	 */
-	public static DoubleMatrix1D jp_get_reorder(DoubleMatrix1D A, int[] idx) {
+	public static DoubleMatrix1D get_reorder(DoubleMatrix1D A, int[] idx) {
 		return A.viewSelection(idx).copy();
 	}
 

@@ -40,7 +40,7 @@ public abstract class Djp_rundcpf_test extends Djp_base_test {
 //	}
 
 	public void test_rundcpf__jpc() {
-		test_jpc(Djp_rundcpf.jp_rundcpf(this.jpc), true);
+		test_jpc(Djp_rundcpf.rundcpf(this.jpc), true);
 	}
 
 }

@@ -55,20 +55,20 @@ public class Djp_printpf {
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final DComplexFunctions cfunc = DComplexFunctions.functions;
 
-	public static void jp_printpf(Djp_jpc results) {
-		jp_printpf(results, System.out);
+	public static void printpf(Djp_jpc results) {
+		printpf(results, System.out);
 	}
 
-	public static void jp_printpf(Djp_jpc results, String fname) {
-		jp_printpf(results, fname, Djp_jpoption.jp_jpoption());
+	public static void printpf(Djp_jpc results, String fname) {
+		printpf(results, fname, Djp_jpoption.jpoption());
 	}
 
-	public static void jp_printpf(Djp_jpc results, String fname, Map<String, Double> jpopt) {
+	public static void printpf(Djp_jpc results, String fname, Map<String, Double> jpopt) {
 		FileOutputStream output;
 		try {
 			output = new FileOutputStream(fname);
 
-			jp_printpf(results, output, Djp_jpoption.jp_jpoption());
+			printpf(results, output, Djp_jpoption.jpoption());
 
 			output.close();
 		} catch (FileNotFoundException e) {
@@ -78,12 +78,12 @@ public class Djp_printpf {
 		}
 	}
 
-	public static void jp_printpf(Djp_jpc results, OutputStream output) {
-		jp_printpf(results, output, Djp_jpoption.jp_jpoption());
+	public static void printpf(Djp_jpc results, OutputStream output) {
+		printpf(results, output, Djp_jpoption.jpoption());
 	}
 
 	@SuppressWarnings("static-access")
-	public static void jp_printpf(Djp_jpc results, OutputStream output, Map<String, Double> jpopt) {
+	public static void printpf(Djp_jpc results, OutputStream output, Map<String, Double> jpopt) {
 		PrintWriter pw;
 
 		int i, k, nb, nl, ng, nout, mini, maxi, a, nxfmr;
@@ -202,7 +202,7 @@ public class Djp_printpf {
 		shunt.assign(Djp_util.intm(bus.Bs), ifunc.or);
 		nzsh = Djp_util.nonzero(shunt);
 
-		isload = Djp_isload.jp_isload(gen);
+		isload = Djp_isload.isload(gen);
 		notload = isload.copy();
 		notload.assign(ifunc.equals(0));
 

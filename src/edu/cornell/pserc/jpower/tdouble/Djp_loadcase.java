@@ -27,12 +27,12 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_loadcase {
 
-	public static Djp_jpc jp_loadcase(String casefile) {
+	public static Djp_jpc loadcase(String casefile) {
 		// TODO Implement this method
 		throw new UnsupportedOperationException();
 	}
 
-	public static Djp_jpc jp_loadcase(Djp_jpc jpc) {
+	public static Djp_jpc loadcase(Djp_jpc jpc) {
 		jpc = jpc.copy();
 
 		// TODO: -----  check contents of case  -----

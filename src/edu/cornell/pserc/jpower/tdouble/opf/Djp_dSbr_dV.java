@@ -92,7 +92,7 @@ public class Djp_dSbr_dV {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_dSbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
+	public static AbstractMatrix[] dSbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
 
 		/* define */
 		f = branch.f_bus.toArray();		// list of "from" buses
@@ -147,4 +147,5 @@ public class Djp_dSbr_dV {
 
 		return new AbstractMatrix[] {dSf_dVa, dSf_dVm, dSt_dVa, dSt_dVm, Sf, St};
 	}
+
 }

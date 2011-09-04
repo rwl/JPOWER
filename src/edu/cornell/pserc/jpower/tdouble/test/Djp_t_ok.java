@@ -28,8 +28,8 @@ package edu.cornell.pserc.jpower.tdouble.test;
  */
 public class Djp_t_ok {
 
-	public static void jp_t_ok(boolean cond) {
-		jp_t_ok(cond, null);
+	public static void t_ok(boolean cond) {
+		t_ok(cond, null);
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class Djp_t_ok {
 	 * @param cond
 	 * @param msg
 	 */
-	public static void jp_t_ok(boolean cond, String msg) {
+	public static void t_ok(boolean cond, String msg) {
 		if (msg == null) {
 			msg = "";
 		} else {

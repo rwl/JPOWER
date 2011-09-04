@@ -10,12 +10,12 @@ public class Djp_t_run_tests {
 
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
-	public static void jp_t_run_tests(List<String> test_names) {
-		jp_t_run_tests(test_names, false);
+	public static void t_run_tests(List<String> test_names) {
+		t_run_tests(test_names, false);
 	}
 
 	@SuppressWarnings("static-access")
-	public static void jp_t_run_tests(List<String> test_names, boolean verbose) {
+	public static void t_run_tests(List<String> test_names, boolean verbose) {
 		IntMatrix1D len;
 		int maxlen = 0, num_of_tests, counter, ok_cnt, not_ok_cnt, skip_cnt, pad;
 		long t0;

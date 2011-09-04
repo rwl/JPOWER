@@ -39,7 +39,7 @@ public abstract class Djp_loadcase_test extends Djp_base_test {
 	}
 
 	public void test_loadcase__jpc() {
-		test_jpc(Djp_loadcase.jp_loadcase(this.jpc));
+		test_jpc(Djp_loadcase.loadcase(this.jpc));
 	}
 
 }

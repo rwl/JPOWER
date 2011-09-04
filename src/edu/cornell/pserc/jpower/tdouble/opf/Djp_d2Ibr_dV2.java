@@ -53,7 +53,7 @@ public class Djp_d2Ibr_dV2 {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix2D[] jp_d2Ibr_dV2(DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
+	public static DComplexMatrix2D[] d2Ibr_dV2(DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
 
 		nb = (int) V.size();
 

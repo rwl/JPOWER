@@ -47,9 +47,9 @@ public abstract class Djp_bustypes_test extends Djp_base_test {
 		File ref_file, pv_file, pq_file;
 		IntMatrix1D ref, pv, pq;
 
-		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		jpc = Djp_ext2int.jp_ext2int(jpc);
-		bustypes = Djp_bustypes.jp_bustypes(jpc.bus, jpc.gen);
+		jpc = Djp_loadcase.loadcase(this.jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
+		bustypes = Djp_bustypes.bustypes(jpc.bus, jpc.gen);
 
 		ref_file = new File(fdir, "ref.mtx");
 		pv_file = new File(fdir, "pv.mtx");

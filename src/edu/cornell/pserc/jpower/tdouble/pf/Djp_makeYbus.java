@@ -60,7 +60,7 @@ public class Djp_makeYbus {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix2D[] jp_makeYbus(double baseMVA, Djp_bus bus,
+	public static DComplexMatrix2D[] makeYbus(double baseMVA, Djp_bus bus,
 			Djp_branch branch) {
 		int nb, nl;
 		int[] i, f, t, il;

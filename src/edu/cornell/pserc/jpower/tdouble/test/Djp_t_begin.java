@@ -19,6 +19,14 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_quiet;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_num_of_tests;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_counter;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_not_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_skip_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_clock;
+
 /**
  * Begin running tests.
  *
@@ -28,8 +36,8 @@ package edu.cornell.pserc.jpower.tdouble.test;
  */
 public class Djp_t_begin {
 
-	public static void jp_t_begin(int num_of_tests) {
-		jp_t_begin(num_of_tests, false);
+	public static void t_begin(int num_of_tests) {
+		t_begin(num_of_tests, false);
 	}
 
 	/**
@@ -40,16 +48,17 @@ public class Djp_t_begin {
 	 *
 	 * @param quiet
 	 */
-	public static void jp_t_begin(int num_of_tests, boolean quiet) {
-		TestGlobals.t_quiet = quiet;
-		TestGlobals.t_num_of_tests = num_of_tests;
-		TestGlobals.t_counter = 1;
-		TestGlobals.t_ok_cnt = 0;
-		TestGlobals.t_not_ok_cnt = 0;
-		TestGlobals.t_skip_cnt = 0;
-		TestGlobals.t_clock = System.currentTimeMillis();
+	public static void t_begin(int num_of_tests, boolean quiet) {
+		t_quiet = quiet;
+		t_num_of_tests = num_of_tests;
+		t_counter = 1;
+		t_ok_cnt = 0;
+		t_not_ok_cnt = 0;
+		t_skip_cnt = 0;
+		t_clock = System.currentTimeMillis();
 
-		if (TestGlobals.t_quiet == false)
+		if (t_quiet == false)
 			System.out.printf("1..%d\n", num_of_tests);
 	}
+
 }

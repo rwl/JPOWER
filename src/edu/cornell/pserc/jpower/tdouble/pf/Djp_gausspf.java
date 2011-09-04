@@ -68,7 +68,7 @@ public class Djp_gausspf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+	public static Object[] gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
 		double tol, normF;
 		int i, max_it, verbose, npv;
@@ -162,9 +162,9 @@ public class Djp_gausspf {
 		return new Object[] {V, converged, i};
 	}
 
-	public static Object[] jp_gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+	public static Object[] gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
-		return jp_gausspf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jp_jpoption());
+		return gausspf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jpoption());
 	}
 
 }

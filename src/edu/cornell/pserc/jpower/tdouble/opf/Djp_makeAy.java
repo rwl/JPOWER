@@ -76,7 +76,7 @@ public class Djp_makeAy {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_makeAy(double baseMVA, int ng, Djp_gencost gencost,
+	public static AbstractMatrix[] makeAy(double baseMVA, int ng, Djp_gencost gencost,
 			int pgbas, int qgbas, int ybas) {
 
 		/* find all pwl cost rows in gencost, either real or reactive */

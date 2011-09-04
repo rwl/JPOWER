@@ -126,7 +126,7 @@ public class Djp_ext2int {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Djp_jpc jp_ext2int(Djp_jpc jpc) {
+	public static Djp_jpc ext2int(Djp_jpc jpc) {
 		int i, nb, ng, ng0;
 		boolean first, dc;
 		Djp_order o;
@@ -246,11 +246,11 @@ public class Djp_ext2int {
 				jpc.order.external.gencost = jpc.gencost.copy();	// Save with external ordering.
 				if (jpc.gencost.size() == 2*ng0) {
 					String[] ordering = new String[] {"gen", "gen"};  // include Qg cost
-					jpc.gencost = Djp_gencost.fromMatrix( jp_ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					jpc.gencost = Djp_gencost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
 
 				} else {
 					String ordering = "gen";  // Pg cost only
-					jpc.gencost = Djp_gencost.fromMatrix( jp_ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					jpc.gencost = Djp_gencost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
 				}
 			}
 //			if (jpc.A != null | jpc.N != null) {
@@ -274,12 +274,12 @@ public class Djp_ext2int {
 	}
 
 
-	public static Djp_jpc jp_ext2int(Djp_jpc jpc, String field, String[] ordering) {
+	public static Djp_jpc ext2int(Djp_jpc jpc, String field, String[] ordering) {
 		int dim = 1;
-		return jp_ext2int(jpc, field, ordering, dim);
+		return ext2int(jpc, field, ordering, dim);
 	}
 
-	public static Djp_jpc jp_ext2int(Djp_jpc jpc, String field, String[] ordering, int dim) {
+	public static Djp_jpc ext2int(Djp_jpc jpc, String field, String[] ordering, int dim) {
 		DoubleMatrix1D val1;
 		DoubleMatrix2D val2;
 		Field fld;
@@ -291,11 +291,11 @@ public class Djp_ext2int {
 			if (type == DoubleMatrix1D.class) {
 				val1 = (DoubleMatrix1D) fld.get(jpc);
 				fld.set(jpc.order.external, val1.copy());
-				fld.set(jpc, jp_ext2int(jpc, val1, ordering, dim));
+				fld.set(jpc, ext2int(jpc, val1, ordering, dim));
 			} else if (type == DoubleMatrix2D.class) {
 				val2 = (DoubleMatrix2D) fld.get(jpc);
 				fld.set(jpc.order.external, val2.copy());
-				fld.set(jpc, jp_ext2int(jpc, val2, ordering, dim));
+				fld.set(jpc, ext2int(jpc, val2, ordering, dim));
 			} else {
 				throw new UnsupportedOperationException();
 			}
@@ -312,8 +312,8 @@ public class Djp_ext2int {
 		return jpc;
 	}
 
-	public static Djp_jpc jp_ext2int(Djp_jpc jpc, String[] field, String[] ordering) {
-		return jp_ext2int(jpc, field, ordering, 1);
+	public static Djp_jpc ext2int(Djp_jpc jpc, String[] field, String[] ordering) {
+		return ext2int(jpc, field, ordering, 1);
 	}
 
 	/**
@@ -324,7 +324,7 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	public static Djp_jpc jp_ext2int(Djp_jpc jpc, String[] field, String[] ordering, int dim) {
+	public static Djp_jpc ext2int(Djp_jpc jpc, String[] field, String[] ordering, int dim) {
 //		DoubleMatrix1D val1;
 //		DoubleMatrix2D val2;
 //		Field fld;
@@ -360,11 +360,11 @@ public class Djp_ext2int {
 	}
 
 
-	public static DoubleMatrix1D jp_ext2int(Djp_jpc jpc, DoubleMatrix1D val, String ordering) {
-		return jp_ext2int(jpc, val, ordering, 1);
+	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String ordering) {
+		return ext2int(jpc, val, ordering, 1);
 	}
 
-	public static DoubleMatrix1D jp_ext2int(Djp_jpc jpc, DoubleMatrix1D val, String ordering, int dim) {
+	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String ordering, int dim) {
 		int[] idx;
 		Djp_order o;
 		DoubleMatrix1D int_val1;
@@ -382,13 +382,13 @@ public class Djp_ext2int {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-		int_val1 = Djp_get_reorder.jp_get_reorder(val, idx);
+		int_val1 = Djp_get_reorder.get_reorder(val, idx);
 
 		return int_val1;
 	}
 
-	public static DoubleMatrix1D jp_ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering) {
-		return jp_ext2int(jpc, val, ordering, 1);
+	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering) {
+		return ext2int(jpc, val, ordering, 1);
 	}
 
 	/**
@@ -399,7 +399,7 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	public static DoubleMatrix1D jp_ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering, int dim) {
+	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		int b, n, k;
@@ -449,11 +449,11 @@ public class Djp_ext2int {
 
 
 
-	public static DoubleMatrix2D jp_ext2int(Djp_jpc jpc, DoubleMatrix2D val, String ordering) {
-		return jp_ext2int(jpc, val, ordering, 1);
+	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String ordering) {
+		return ext2int(jpc, val, ordering, 1);
 	}
 
-	public static DoubleMatrix2D jp_ext2int(Djp_jpc jpc, DoubleMatrix2D val, String ordering, int dim) {
+	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String ordering, int dim) {
 		int[] idx;
 		Djp_order o;
 		DoubleMatrix2D int_val2;
@@ -470,13 +470,13 @@ public class Djp_ext2int {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-		int_val2 = Djp_get_reorder.jp_get_reorder(val, idx, dim);
+		int_val2 = Djp_get_reorder.get_reorder(val, idx, dim);
 
 		return int_val2;
 	}
 
-	public static DoubleMatrix2D jp_ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering) {
-		return jp_ext2int(jpc, val, ordering, 1);
+	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering) {
+		return ext2int(jpc, val, ordering, 1);
 	}
 
 	/**
@@ -487,7 +487,7 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	public static DoubleMatrix2D jp_ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering, int dim) {
+	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		int b, n, k;
@@ -560,8 +560,8 @@ public class Djp_ext2int {
 	 * @param branch
 	 * @return
 	 */
-	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch) {
-		return jp_ext2int(bus, gen, branch, null);
+	public static Object[] ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch) {
+		return ext2int(bus, gen, branch, null);
 	}
 
 	/**
@@ -573,7 +573,7 @@ public class Djp_ext2int {
 	 * @param areas
 	 * @return
 	 */
-	public static Object[] jp_ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch, Djp_areas areas) {
+	public static Object[] ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch, Djp_areas areas) {
 		int[] i2e;
 		IntMatrix1D e2i;
 

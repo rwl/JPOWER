@@ -136,12 +136,12 @@ public class Djd_rundyn {
 		/* Initialization: Power Flow */
 
 		// Power flow options
-		jpopt = Djp_jpoption.jp_jpoption();
+		jpopt = Djp_jpoption.jpoption();
 		jpopt.put("VERBOSE", 0.0);
 		jpopt.put("OUT_ALL", 0.0);
 
 		// Run power flow
-		jpc = Djp_runpf.jp_runpf(casefile_pf, jpopt);
+		jpc = Djp_runpf.runpf(casefile_pf, jpopt);
 		baseMVA = jpc.baseMVA;
 		bus = jpc.bus;
 		gen = jpc.gen;

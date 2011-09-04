@@ -102,7 +102,7 @@ public class Djp_opf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Djp_jpc jp_opf(Djp_jpc jpc, DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
+	public static Djp_jpc opf(Djp_jpc jpc, DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			Map<String, Double> jpopt, DoubleMatrix2D N, DoubleMatrix2D fparm, DoubleMatrix2D H,
 			DoubleMatrix1D Cw, DoubleMatrix1D z0, DoubleMatrix1D zl, DoubleMatrix1D zu) {
 
@@ -111,7 +111,7 @@ public class Djp_opf {
 		t0 = System.currentTimeMillis();	// start timer
 
 		/* process input arguments */
-		opf_args = Djp_opf_args.jp_opf_args();
+		opf_args = Djp_opf_args.opf_args();
 		jpc = (Djp_jpc) opf_args[0];
 		jpopt = (Map<String, Double>) opf_args[1];
 
@@ -147,7 +147,7 @@ public class Djp_opf {
 
 		if (dc) {
 			/* ignore reactive costs for DC */
-			pqcost = Djp_pqcost.jp_pqcost(jpc.gencost, ng);
+			pqcost = Djp_pqcost.pqcost(jpc.gencost, ng);
 			jpc.gencost = pqcost[0];
 
 			/* reduce A and/or N from AC dimensions to DC dimensions, if needed */
@@ -185,7 +185,7 @@ public class Djp_opf {
 		}
 
 		/* convert to internal numbering, remove out-of-service stuff */
-		jpc = Djp_ext2int.jp_ext2int(jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
 
 		/* update dimensions */
 		nb = jpc.bus.size();			// number of buses
@@ -193,7 +193,7 @@ public class Djp_opf {
 		ng = jpc.gen.size();			// number of dispatchable injections
 
 		/* create (read-only) copies of individual fields for convenience */
-		opf_args = Djp_opf_args.jp_opf_args(jpc, jpopt);
+		opf_args = Djp_opf_args.opf_args(jpc, jpopt);
 		baseMVA = (Double) opf_args[0];
 		bus = (Djp_bus) opf_args[1];
 		gen = (Djp_gen) opf_args[2];
@@ -238,7 +238,7 @@ public class Djp_opf {
 			q1 = -1;	// index of 1st Qg column in Ay
 
 			/* power mismatch constraints */
-			Bdc = Djp_makeBdc.jp_makeBdc(baseMVA, bus, branch);
+			Bdc = Djp_makeBdc.makeBdc(baseMVA, bus, branch);
 			B = (DoubleMatrix2D) Bdc[0];
 			Bf = (DoubleMatrix2D) Bdc[1];
 			Pbusinj = (DoubleMatrix1D) Bdc[2];
@@ -263,13 +263,13 @@ public class Djp_opf {
 			q1 = ng;	// index of 1st Qg column in Ay
 
 			/* dispatchable load, constant power factor constraints */
-			Alu_vl = Djp_makeAvl.jp_makeAvl(baseMVA, gen);
+			Alu_vl = Djp_makeAvl.makeAvl(baseMVA, gen);
 			Avl = (DoubleMatrix2D) Alu_vl[0];
 			lvl = (DoubleMatrix1D) Alu_vl[1];
 			uvl = (DoubleMatrix1D) Alu_vl[2];
 
 			/* generator PQ capability curve constraints */
-			Alu_pq = Djp_makeApq.jp_makeApq(baseMVA, gen);
+			Alu_pq = Djp_makeApq.makeApq(baseMVA, gen);
 			Apqh  = (DoubleMatrix2D) Alu_pq[0];
 			ubpqh = (DoubleMatrix1D) Alu_pq[1];
 			Apql  = (DoubleMatrix2D) Alu_pq[2];
@@ -287,7 +287,7 @@ public class Djp_opf {
 		Val.viewSelection(refs).assign(Va.viewSelection(refs));
 
 		/* branch voltage angle difference limits */
-		Alu_ang = Djp_makeAang.jp_makeAang(baseMVA, branch, nb, jpopt);
+		Alu_ang = Djp_makeAang.makeAang(baseMVA, branch, nb, jpopt);
 		Aang = (DoubleMatrix2D) Alu_ang[0];
 		lang = (DoubleMatrix1D) Alu_ang[1];
 		uang = (DoubleMatrix1D) Alu_ang[2];
@@ -301,7 +301,7 @@ public class Djp_opf {
 		} else {
 			int[] ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
 			ny = ipwl.length;	// number of piece-wise linear cost vars
-			AbstractMatrix[] Ab_y = Djp_makeAy.jp_makeAy(baseMVA, ng, gencost, 1, q1, ng+nq);
+			AbstractMatrix[] Ab_y = Djp_makeAy.makeAy(baseMVA, ng, gencost, 1, q1, ng+nq);
 			Ay = (DoubleMatrix2D) Ab_y[0];
 			by = (DoubleMatrix1D) Ab_y[1];
 		}
@@ -377,7 +377,7 @@ public class Djp_opf {
 		}
 
 		/* execute userfcn callbacks for 'formulation' stage */
-		om = Djp_run_userfcn.jp_run_userfcn(userfcn, "formulation", om);
+		om = Djp_run_userfcn.run_userfcn(userfcn, "formulation", om);
 
 		/* build user-defined costs */
 		om = om.build_cost_params();
@@ -391,13 +391,13 @@ public class Djp_opf {
 
 		/* call the specific solver */
 		if (verbose > 0) {
-			v = Djp_jpver.jp_jpver("all");
+			v = Djp_jpver.jpver("all");
 			System.out.printf("\nMATPOWER Version %s, %s", v.get("Version"), v.get("Date"));
 		}
 		if (dc) {
 			if (verbose > 0)
 				System.out.printf(" -- DC Optimal Power Flow\n");
-			r = Djp_dcopf_solver.jp_dcopf_solver(om, jpopt, output);
+			r = Djp_dcopf_solver.dcopf_solver(om, jpopt, output);
 			results = (Map<String, AbstractMatrix>) r[0];
 			success = (Boolean) r[1];
 			raw = (Map<String, AbstractMatrix>) r[2];
@@ -408,7 +408,7 @@ public class Djp_opf {
 			if (alg != 560 || alg != 565)
 				System.err.println("Unsupported algorithm, using JIPS.");
 
-			r = Djp_jipsopf_solver.jp_jipsopf_solver(om, jpopt, output);
+			r = Djp_jipsopf_solver.jipsopf_solver(om, jpopt, output);
 			results = (Map<String, AbstractMatrix>) r[0];
 			success = (Boolean) r[1];
 			raw = (Map<String, AbstractMatrix>) r[2];
@@ -420,7 +420,7 @@ public class Djp_opf {
 		return null;
 	}
 
-	public static Djp_jpc jp_opf(Djp_jpc jpc, Map<String, Double> jpopt) {
+	public static Djp_jpc opf(Djp_jpc jpc, Map<String, Double> jpopt) {
 		return null;
 	}
 

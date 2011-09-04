@@ -21,18 +21,18 @@ package edu.cornell.pserc.jpower.tdouble.test;
 
 public class Djp_t_loadcase {
 
-	public static void jp_t_loadcase() {
-		jp_t_loadcase(false);
+	public static void t_loadcase() {
+		t_loadcase(false);
 	}
 
-	public static void jp_t_loadcase(boolean quiet) {
+	public static void t_loadcase(boolean quiet) {
 
-		Djp_t_begin.jp_t_begin(240, quiet);
+		Djp_t_begin.t_begin(240, quiet);
 
 	}
 
 	public static void main(String[] args) {
-		jp_t_loadcase(false);
+		t_loadcase(false);
 	}
 
 }

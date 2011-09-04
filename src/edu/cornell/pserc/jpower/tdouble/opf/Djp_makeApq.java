@@ -73,7 +73,7 @@ public class Djp_makeApq {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_makeApq(double baseMVA, Djp_gen gen) {
+	public static Object[] makeApq(double baseMVA, Djp_gen gen) {
 
 		/* data dimensions */
 		ng = gen.size();		// number of dispatchable injections
@@ -82,8 +82,8 @@ public class Djp_makeApq {
 		 * (in addition to simple box constraints) on (Pg,Qg) to correctly
 		 * model their PQ capability curves
 		 */
-		ipqh = Djp_util.nonzero( Djp_hasPQcap.jp_hasPQcap(gen, "U") );
-		ipql = Djp_util.nonzero( Djp_hasPQcap.jp_hasPQcap(gen, "L") );
+		ipqh = Djp_util.nonzero( Djp_hasPQcap.hasPQcap(gen, "U") );
+		ipql = Djp_util.nonzero( Djp_hasPQcap.hasPQcap(gen, "L") );
 		npqh = ipqh.length;		// number of general PQ capability curves (upper)
 		npql = ipql.length;		// number of general PQ capability curves (lower)
 

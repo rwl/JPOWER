@@ -59,13 +59,13 @@ public class Djp_d2AIbr_dV2 {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix2D[] jp_d2AIbr_dV2(DComplexMatrix2D dIbr_dVa, DComplexMatrix2D dIbr_dVm,
+	public static DoubleMatrix2D[] d2AIbr_dV2(DComplexMatrix2D dIbr_dVa, DComplexMatrix2D dIbr_dVm,
 			DComplexMatrix1D Ibr, DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
 
 		diaglam = DComplexFactory2D.sparse.diagonal(lam);
 		conj_diagIbr = DComplexFactory2D.sparse.diagonal(Ibr.copy().assign(cfunc.conj));
 
-		d2Ibr_dV2 = Djp_d2Ibr_dV2.jp_d2Ibr_dV2(Ybr, V, conj_diagIbr.zMult(lam, null));
+		d2Ibr_dV2 = Djp_d2Ibr_dV2.d2Ibr_dV2(Ybr, V, conj_diagIbr.zMult(lam, null));
 		Iaa = d2Ibr_dV2[0];
 		Iav = d2Ibr_dV2[1];
 		Iva = d2Ibr_dV2[2];
@@ -88,4 +88,5 @@ public class Djp_d2AIbr_dV2 {
 
 		return new DoubleMatrix2D[] {Haa, Hav, Hva, Hvv};
 	}
+
 }

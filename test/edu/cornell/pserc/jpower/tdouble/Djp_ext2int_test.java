@@ -38,8 +38,8 @@ public abstract class Djp_ext2int_test extends Djp_base_test {
 	public void test_ext2int__jpc() {
 		Djp_jpc jpc;
 
-		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		jpc = Djp_ext2int.jp_ext2int(jpc);
+		jpc = Djp_loadcase.loadcase(this.jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
 
 		jpc.bus.bus_i.assign(IntFunctions.plus(1));
 		jpc.gen.gen_bus.assign(IntFunctions.plus(1));

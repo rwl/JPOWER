@@ -33,7 +33,7 @@ public class Dips_qps_jips {
 
 	private static int nx;
 
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+	public static Object[] qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0, Map<String, Double> opt) {
 
@@ -88,24 +88,24 @@ public class Dips_qps_jips {
 
 		Dips_qp_f f_fcn = new Dips_qp_f(x0, H, c);
 
-		return Dips_jips.ips_jips(f_fcn, x0, A, l, u, xmin, xmax);
+		return Dips_jips.jips(f_fcn, x0, A, l, u, xmin, xmax);
 	}
 
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+	public static Object[] qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u) {
-		return ips_qps_jips(H, c, A, l, u, null, null);
+		return qps_jips(H, c, A, l, u, null, null);
 	}
 
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+	public static Object[] qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			DoubleMatrix1D xmin, DoubleMatrix1D xmax) {
-		return ips_qps_jips(H, c, A, l, u, xmin, xmax, null);
+		return qps_jips(H, c, A, l, u, xmin, xmax, null);
 	}
 
-	public static Object[] ips_qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
+	public static Object[] qps_jips(DoubleMatrix2D H, DoubleMatrix1D c,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			DoubleMatrix1D xmin, DoubleMatrix1D xmax, DoubleMatrix1D x0) {
-		return ips_qps_jips(H, c, A, l, u, xmin, xmax, x0, new HashMap<String, Double>());
+		return qps_jips(H, c, A, l, u, xmin, xmax, x0, new HashMap<String, Double>());
 	}
 
 }

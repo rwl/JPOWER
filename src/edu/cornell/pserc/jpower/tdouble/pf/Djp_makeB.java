@@ -49,7 +49,7 @@ public class Djp_makeB {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix2D[] jp_makeB(double baseMVA, Djp_bus bus, Djp_branch branch, int alg) {
+	public static DoubleMatrix2D[] makeB(double baseMVA, Djp_bus bus, Djp_branch branch, int alg) {
 		Djp_branch temp_branch;
 		Djp_bus temp_bus;
 		DComplexMatrix2D[] Ybus;
@@ -64,7 +64,7 @@ public class Djp_makeB {
 		if (alg == 2)								// if XB method
 			temp_branch.br_r.assign(0);				// zero out line resistance
 
-		Ybus = Djp_makeYbus.jp_makeYbus(baseMVA, temp_bus, temp_branch);
+		Ybus = Djp_makeYbus.makeYbus(baseMVA, temp_bus, temp_branch);
 		Bp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
 
 		/* -----  form Bpp (B double prime)  ----- */
@@ -73,9 +73,10 @@ public class Djp_makeB {
 		if (alg == 3)								// if BX method
 			temp_branch.br_b.assign(0);				// zero out line resistance
 
-		Ybus = Djp_makeYbus.jp_makeYbus(baseMVA, temp_bus, temp_branch);
+		Ybus = Djp_makeYbus.makeYbus(baseMVA, temp_bus, temp_branch);
 		Bpp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
 
 		return new DoubleMatrix2D[] {Bp, Bpp};
 	}
+
 }

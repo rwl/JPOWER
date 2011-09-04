@@ -56,7 +56,7 @@ public class Djp_totcost {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D jp_totcost(Djp_gencost gencost, DoubleMatrix1D Pg) {
+	public static DoubleMatrix1D totcost(Djp_gencost gencost, DoubleMatrix1D Pg) {
 
 		ng = gencost.size();
 
@@ -92,4 +92,5 @@ public class Djp_totcost {
 
 		return totalcost;
 	}
+
 }

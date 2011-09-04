@@ -12,7 +12,7 @@ public class Djp_isload {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D jp_isload(Djp_gen gen) {
+	public static IntMatrix1D isload(Djp_gen gen) {
 		IntMatrix1D lt, eq;
 
 		lt = Djp_util.intm(gen.Pmin.copy().assign( dfunc.less(0) ));

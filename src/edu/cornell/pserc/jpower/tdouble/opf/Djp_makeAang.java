@@ -68,7 +68,7 @@ public class Djp_makeAang {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_makeAang(double baseMVA, Djp_branch branch, int nb, Map<String, Double> jpopt) {
+	public static AbstractMatrix[] makeAang(double baseMVA, Djp_branch branch, int nb, Map<String, Double> jpopt) {
 
 		/* options */
 		ignore_ang_lim = jpopt.get("OPF_IGNORE_ANG_LIM") == 1;

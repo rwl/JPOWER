@@ -44,9 +44,9 @@ public abstract class Djp_makeSbus_test extends Djp_base_test {
 		DComplexMatrix1D Sbus, mpSbus;
 		File Sbus_file;
 
-		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		jpc = Djp_ext2int.jp_ext2int(jpc);
-		Sbus = Djp_makeSbus.jp_makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
+		jpc = Djp_loadcase.loadcase(this.jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
+		Sbus = Djp_makeSbus.makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
 
 		Sbus_file = new File(fdir, "Sbus.mtx");;
 

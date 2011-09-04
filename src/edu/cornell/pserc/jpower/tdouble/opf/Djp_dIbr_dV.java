@@ -69,7 +69,7 @@ public class Djp_dIbr_dV {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_dIbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
+	public static AbstractMatrix[] dIbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
 
 		Vnorm = V.copy().assign(cfunc.abs).assign(V, cfunc.swapArgs(cfunc.div));
 		diagV = DComplexFactory2D.sparse.diagonal(V);
@@ -87,4 +87,5 @@ public class Djp_dIbr_dV {
 
 		return new AbstractMatrix[] {dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm, If, It};
 	}
+
 }

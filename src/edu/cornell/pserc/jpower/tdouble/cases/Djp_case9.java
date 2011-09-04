@@ -41,7 +41,7 @@ public class Djp_case9 {
 	 *
 	 * @return a 9 bus, 3 generator case.
 	 */
-	public static Djp_jpc jp_case9() {
+	public static Djp_jpc case9() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

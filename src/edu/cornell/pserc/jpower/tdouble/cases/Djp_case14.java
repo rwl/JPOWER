@@ -45,7 +45,7 @@ public class Djp_case14 {
 	 *
 	 * @return power flow data for IEEE 14 bus test case.
 	 */
-	public static Djp_jpc jp_case14() {
+	public static Djp_jpc case14() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class Dips_jipsver {
 
-	public static Map<String, String> ips_jipsver(String string) {
+	public static Map<String, String> jipsver(String string) {
 		// TODO Auto-generated method stub
 		return null;
 	}

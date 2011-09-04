@@ -61,13 +61,13 @@ public class Djp_d2ASbr_dV2 {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix2D[] jp_d2ASbr_dV2(DComplexMatrix2D dSbr_dVa, DComplexMatrix2D dSbr_dVm,
+	public static DoubleMatrix2D[] d2ASbr_dV2(DComplexMatrix2D dSbr_dVa, DComplexMatrix2D dSbr_dVm,
 			DComplexMatrix1D Sbr, DComplexMatrix2D Cbr, DComplexMatrix2D Ybr, DComplexMatrix1D V, DComplexMatrix1D lam) {
 
 		diaglam = DComplexFactory2D.sparse.diagonal(lam);
 		conj_diagSbr = DComplexFactory2D.sparse.diagonal(Sbr.copy().assign(cfunc.conj));
 
-		d2Sbr_dV2 = Djp_d2Sbr_dV2.jp_d2Sbr_dV2(Cbr, Ybr, V, conj_diagSbr.zMult(lam, null));
+		d2Sbr_dV2 = Djp_d2Sbr_dV2.d2Sbr_dV2(Cbr, Ybr, V, conj_diagSbr.zMult(lam, null));
 		Saa = d2Sbr_dV2[0];
 		Sav = d2Sbr_dV2[1];
 		Sva = d2Sbr_dV2[2];
@@ -90,4 +90,5 @@ public class Djp_d2ASbr_dV2 {
 
 		return new DoubleMatrix2D[] {Haa, Hav, Hva, Hvv};
 	}
+
 }

@@ -24,12 +24,12 @@ import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model;
 
 public class Djp_run_userfcn {
 
-	public static Djp_jpc jp_run_userfcn(String userfcn, String stage, Djp_jpc jpc) {
+	public static Djp_jpc run_userfcn(String userfcn, String stage, Djp_jpc jpc) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public static Djp_opf_model jp_run_userfcn(String userfcn, String stage, Djp_opf_model om) {
+	public static Djp_opf_model run_userfcn(String userfcn, String stage, Djp_opf_model om) {
 		// TODO Auto-generated method stub
 		return null;
 	}

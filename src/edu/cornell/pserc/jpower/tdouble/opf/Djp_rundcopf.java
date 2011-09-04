@@ -42,21 +42,21 @@ public class Djp_rundcopf {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Djp_jpc jp_rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_DC", 1.0);
-		return Djp_runopf.jp_runopf(casedata, jpopt, fname, solvedcase);
+	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		jpopt = Djp_jpoption.jpoption(jpopt, "PF_DC", 1.0);
+		return Djp_runopf.runopf(casedata, jpopt, fname, solvedcase);
 	}
 
-	public static Djp_jpc jp_rundcopf(Djp_jpc casedata) {
-		return jp_rundcopf(casedata, Djp_jpoption.jp_jpoption());
+	public static Djp_jpc rundcopf(Djp_jpc casedata) {
+		return rundcopf(casedata, Djp_jpoption.jpoption());
 	}
 
-	public static Djp_jpc jp_rundcopf(Djp_jpc casedata, Map<String, Double> jpopt) {
-		return jp_rundcopf(casedata, jpopt, "");
+	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt) {
+		return rundcopf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc jp_rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
-		return jp_rundcopf(casedata, jpopt, fname, "");
+	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+		return rundcopf(casedata, jpopt, fname, "");
 	}
 
 }

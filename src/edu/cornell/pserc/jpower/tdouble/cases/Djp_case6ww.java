@@ -42,7 +42,7 @@ public class Djp_case6ww {
 	 *
 	 * @return a 6 bus, 3 gen case from Wood & Wollenberg.
 	 */
-	public static Djp_jpc jp_case6ww() {
+	public static Djp_jpc case6ww() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

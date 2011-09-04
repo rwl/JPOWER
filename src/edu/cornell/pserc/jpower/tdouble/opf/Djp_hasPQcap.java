@@ -69,7 +69,7 @@ public class Djp_hasPQcap {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D jp_hasPQcap(Djp_gen gen, String hilo) {
+	public static IntMatrix1D hasPQcap(Djp_gen gen, String hilo) {
 
 		/* check for errors capability curve data */
 		if ( Djp_util.any(gen.Pc1.copy().assign(gen.Pc2, dfunc.greater)) )
@@ -107,8 +107,8 @@ public class Djp_hasPQcap {
 		return Djp_util.intm(L).assign(Djp_util.intm(U), ifunc.or);
 	}
 
-	public static IntMatrix1D jp_hasPQcap(Djp_gen gen) {
-		return jp_hasPQcap(gen, "B");	// look at both top and bottom by default
+	public static IntMatrix1D hasPQcap(Djp_gen gen) {
+		return hasPQcap(gen, "B");	// look at both top and bottom by default
 	}
 
 }

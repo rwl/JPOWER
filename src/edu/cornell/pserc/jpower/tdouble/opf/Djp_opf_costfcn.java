@@ -105,7 +105,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
 		f = 0;
 		if (ipol.length > 0)
-			f = Djp_totcost.jp_totcost(gencost.copy(ipol), xx.viewSelection(ipol)).aggregate(dfunc.plus, dfunc.identity);
+			f = Djp_totcost.totcost(gencost.copy(ipol), xx.viewSelection(ipol)).aggregate(dfunc.plus, dfunc.identity);
 
 		/* piecewise linear cost of P and Q */
 //		DoubleMatrix1D ccost;
@@ -195,7 +195,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		df_dPgQg = DoubleFactory1D.dense.make(2 * ng);
 		ipol = Djp_util.nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 		xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
-		df_dPgQg.viewSelection(ipol).assign( Djp_polycost.jp_polycost(gencost.copy(ipol), xx.viewSelection(ipol), 1).assign(dfunc.mult(baseMVA)) );
+		df_dPgQg.viewSelection(ipol).assign( Djp_polycost.polycost(gencost.copy(ipol), xx.viewSelection(ipol), 1).assign(dfunc.mult(baseMVA)) );
 		df = DoubleFactory1D.dense.make(nxyz);
 		df.viewSelection(iPg).assign( df_dPgQg.viewPart(0, ng) );
 		df.viewSelection(iQg).assign( df_dPgQg.viewPart(ng, ng) );
@@ -285,10 +285,10 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		d2f_dPg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Pg
 		d2f_dQg2 = DoubleFactory1D.sparse.make(ng);	// w.r.t. p.u. Qg
 		ipolp = Djp_util.nonzero(pcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
-		d2f_dPg2.assign( Djp_polycost.jp_polycost(pcost.copy(ipolp), Pg.viewSelection(ipolp).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
+		d2f_dPg2.assign( Djp_polycost.polycost(pcost.copy(ipolp), Pg.viewSelection(ipolp).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
 		if (qcost != null) {	// Qg is not free
 			ipolq = Djp_util.nonzero(qcost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
-			d2f_dQg2.assign( Djp_polycost.jp_polycost(qcost.copy(ipolq), Qg.viewSelection(ipolq).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
+			d2f_dQg2.assign( Djp_polycost.polycost(qcost.copy(ipolq), Qg.viewSelection(ipolq).copy().assign(dfunc.mult(baseMVA)), 2).assign(dfunc.mult(Math.pow(baseMVA, 2))) );
 		}
 		i = Djp_util.icat(iPg, iQg);
 		d2f = new SparseRCDoubleMatrix2D(nxyz, nxyz, i, i,

@@ -73,7 +73,7 @@ public class Djp_newtonpf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+	public static Object[] newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq, Map<String, Double> jpopt) {
 		int i, max_it, verbose, npv, npq, j1, j2, j3, j4, j5, j6;
 		int[] pvpq;
@@ -134,7 +134,7 @@ public class Djp_newtonpf {
 			i += 1;
 
 			/* evaluate Jacobian */
-			dSbus_dV = Djp_dSbus_dV.jp_dSbus_dV(Ybus, V);
+			dSbus_dV = Djp_dSbus_dV.dSbus_dV(Ybus, V);
 			dSbus_dVm = dSbus_dV[0];
 			dSbus_dVa = dSbus_dV[1];
 
@@ -188,9 +188,9 @@ public class Djp_newtonpf {
 		return new Object[] {V, converged, i};
 	}
 
-	public static Object[] jp_newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
+	public static Object[] newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
-		return jp_newtonpf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jp_jpoption());
+		return newtonpf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jpoption());
 	}
 
 }

@@ -55,7 +55,7 @@ public class Djp_makeBdc {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_makeBdc(double baseMVA, Djp_bus bus, Djp_branch branch) {
+	public static AbstractMatrix[] makeBdc(double baseMVA, Djp_bus bus, Djp_branch branch) {
 		int nb, nl;
 		int[] xfmr, ft, il;
 		double[] v;

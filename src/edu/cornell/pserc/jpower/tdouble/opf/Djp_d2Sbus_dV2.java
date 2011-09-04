@@ -53,7 +53,7 @@ public class Djp_d2Sbus_dV2 {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix2D[] jp_d2Sbus_dV2(DComplexMatrix2D Ybus, DComplexMatrix1D V, DComplexMatrix1D lam) {
+	public static DComplexMatrix2D[] d2Sbus_dV2(DComplexMatrix2D Ybus, DComplexMatrix1D V, DComplexMatrix1D lam) {
 
 		Ibus = Ybus.zMult(V, null);
 		diaglam = DComplexFactory2D.sparse.diagonal(lam);

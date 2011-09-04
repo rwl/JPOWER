@@ -29,7 +29,7 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 public class Djp_t_case_int {
 
-	public static Djp_jpc jp_t_case_int() {
+	public static Djp_jpc t_case_int() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

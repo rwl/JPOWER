@@ -55,7 +55,7 @@ public class Djp_poly2pwl {
 	 * @param npts
 	 * @return
 	 */
-	public static Djp_gencost jp_poly2pwl(Djp_gencost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
+	public static Djp_gencost poly2pwl(Djp_gencost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
 
 		pwlcost = polycost.copy();
 		m = polycost.size();
@@ -80,10 +80,11 @@ public class Djp_poly2pwl {
 			} else {
 				// FIXME Pmin < 0 && Pmax <= 0
 			}
-			yy = Djp_totcost.jp_totcost(polycost.copy(new int[] {i}), xx);
+			yy = Djp_totcost.totcost(polycost.copy(new int[] {i}), xx);
 			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(0, 2 * (npts - 1)    , 2)).assign(xx);
 			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
 		}
 		return pwlcost;
 	}
+
 }

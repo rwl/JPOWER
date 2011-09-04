@@ -58,23 +58,23 @@ public abstract class Djp_dcpf_test extends Djp_base_test {
 
 		DoubleFunctions dfunc = DoubleFunctions.functions;
 
-		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		jpc = Djp_ext2int.jp_ext2int(jpc);
+		jpc = Djp_loadcase.loadcase(this.jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
 
-		bustypes = Djp_bustypes.jp_bustypes(jpc.bus, jpc.gen);
+		bustypes = Djp_bustypes.bustypes(jpc.bus, jpc.gen);
 		ref = bustypes[0].get(0);
 		pv  = bustypes[1].toArray();
 		pq  = bustypes[2].toArray();
 
-		Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
+		Bdc = Djp_makeBdc.makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
 		Bbus = (DoubleMatrix2D) Bdc[0];
-		Sbus = Djp_makeSbus.jp_makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
+		Sbus = Djp_makeSbus.makeSbus(jpc.baseMVA, jpc.bus, jpc.gen);
 		Pbus = Sbus.getRealPart();
 
 		Va0 = jpc.bus.Va.copy();
 		Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
-		Va = Djp_dcpf.jp_dcpf(Bbus, Pbus, Va0, ref, pv, pq);
+		Va = Djp_dcpf.dcpf(Bbus, Pbus, Va0, ref, pv, pq);
 
 		mpVa = (DoubleMatrix1D) Djp_mm.readMatrix(new File(fdir, "Va.mtx"));
 

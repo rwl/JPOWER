@@ -48,7 +48,7 @@ public class Djp_jp_isload {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D jp_isload(Djp_gen gen) {
+	public static IntMatrix1D isload(Djp_gen gen) {
 
 		return Djp_util.intm( gen.Pmin.copy().assign(dfunc.less(0)) ).assign(Djp_util.intm( gen.Pmax.copy().assign(dfunc.equals(0)) ), ifunc.and);
 	}

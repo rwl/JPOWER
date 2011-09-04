@@ -39,7 +39,7 @@ public class Djp_t_case9_pf {
 	 *
 	 * @return a 9 bus, 3 generator case, no OPF data.
 	 */
-	public static Djp_jpc jp_t_case9_pf() {
+	public static Djp_jpc t_case9_pf() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

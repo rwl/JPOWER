@@ -48,7 +48,7 @@ public class Djp_dcpf {
 	 * @return a vector of bus voltage angles in radians
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D jp_dcpf(DoubleMatrix2D B, DoubleMatrix1D Pbus,
+	public static DoubleMatrix1D dcpf(DoubleMatrix2D B, DoubleMatrix1D Pbus,
 			DoubleMatrix1D Va0, int ref, int[] pv, int[] pq) {
 		DoubleMatrix1D Va, b;
 		DoubleMatrix2D A;

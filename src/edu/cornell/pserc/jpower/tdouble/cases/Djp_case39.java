@@ -104,7 +104,7 @@ public class Djp_case39 {
 	 *
 	 * @return power flow data for 39 bus New England system.
 	 */
-	public static Djp_jpc jp_case39() {
+	public static Djp_jpc case39() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

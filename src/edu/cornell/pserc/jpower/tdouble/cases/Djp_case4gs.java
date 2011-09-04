@@ -40,7 +40,7 @@ public class Djp_case4gs {
 	 *
 	 * @return a 4 bus, 2 gen case from Grainger & Stevenson.
 	 */
-	public static Djp_jpc jp_case4gs() {
+	public static Djp_jpc case4gs() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

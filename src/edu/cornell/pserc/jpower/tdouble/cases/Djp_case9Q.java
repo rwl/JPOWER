@@ -42,7 +42,7 @@ public class Djp_case9Q {
 	 *
 	 * @return case 9 with costs for reactive generation.
 	 */
-	public static Djp_jpc jp_case9Q() {
+	public static Djp_jpc case9Q() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

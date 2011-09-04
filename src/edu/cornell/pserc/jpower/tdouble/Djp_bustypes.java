@@ -53,7 +53,7 @@ public class Djp_bustypes {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D[] jp_bustypes(Djp_bus bus, Djp_gen gen) {
+	public static IntMatrix1D[] bustypes(Djp_bus bus, Djp_gen gen) {
 		int nb, ng;
 		SparseRCIntMatrix2D Cg;
 		IntMatrix1D bus_gen_status, ref_types, ref, pv_types, pv, pq_types, pq;

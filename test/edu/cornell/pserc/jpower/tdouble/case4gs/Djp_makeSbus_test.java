@@ -28,7 +28,7 @@ import edu.cornell.pserc.jpower.tdouble.cases.Djp_case4gs;
 public class Djp_makeSbus_test extends edu.cornell.pserc.jpower.tdouble.Djp_makeSbus_test {
 
 	public Djp_makeSbus_test(String name) {
-		super(name, "case4gs", Djp_case4gs.jp_case4gs());
+		super(name, "case4gs", Djp_case4gs.case4gs());
 	}
 
 }

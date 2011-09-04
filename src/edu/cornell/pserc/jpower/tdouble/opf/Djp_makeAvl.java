@@ -62,7 +62,7 @@ public class Djp_makeAvl {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] jp_makeAvl(double baseMVA, Djp_gen gen) {
+	public static AbstractMatrix[] makeAvl(double baseMVA, Djp_gen gen) {
 
 		/* data dimensions */
 		ng = gen.size();	// number of dispatchable injections
@@ -82,7 +82,7 @@ public class Djp_makeAvl {
 		 * without the need for an additional constraint.
 		 */
 
-		ivl = Djp_util.nonzero( Djp_jp_isload.jp_isload(gen).assign(Djp_util.intm( Qmax.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( Qmin.copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.or), ifunc.and) );
+		ivl = Djp_util.nonzero( Djp_jp_isload.isload(gen).assign(Djp_util.intm( Qmax.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( Qmin.copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.or), ifunc.and) );
 		nvl = ivl.length;	// number of dispatchable loads
 
 		/* at least one of the Q limits must be zero (corresponding to Pmax == 0) */

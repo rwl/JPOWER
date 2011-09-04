@@ -49,7 +49,7 @@ public class Djp_makeSbus {
 	 * @return vector of complex bus power injections
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix1D jp_makeSbus(double baseMVA, Djp_bus bus, Djp_gen gen) {
+	public static DComplexMatrix1D makeSbus(double baseMVA, Djp_bus bus, Djp_gen gen) {
 		int nb, ngon;
 		int[] on, gbus;
 		DComplexMatrix1D Sg, Sd, Sbus;

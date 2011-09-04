@@ -48,9 +48,9 @@ public abstract class Djp_makeBdc_test extends Djp_base_test {
 		DoubleMatrix2D Bbus, Bf;
 		DoubleMatrix1D Pbusinj, Pfinj;
 
-		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		jpc = Djp_ext2int.jp_ext2int(jpc);
-		Bdc = Djp_makeBdc.jp_makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
+		jpc = Djp_loadcase.loadcase(this.jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
+		Bdc = Djp_makeBdc.makeBdc(jpc.baseMVA, jpc.bus, jpc.branch);
 
 		Bbus_file    = new File(fdir, "Bbus.mtx");
 		Bf_file      = new File(fdir, "Bf.mtx");

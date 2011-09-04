@@ -42,45 +42,45 @@ public class Djp_rundcpf {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Djp_jpc jp_rundcpf(Djp_jpc casedata, Map<String, Double> jpopt,
+	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
-		jpopt = Djp_jpoption.jp_jpoption(jpopt, "PF_DC", 1.0);
+		jpopt = Djp_jpoption.jpoption(jpopt, "PF_DC", 1.0);
 
-		return Djp_runpf.jp_runpf(casedata, jpopt, fname, solvedcase);
+		return Djp_runpf.runpf(casedata, jpopt, fname, solvedcase);
 	}
 
-	public static Djp_jpc jp_rundcpf() {
-		return jp_rundcpf("case9");
+	public static Djp_jpc rundcpf() {
+		return rundcpf("case9");
 	}
 
-	public static Djp_jpc jp_rundcpf(String casedata) {
-		return jp_rundcpf(casedata, Djp_jpoption.jp_jpoption());
+	public static Djp_jpc rundcpf(String casedata) {
+		return rundcpf(casedata, Djp_jpoption.jpoption());
 	}
 
-	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt) {
-		return jp_rundcpf(casedata, jpopt, "");
+	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt) {
+		return rundcpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt, String fname) {
-		return jp_rundcpf(casedata, jpopt, fname, "");
+	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt, String fname) {
+		return rundcpf(casedata, jpopt, fname, "");
 	}
 
-	public static Djp_jpc jp_rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = Djp_loadcase.jp_loadcase(casedata);
-		return jp_rundcpf(jpc, jpopt, fname, "");
+	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		return rundcpf(jpc, jpopt, fname, "");
 	}
 
-	public static Djp_jpc jp_rundcpf(Djp_jpc casedata) {
-		return jp_rundcpf(casedata, Djp_jpoption.jp_jpoption());
+	public static Djp_jpc rundcpf(Djp_jpc casedata) {
+		return rundcpf(casedata, Djp_jpoption.jpoption());
 	}
 
-	public static Djp_jpc jp_rundcpf(Djp_jpc casedata, Map<String, Double> jpopt) {
-		return jp_rundcpf(casedata, jpopt, "");
+	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt) {
+		return rundcpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc jp_rundcpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
-		return jp_rundcpf(casedata, jpopt, "", "");
+	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+		return rundcpf(casedata, jpopt, "", "");
 	}
 
 }

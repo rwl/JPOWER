@@ -76,7 +76,7 @@ public class Djp_dAbr_dV {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix2D[] jp_dAbr_dV(DComplexMatrix2D dSf_dVa, DComplexMatrix2D dSf_dVm,
+	public static DoubleMatrix2D[] dAbr_dV(DComplexMatrix2D dSf_dVa, DComplexMatrix2D dSf_dVm,
 			DComplexMatrix2D dSt_dVa, DComplexMatrix2D dSt_dVm, DComplexMatrix1D Sf, DComplexMatrix1D St) {
 
 		dAf_dPf = DoubleFactory2D.sparse.diagonal(Sf.getRealPart().assign(dfunc.mult(2)));

@@ -53,7 +53,7 @@ public class Djp_polycost {
 	 * @return the vector of derivatives of costs evaluated at PG
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D jp_polycost(Djp_gencost gencost, DoubleMatrix1D Pg, int der) {
+	public static DoubleMatrix1D polycost(Djp_gencost gencost, DoubleMatrix1D Pg, int der) {
 
 		ng = (int) Pg.size();
 		maxN = gencost.ncost.aggregate(ifunc.max, ifunc.identity);
@@ -96,8 +96,8 @@ public class Djp_polycost {
 	 * @param Pg is in MW, not p.u. (works for QG too).
 	 * @return the vector of costs evaluated at Pg.
 	 */
-	public static DoubleMatrix1D jp_polycost(Djp_gencost gencost, DoubleMatrix1D Pg) {
-		return jp_polycost(gencost, Pg, 0);
+	public static DoubleMatrix1D polycost(Djp_gencost gencost, DoubleMatrix1D Pg) {
+		return polycost(gencost, Pg, 0);
 	}
 
 }

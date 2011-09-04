@@ -41,7 +41,7 @@ public class Djp_case30pwl {
 	 *
 	 * @return power flow data for 30 bus, 6 generator case.
 	 */
-	public static Djp_jpc jp_case30pwl() {
+	public static Djp_jpc case30pwl() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

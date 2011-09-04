@@ -139,7 +139,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		gen.Qg.assign(Qg.assign(dfunc.mult(baseMVA)));	// reactive generation in MVAr
 
 		/* rebuild Sbus */
-		Sbus = Djp_makeSbus.jp_makeSbus(baseMVA, bus, gen);
+		Sbus = Djp_makeSbus.makeSbus(baseMVA, bus, gen);
 
 		/* ----- evaluate constraints ----- */
 
@@ -246,7 +246,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		iQg = Djp_util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
 
 		/* compute partials of injected bus powers */
-		dSbus_dV = Djp_dSbus_dV.jp_dSbus_dV(Ybus, V);	// w.r.t. V
+		dSbus_dV = Djp_dSbus_dV.dSbus_dV(Ybus, V);	// w.r.t. V
 		dSbus_dVm = dSbus_dV[0]; dSbus_dVa = dSbus_dV[1];
 		// Pbus w.r.t. Pg, Qbus w.r.t. Qg
 		neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), Djp_util.irange(ng), -1, false, false);
@@ -262,7 +262,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		if (nl2 > 0) {
 			/* compute partials of Flows w.r.t. V */
 			if (jpopt.get("OPF_FLOW_LIM") == 2) {	// current
-				dIbr_dV = Djp_dIbr_dV.jp_dIbr_dV(branch.copy(il), Yf, Yt, V);
+				dIbr_dV = Djp_dIbr_dV.dIbr_dV(branch.copy(il), Yf, Yt, V);
 				dFf_dVa = (DComplexMatrix2D) dIbr_dV[0];
 				dFf_dVm = (DComplexMatrix2D) dIbr_dV[1];
 				dFt_dVa = (DComplexMatrix2D) dIbr_dV[2];
@@ -270,7 +270,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 				Ff = (DComplexMatrix1D) dIbr_dV[4];
 				Ft = (DComplexMatrix1D) dIbr_dV[5];
 			} else {								// power
-				dSbr_dV = Djp_dSbr_dV.jp_dSbr_dV(branch.copy(il), Yf, Yt, V);
+				dSbr_dV = Djp_dSbr_dV.dSbr_dV(branch.copy(il), Yf, Yt, V);
 				dFf_dVa = (DComplexMatrix2D) dSbr_dV[0];
 				dFf_dVm = (DComplexMatrix2D) dSbr_dV[1];
 				dFt_dVa = (DComplexMatrix2D) dSbr_dV[2];
@@ -288,7 +288,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 			}
 
 			/* squared magnitude of flow (of complex power or current, or real power) */
-			dAbr_dV = Djp_dAbr_dV.jp_dAbr_dV(dFf_dVa, dFf_dVm, dFt_dVa, dFt_dVm, Ff, Ft);
+			dAbr_dV = Djp_dAbr_dV.dAbr_dV(dFf_dVa, dFf_dVm, dFt_dVa, dFt_dVm, Ff, Ft);
 			df_dVa = dAbr_dV[0]; df_dVm = dAbr_dV[1]; dt_dVa = dAbr_dV[2]; dt_dVm = dAbr_dV[3];
 
 			/* construct Jacobian of inequality constraints (branch limits)

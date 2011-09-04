@@ -77,7 +77,7 @@ public class Dips_jips {
 	private static DoubleMatrix2D[][] Ai_p, AAA_p;
 
 	@SuppressWarnings("static-access")
-	public static Object[] ips_jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
+	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u, DoubleMatrix1D xmin, DoubleMatrix1D xmax,
 			ConstraintEvaluator gh_fcn, HessianEvaluator hess_fcn, Map<String, Double> opt) {
 
@@ -266,7 +266,7 @@ public class Dips_jips {
 
 		if (opt.get("verbose") > 0) {
 			s = opt.get("step_control") > 0 ? "-sc" : "";
-			v = Dips_jipsver.ips_jipsver("all");
+			v = Dips_jipsver.jipsver("all");
 			System.out.printf("Java Interior Point Solver -- JIPS%s, Version %s, %s",
 				s, v.get("Version"), v.get("Date"));
 			if (opt.get("verbose") > 1) {
@@ -569,7 +569,7 @@ public class Dips_jips {
 		return new Object[] {x, f, eflag, output, lambda};
 	}
 
-	public static Object[] ips_jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0) {
+	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0) {
 		DoubleMatrix2D A;
 		DoubleMatrix1D l, u;
 
@@ -578,10 +578,10 @@ public class Dips_jips {
 		l = DoubleFactory1D.dense.make(0);
 		u = DoubleFactory1D.dense.make(0);
 
-		return ips_jips(f_fcn, x0, A, l, u);
+		return jips(f_fcn, x0, A, l, u);
 	}
 
-	public static Object[] ips_jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
+	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u) {
 		DoubleMatrix1D xmin, xmax;
 
@@ -589,24 +589,24 @@ public class Dips_jips {
 		xmin = DoubleFactory1D.dense.make(nx, Double.NEGATIVE_INFINITY);
 		xmax = DoubleFactory1D.dense.make(nx, Double.POSITIVE_INFINITY);
 
-		return ips_jips(f_fcn, x0, A, l, u, xmin, xmax);
+		return jips(f_fcn, x0, A, l, u, xmin, xmax);
 	}
 
-	public static Object[] ips_jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
+	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u, DoubleMatrix1D xmin, DoubleMatrix1D xmax) {
-		return ips_jips(f_fcn, x0, A, l, u, xmin, xmax, null, null);
+		return jips(f_fcn, x0, A, l, u, xmin, xmax, null, null);
 	}
 
-	public static Object[] ips_jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
+	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u, DoubleMatrix1D xmin, DoubleMatrix1D xmax,
 			ConstraintEvaluator gh_fcn) {
-		return ips_jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, null);
+		return jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, null);
 	}
 
-	public static Object[] ips_jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
+	public static Object[] jips(ObjectiveEvaluator f_fcn, DoubleMatrix1D x0,
 			DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u, DoubleMatrix1D xmin, DoubleMatrix1D xmax,
 			ConstraintEvaluator gh_fcn, HessianEvaluator hess_fcn) {
-		return ips_jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, null, new HashMap<String, Double>());
+		return jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, null, new HashMap<String, Double>());
 	}
 
 }

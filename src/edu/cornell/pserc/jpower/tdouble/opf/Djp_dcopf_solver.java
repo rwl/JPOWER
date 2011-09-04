@@ -97,7 +97,7 @@ public class Djp_dcopf_solver {
 	 * @return a RESULTS struct, SUCCESS flag and RAW output struct.
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_dcopf_solver(Djp_opf_model om, Map<String, Double> jpopt, Map<String, AbstractMatrix> out_opt) {
+	public static Object[] dcopf_solver(Djp_opf_model om, Map<String, Double> jpopt, Map<String, AbstractMatrix> out_opt) {
 
 		/* ----- initialization ----- */
 
@@ -249,7 +249,7 @@ public class Djp_dcopf_solver {
 
 		/* -----  run opf  ----- */
 
-		qps = Dips_qps_jips.ips_qps_jips(HH, CC, A, l, u, xmin, xmax, x0, jips_opt);
+		qps = Dips_qps_jips.qps_jips(HH, CC, A, l, u, xmin, xmax, x0, jips_opt);
 		x = (DoubleMatrix1D) qps[0];
 		f = (Double) qps[1];
 		info = (Integer) qps[2];
@@ -344,8 +344,8 @@ public class Djp_dcopf_solver {
 		return new Object[] {results, success, raw};
 	}
 
-	public static Object[] jp_dcopf_solver(Djp_opf_model om, Map<String, Double> jpopt) {
-		return jp_dcopf_solver(om, jpopt, new HashMap<String, AbstractMatrix>());
+	public static Object[] dcopf_solver(Djp_opf_model om, Map<String, Double> jpopt) {
+		return dcopf_solver(om, jpopt, new HashMap<String, AbstractMatrix>());
 	}
 
 }

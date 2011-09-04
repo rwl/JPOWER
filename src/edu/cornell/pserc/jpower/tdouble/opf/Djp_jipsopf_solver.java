@@ -104,7 +104,7 @@ public class Djp_jipsopf_solver {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] jp_jipsopf_solver(Djp_opf_model om,
+	public static Object[] jipsopf_solver(Djp_opf_model om,
 			Map<String, Double> jpopt, Map<String, AbstractMatrix> out_opt) {
 
 		/* ----- initialization ----- */
@@ -156,7 +156,7 @@ public class Djp_jipsopf_solver {
 		x0 = xx[0]; xmin = xx[1]; xmax = xx[2];
 
 		/* build admittance matrices */
-		Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
+		Y = Djp_makeYbus.makeYbus(baseMVA, bus, branch);
 		Ybus = Y[0]; Yf = Y[1]; Yt = Y[2];
 
 		/* try to select an interior initial point */
@@ -181,7 +181,7 @@ public class Djp_jipsopf_solver {
 		f_fcn = new Djp_opf_costfcn(om);
 		hess_fcn = new Djp_opf_hessfcn(om, Ybus, Yf.viewSelection(il, null), Yt.viewSelection(il, null), jpopt, il, opt.get("cost_mult"));
 		gh_fcn = new Djp_opf_consfcn(om, Ybus, Yf.viewSelection(il, null), Yt.viewSelection(il, null), jpopt, il);
-		jips = Dips_jips.ips_jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, hess_fcn, opt);
+		jips = Dips_jips.jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, hess_fcn, opt);
 		x = (DoubleMatrix1D) jips[0];
 		f = (Double) jips[1];
 		info = (Integer) jips[2];
@@ -302,8 +302,8 @@ public class Djp_jipsopf_solver {
 		return new Object[] {results, success, raw};
 	}
 
-	public static Object[] jp_jipsopf_solver(Djp_opf_model om, Map<String, Double> jpopt) {
-		return jp_jipsopf_solver(om, jpopt, new HashMap<String, AbstractMatrix>());
+	public static Object[] jipsopf_solver(Djp_opf_model om, Map<String, Double> jpopt) {
+		return jipsopf_solver(om, jpopt, new HashMap<String, AbstractMatrix>());
 	}
 
 }

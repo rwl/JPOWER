@@ -58,7 +58,7 @@ public class Djp_case24_ieee_rts {
 	 *
 	 * @return power flow data for the IEEE RELIABILITY TEST SYSTEM.
 	 */
-	public static Djp_jpc jp_case24_ieee_rts() {
+	public static Djp_jpc case24_ieee_rts() {
 
 		Djp_jpc jpc = new Djp_jpc();
 

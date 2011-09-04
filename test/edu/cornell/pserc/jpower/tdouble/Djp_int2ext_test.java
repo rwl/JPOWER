@@ -37,10 +37,10 @@ public abstract class Djp_int2ext_test extends Djp_base_test {
 	public void test_int2ext__jpc() {
 		Djp_jpc jpc;
 
-		jpc = Djp_loadcase.jp_loadcase(this.jpc);
-		jpc = Djp_ext2int.jp_ext2int(jpc);
+		jpc = Djp_loadcase.loadcase(this.jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
 
-		test_jpc(Djp_int2ext.jp_int2ext(jpc));
+		test_jpc(Djp_int2ext.int2ext(jpc));
 	}
 
 	// TODO: test overloaded methods.

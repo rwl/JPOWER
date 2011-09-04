@@ -94,7 +94,7 @@ public class Djp_runpf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Djp_jpc jp_runpf(Djp_jpc casedata, Map<String, Double> jpopt,
+	public static Djp_jpc runpf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 		int i, verbose, qlim, ref, refgen, ref0, /*iterations, */k, bi, ref_temp;
 		int[] pv, pq, on, gbus, limited, mx, mn;
@@ -123,7 +123,7 @@ public class Djp_runpf {
 		dc = jpopt.get("PF_DC") != 0.0;				/* use DC formulation? */
 
 		/* read data */
-		jpc = Djp_loadcase.jp_loadcase(casedata);
+		jpc = Djp_loadcase.loadcase(casedata);
 
 		/* add zero columns to branch for flows if needed */
 		branch = jpc.branch;
@@ -136,14 +136,14 @@ public class Djp_runpf {
 		}
 
 		/* convert to internal indexing */
-		jpc = Djp_ext2int.jp_ext2int(jpc);
+		jpc = Djp_ext2int.ext2int(jpc);
 		baseMVA = jpc.baseMVA;
 		bus = jpc.bus;
 		gen = jpc.gen;
 		branch = jpc.branch;
 
 		/* get bus index lists of each type of bus */
-		bustypes = Djp_bustypes.jp_bustypes(bus, gen);
+		bustypes = Djp_bustypes.bustypes(bus, gen);
 		ref = bustypes[0].get(0);
 		pv = bustypes[1].toArray();
 		pq = bustypes[2].toArray();
@@ -156,7 +156,7 @@ public class Djp_runpf {
 		/* -----  run the power flow  ----- */
 		t0 = System.currentTimeMillis();
 		if (verbose > 0) {
-			v = Djp_jpver.jp_jpver("all");
+			v = Djp_jpver.jpver("all");
 			System.out.printf("\nJPOWER Version %s, %s", v.get("Version"), v.get("Date"));
 		}
 
@@ -170,7 +170,7 @@ public class Djp_runpf {
 			Va0.assign(dfunc.chain(dfunc.mult(Math.PI), dfunc.div(180)));
 
 			/* build B matrices and phase shift injections */
-			Bdc = Djp_makeBdc.jp_makeBdc(baseMVA, bus, branch);
+			Bdc = Djp_makeBdc.makeBdc(baseMVA, bus, branch);
 			B = (DoubleMatrix2D) Bdc[0];
 			Bf = (DoubleMatrix2D) Bdc[1];
 			Pbusinj = (DoubleMatrix1D) Bdc[2];
@@ -178,12 +178,12 @@ public class Djp_runpf {
 
 			/* compute complex bus power injections (generation - load) */
 			/* adjusted for phase shifters and real shunts */
-			Pbus = Djp_makeSbus.jp_makeSbus(baseMVA, bus, gen).getRealPart();
+			Pbus = Djp_makeSbus.makeSbus(baseMVA, bus, gen).getRealPart();
 			Pbus.assign(Pbusinj, dfunc.minus);
 			Pbus.assign(bus.Gs.copy().assign(dfunc.div(baseMVA)), dfunc.minus);
 
 			/* "run" the power flow */
-			Va = Djp_dcpf.jp_dcpf(B, Pbus, Va0, ref, pv, pq);
+			Va = Djp_dcpf.dcpf(B, Pbus, Va0, ref, pv, pq);
 
 			/* update data matrices with solution */
 			branch.Qf.assign(0);
@@ -224,22 +224,22 @@ public class Djp_runpf {
 			repeat = true;
 			while (repeat) {
 				/* build admittance matrices */
-				Y = Djp_makeYbus.jp_makeYbus(baseMVA, bus, branch);
+				Y = Djp_makeYbus.makeYbus(baseMVA, bus, branch);
 				Ybus = Y[0]; Yf = Y[1]; Yt = Y[2];
 
 				/* compute complex bus power injections (generation - load) */
-				Sbus = Djp_makeSbus.jp_makeSbus(baseMVA, bus, gen);
+				Sbus = Djp_makeSbus.makeSbus(baseMVA, bus, gen);
 
 				/* run the power flow */
 				int alg = jpopt.get("PF_ALG").intValue();
 				soln = null;
 				if (alg == 1) {
-					soln = Djp_newtonpf.jp_newtonpf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
+					soln = Djp_newtonpf.newtonpf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
 				} else if (alg == 2 || alg == 3) {
-					BB = Djp_makeB.jp_makeB(baseMVA, bus, branch, alg);
-					soln = Djp_fdpf.jp_fdpf(Ybus, Sbus, V0, BB[0], BB[1], ref, pv, pq, jpopt);
+					BB = Djp_makeB.makeB(baseMVA, bus, branch, alg);
+					soln = Djp_fdpf.fdpf(Ybus, Sbus, V0, BB[0], BB[1], ref, pv, pq, jpopt);
 				} else if (alg == 4) {
-					soln = Djp_gausspf.jp_gausspf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
+					soln = Djp_gausspf.gausspf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
 				} else {
 					System.err.println("Only Newton''s method, fast-decoupled, and Gauss-Seidel power flow algorithms currently implemented.");
 					// TODO: throw unsupported algorithm exception.
@@ -249,7 +249,7 @@ public class Djp_runpf {
 				//iterations = (Integer) soln[2];
 
 				/* update data matrices with solution */
-				data = Djp_pfsoln.jp_pfsoln(baseMVA, bus, gen, branch, Ybus, Yf, Yt, V, ref, pv, pq);
+				data = Djp_pfsoln.pfsoln(baseMVA, bus, gen, branch, Ybus, Yf, Yt, V, ref, pv, pq);
 				bus = (Djp_bus) data[0];
 				gen = (Djp_gen) data[1];
 				branch = (Djp_branch) data[2];
@@ -310,7 +310,7 @@ public class Djp_runpf {
 
 						/* update bus index lists of each type of bus */
 						ref_temp = ref;
-						bustypes = Djp_bustypes.jp_bustypes(bus, gen);
+						bustypes = Djp_bustypes.bustypes(bus, gen);
 						ref = bustypes[0].get(0);
 						pv = bustypes[1].toArray();
 						pq = bustypes[2].toArray();
@@ -349,7 +349,7 @@ public class Djp_runpf {
 		jpc.gen = gen;
 		jpc.branch = branch;
 
-		results = Djp_int2ext.jp_int2ext(jpc);
+		results = Djp_int2ext.int2ext(jpc);
 
 		// zero out result fields of out-of-service gens & branches
 		if (results.order.gen.status.off.length > 0) {
@@ -364,47 +364,48 @@ public class Djp_runpf {
 		}
 
 		if (fname != "")
-			Djp_printpf.jp_printpf(results, fname, jpopt);
+			Djp_printpf.printpf(results, fname, jpopt);
 
-		Djp_printpf.jp_printpf(results, System.out, jpopt);
+		Djp_printpf.printpf(results, System.out, jpopt);
 
 		/* save solved case */
 		if (solvedcase != "")
-			Djp_savecase.jp_savecase(solvedcase, results);
+			Djp_savecase.savecase(solvedcase, results);
 
 		return results;
 	}
 
-	public static Djp_jpc jp_runpf() {
-		return jp_runpf("case9");
+	public static Djp_jpc runpf() {
+		return runpf("case9");
 	}
 
-	public static Djp_jpc jp_runpf(String casedata) {
-		return jp_runpf(casedata, Djp_jpoption.jp_jpoption());
+	public static Djp_jpc runpf(String casedata) {
+		return runpf(casedata, Djp_jpoption.jpoption());
 	}
 
-	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt) {
-		return jp_runpf(casedata, jpopt, "");
+	public static Djp_jpc runpf(String casedata, Map<String, Double> jpopt) {
+		return runpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt, String fname) {
-		return jp_runpf(casedata, jpopt, fname, "");
+	public static Djp_jpc runpf(String casedata, Map<String, Double> jpopt, String fname) {
+		return runpf(casedata, jpopt, fname, "");
 	}
 
-	public static Djp_jpc jp_runpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = Djp_loadcase.jp_loadcase(casedata);
-		return jp_runpf(jpc, jpopt, fname, "");
+	public static Djp_jpc runpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		return runpf(jpc, jpopt, fname, "");
 	}
 
-	public static Djp_jpc jp_runpf(Djp_jpc casedata) {
-		return jp_runpf(casedata, Djp_jpoption.jp_jpoption());
+	public static Djp_jpc runpf(Djp_jpc casedata) {
+		return runpf(casedata, Djp_jpoption.jpoption());
 	}
 
-	public static Djp_jpc jp_runpf(Djp_jpc casedata, Map<String, Double> jpopt) {
-		return jp_runpf(casedata, jpopt, "");
+	public static Djp_jpc runpf(Djp_jpc casedata, Map<String, Double> jpopt) {
+		return runpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc jp_runpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
-		return jp_runpf(casedata, jpopt, "", "");
+	public static Djp_jpc runpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+		return runpf(casedata, jpopt, "", "");
 	}
+
 }
