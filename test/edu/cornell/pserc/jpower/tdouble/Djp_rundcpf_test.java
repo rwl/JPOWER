@@ -18,8 +18,8 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_rundcpf;
+import edu.cornell.pserc.jpower.jpc.JPC;
+import edu.cornell.pserc.jpower.pf.Djp_rundcpf;
 
 /**
  *

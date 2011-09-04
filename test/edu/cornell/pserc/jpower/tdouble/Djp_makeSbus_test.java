@@ -22,8 +22,10 @@ import java.io.File;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.util.tdouble.MMUtil;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
+import edu.cornell.pserc.jpower.Djp_ext2int;
+import edu.cornell.pserc.jpower.Djp_loadcase;
+import edu.cornell.pserc.jpower.jpc.JPC;
+import edu.cornell.pserc.jpower.pf.Djp_makeSbus;
 
 /**
  *

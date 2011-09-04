@@ -18,7 +18,7 @@
 
 package edu.cornell.pserc.jpower.tdouble.case4gs;
 
-import edu.cornell.pserc.jpower.tdouble.cases.Djp_case4gs;
+import edu.cornell.pserc.jpower.cases.Djp_case4gs;
 
 /**
  *

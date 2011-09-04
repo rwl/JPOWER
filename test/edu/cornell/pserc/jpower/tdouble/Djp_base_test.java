@@ -26,7 +26,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
 import cern.colt.matrix.tint.algo.IntProperty;
 import cern.colt.util.tdouble.MMUtil;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.jpc.JPC;
 import junit.framework.TestCase;
 
 abstract class Djp_base_test extends TestCase {

@@ -18,7 +18,8 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.Djp_loadcase;
+import edu.cornell.pserc.jpower.jpc.JPC;
 
 /**
  *

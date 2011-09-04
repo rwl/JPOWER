@@ -19,7 +19,9 @@
 package edu.cornell.pserc.jpower.tdouble;
 
 import cern.jet.math.tint.IntFunctions;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.Djp_ext2int;
+import edu.cornell.pserc.jpower.Djp_loadcase;
+import edu.cornell.pserc.jpower.jpc.JPC;
 
 /**
  *
