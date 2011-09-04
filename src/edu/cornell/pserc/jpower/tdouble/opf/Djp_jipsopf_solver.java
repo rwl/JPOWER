@@ -33,8 +33,11 @@ import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus.makeYbus;
+import static edu.cornell.pserc.jips.tdouble.Dips_jips.jips;
+
 import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
-import edu.cornell.pserc.jips.tdouble.Dips_jips;
 import edu.cornell.pserc.jips.tdouble.HessianEvaluator;
 import edu.cornell.pserc.jips.tdouble.ObjectiveEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
@@ -43,7 +46,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus;
 
 /**
  * Solves AC optimal power flow using JIPS.
@@ -61,40 +63,6 @@ public class Djp_jipsopf_solver {
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
 	private static final int REF       = Djp_jpc.REF;
 
-	private static int nb, nl, ny, nl2, info, nlnN;
-	private static int[] ipwl, il, kl, ku;
-	private static boolean verbose, success;
-	private static double feastol, gradtol, comptol, costtol, max_it, max_red,
-			step_control, baseMVA, c, f;
-	private static Map<String, Double> opt;
-	private static Djp_jpc jpc, results;
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-	private static Djp_gencost gencost;
-
-	private static Map<String, Set>[] idx;
-	private static Map<String, Set> vv, ll, nn;
-	private static Map<String, Object> Output, raw;
-	private static Map<String, DoubleMatrix1D> Lambda, var, nln, lin;
-	private static Map<String, Map<String, DoubleMatrix1D>> mu;
-
-	private static AbstractMatrix[] Alu;
-	private static DoubleMatrix1D l, u, x0, xmin, xmax, lb, ub, Varefs, x,
-			Va, Vm, Pg, Qg, muSf, muSt, nl_mu_l, nl_mu_u, pimul;
-	private static DoubleMatrix1D[] xx;
-	private static DoubleMatrix1D[] geq;
-	private static DoubleMatrix2D A;
-	private static DComplexMatrix1D V, Sf, St;
-	private static DComplexMatrix2D Ybus, Yf, Yt;
-	private static DComplexMatrix2D[] Y;
-
-	private static ObjectiveEvaluator f_fcn;
-	private static HessianEvaluator hess_fcn;
-	private static ConstraintEvaluator gh_fcn, geq_fcn;
-
-	private static Object[] jips;
-
 	/**
 	 * Solves AC optimal power flow using JIPS.
 	 *
@@ -106,6 +74,40 @@ public class Djp_jipsopf_solver {
 	@SuppressWarnings("static-access")
 	public static Object[] jipsopf_solver(Djp_opf_model om,
 			Map<String, Double> jpopt, Map<String, AbstractMatrix> out_opt) {
+
+		int nb, nl, ny, nl2, info, nlnN;
+		int[] ipwl, il, kl, ku;
+		boolean verbose, success;
+		double feastol, gradtol, comptol, costtol, max_it, max_red,
+				step_control, baseMVA, c, f;
+		Map<String, Double> opt;
+		Djp_jpc jpc, results;
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
+		Djp_gencost gencost;
+
+		Map<String, Set>[] idx;
+		Map<String, Set> vv, ll, nn;
+		Map<String, Object> Output, raw;
+		Map<String, DoubleMatrix1D> Lambda, var, nln, lin;
+		Map<String, Map<String, DoubleMatrix1D>> mu;
+
+		AbstractMatrix[] Alu;
+		DoubleMatrix1D l, u, x0, xmin, xmax, lb, ub, Varefs, x,
+				Va, Vm, Pg, Qg, muSf, muSt, nl_mu_l, nl_mu_u, pimul;
+		DoubleMatrix1D[] xx;
+		DoubleMatrix1D[] geq;
+		DoubleMatrix2D A;
+		DComplexMatrix1D V, Sf, St;
+		DComplexMatrix2D Ybus, Yf, Yt;
+		DComplexMatrix2D[] Y;
+
+		ObjectiveEvaluator f_fcn;
+		HessianEvaluator hess_fcn;
+		ConstraintEvaluator gh_fcn, geq_fcn;
+
+		Object[] jips;
 
 		/* ----- initialization ----- */
 
@@ -156,7 +158,7 @@ public class Djp_jipsopf_solver {
 		x0 = xx[0]; xmin = xx[1]; xmax = xx[2];
 
 		/* build admittance matrices */
-		Y = Djp_makeYbus.makeYbus(baseMVA, bus, branch);
+		Y = makeYbus(baseMVA, bus, branch);
 		Ybus = Y[0]; Yf = Y[1]; Yt = Y[2];
 
 		/* try to select an interior initial point */
@@ -181,7 +183,7 @@ public class Djp_jipsopf_solver {
 		f_fcn = new Djp_opf_costfcn(om);
 		hess_fcn = new Djp_opf_hessfcn(om, Ybus, Yf.viewSelection(il, null), Yt.viewSelection(il, null), jpopt, il, opt.get("cost_mult"));
 		gh_fcn = new Djp_opf_consfcn(om, Ybus, Yf.viewSelection(il, null), Yt.viewSelection(il, null), jpopt, il);
-		jips = Dips_jips.jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, hess_fcn, opt);
+		jips = jips(f_fcn, x0, A, l, u, xmin, xmax, gh_fcn, hess_fcn, opt);
 		x = (DoubleMatrix1D) jips[0];
 		f = (Double) jips[1];
 		info = (Integer) jips[2];

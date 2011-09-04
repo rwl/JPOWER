@@ -19,6 +19,8 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_begin.t_begin;
+
 public class Djp_t_loadcase {
 
 	public static void t_loadcase() {
@@ -27,7 +29,7 @@ public class Djp_t_loadcase {
 
 	public static void t_loadcase(boolean quiet) {
 
-		Djp_t_begin.t_begin(240, quiet);
+		t_begin(240, quiet);
 
 	}
 

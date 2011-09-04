@@ -33,7 +33,8 @@ import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 
 /**
  * Solves the power flow using a fast decoupled method.
@@ -203,7 +204,7 @@ public class Djp_fdpf {
 
 	public static Object[] fdpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus, DComplexMatrix1D V0,
 			DoubleMatrix2D Bp, DoubleMatrix2D Bpp, int ref, int[] pv, int[] pq) {
-		return fdpf(Ybus, Sbus, V0, Bp, Bpp, ref, pv, pq, Djp_jpoption.jpoption());
+		return fdpf(Ybus, Sbus, V0, Bp, Bpp, ref, pv, pq, jpoption());
 	}
 
 }

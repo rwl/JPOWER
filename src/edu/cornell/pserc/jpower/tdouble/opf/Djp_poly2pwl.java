@@ -23,6 +23,9 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
+
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_totcost.totcost;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
@@ -36,11 +39,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 public class Djp_poly2pwl {
 
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
-
-	private static int i, m;
-	private static double pmin, pmax, step;
-	private static Djp_gencost pwlcost;
-	private static DoubleMatrix1D xx, yy;
 
 	/**
 	 * Converts the polynomial
@@ -56,6 +54,10 @@ public class Djp_poly2pwl {
 	 * @return
 	 */
 	public static Djp_gencost poly2pwl(Djp_gencost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
+		int i, m;
+		double pmin, pmax, step;
+		Djp_gencost pwlcost;
+		DoubleMatrix1D xx, yy;
 
 		pwlcost = polycost.copy();
 		m = polycost.size();
@@ -79,8 +81,9 @@ public class Djp_poly2pwl {
 				xx = DoubleFactory1D.dense.make(Djp_util.drange(pmin, pmax, step));
 			} else {
 				// FIXME Pmin < 0 && Pmax <= 0
+				xx = DoubleFactory1D.dense.make(0);
 			}
-			yy = Djp_totcost.totcost(polycost.copy(new int[] {i}), xx);
+			yy = totcost(polycost.copy(new int[] {i}), xx);
 			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(0, 2 * (npts - 1)    , 2)).assign(xx);
 			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
 		}

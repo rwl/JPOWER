@@ -31,6 +31,7 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 
 /**
@@ -43,14 +44,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 public class Djp_makeAang {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-
-	private static int nang;
-	private static int[] iang_min, iang_max, iang_a, iangl, iangh, ii, jj;
-	private static boolean ignore_ang_lim;
-
-	private static IntMatrix1D iang;
-	private static DoubleMatrix2D Aang;
-	private static DoubleMatrix1D lang, uang, v;
 
 	/**
 	 * Constructs the parameters for the following linear constraint limiting
@@ -69,6 +62,13 @@ public class Djp_makeAang {
 	 */
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] makeAang(double baseMVA, Djp_branch branch, int nb, Map<String, Double> jpopt) {
+		int nang;
+		int[] iang_min, iang_max, iang_a, iangl, iangh, ii, jj;
+		boolean ignore_ang_lim;
+
+		IntMatrix1D iang;
+		DoubleMatrix2D Aang;
+		DoubleMatrix1D lang, uang, v;
 
 		/* options */
 		ignore_ang_lim = jpopt.get("OPF_IGNORE_ANG_LIM") == 1;

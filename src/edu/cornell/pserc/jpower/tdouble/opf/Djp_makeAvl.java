@@ -29,7 +29,10 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_jp_isload.isload;
 
 /**
  * Construct linear constraints for constant power factor var loads.
@@ -42,12 +45,6 @@ public class Djp_makeAvl {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static int ng, nvl;
-	private static int[] ivl;
-	private static DoubleMatrix1D Pg, Qg, Pmin, Qmin, Qmax, Qlim,
-			lvl, uvl, xx, yy, pftheta, pc, qc;
-	private static DoubleMatrix2D Avl, Avl1, Avl2;
 
 	/**
 	 * Constructs parameters for the following linear constraint enforcing a
@@ -63,6 +60,11 @@ public class Djp_makeAvl {
 	 */
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] makeAvl(double baseMVA, Djp_gen gen) {
+		int ng, nvl;
+		int[] ivl;
+		DoubleMatrix1D Pg, Qg, Pmin, Qmin, Qmax, Qlim,
+				lvl, uvl, xx, yy, pftheta, pc, qc;
+		DoubleMatrix2D Avl, Avl1, Avl2;
 
 		/* data dimensions */
 		ng = gen.size();	// number of dispatchable injections
@@ -82,7 +84,7 @@ public class Djp_makeAvl {
 		 * without the need for an additional constraint.
 		 */
 
-		ivl = Djp_util.nonzero( Djp_jp_isload.isload(gen).assign(Djp_util.intm( Qmax.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( Qmin.copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.or), ifunc.and) );
+		ivl = Djp_util.nonzero( isload(gen).assign(Djp_util.intm( Qmax.copy().assign(dfunc.equals(0)) ).assign(ifunc.not).assign(Djp_util.intm( Qmin.copy().assign(dfunc.equals(0)) ).assign(ifunc.not), ifunc.or), ifunc.and) );
 		nvl = ivl.length;	// number of dispatchable loads
 
 		/* at least one of the Q limits must be zero (corresponding to Pmax == 0) */

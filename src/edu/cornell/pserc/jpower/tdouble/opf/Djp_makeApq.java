@@ -32,7 +32,10 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_hasPQcap.hasPQcap;
 
 /**
  * Construct linear constraints for generator capability curves.
@@ -44,14 +47,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 public class Djp_makeApq {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
-
-	private static int i, ng, npqh, npql;
-	private static int[] ipqh, ipql;
-	private static double tmp;
-	private static Map<String, AbstractMatrix> data;
-
-	private static DoubleMatrix1D ubpqh, ubpql;
-	private static DoubleMatrix2D Apqh, h, Apqh1, Apqh2, Apql, Apql1, Apql2;
 
 	/**
 	 * Constructs the parameters for the following linear constraints
@@ -74,6 +69,13 @@ public class Djp_makeApq {
 	 */
 	@SuppressWarnings("static-access")
 	public static Object[] makeApq(double baseMVA, Djp_gen gen) {
+		int i, ng, npqh, npql;
+		int[] ipqh, ipql;
+		double tmp;
+		Map<String, AbstractMatrix> data;
+
+		DoubleMatrix1D ubpqh, ubpql;
+		DoubleMatrix2D Apqh, h, Apqh1, Apqh2, Apql, Apql1, Apql2;
 
 		/* data dimensions */
 		ng = gen.size();		// number of dispatchable injections
@@ -82,8 +84,8 @@ public class Djp_makeApq {
 		 * (in addition to simple box constraints) on (Pg,Qg) to correctly
 		 * model their PQ capability curves
 		 */
-		ipqh = Djp_util.nonzero( Djp_hasPQcap.hasPQcap(gen, "U") );
-		ipql = Djp_util.nonzero( Djp_hasPQcap.hasPQcap(gen, "L") );
+		ipqh = Djp_util.nonzero( hasPQcap(gen, "U") );
+		ipql = Djp_util.nonzero( hasPQcap(gen, "L") );
 		npqh = ipqh.length;		// number of general PQ capability curves (upper)
 		npql = ipql.length;		// number of general PQ capability curves (lower)
 

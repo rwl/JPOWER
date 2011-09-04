@@ -26,6 +26,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 
 /**
@@ -40,11 +41,6 @@ public class Djp_polycost {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 
-	private static int ng, maxN, minN;
-	private static int[] k;
-	private static DoubleMatrix1D f;
-	private static DoubleMatrix2D c;
-
 	/**
 	 *
 	 * @param gencost gencost must contain only polynomial costs.
@@ -54,6 +50,10 @@ public class Djp_polycost {
 	 */
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D polycost(Djp_gencost gencost, DoubleMatrix1D Pg, int der) {
+		int ng, maxN, minN;
+		int[] k;
+		DoubleMatrix1D f;
+		DoubleMatrix2D c;
 
 		ng = (int) Pg.size();
 		maxN = gencost.ncost.aggregate(ifunc.max, ifunc.identity);

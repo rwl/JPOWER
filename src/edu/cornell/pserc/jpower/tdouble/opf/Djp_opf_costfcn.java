@@ -29,6 +29,10 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_totcost.totcost;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_polycost.polycost;
+
 import edu.cornell.pserc.jips.tdouble.ObjectiveEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
@@ -105,7 +109,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
 		f = 0;
 		if (ipol.length > 0)
-			f = Djp_totcost.totcost(gencost.copy(ipol), xx.viewSelection(ipol)).aggregate(dfunc.plus, dfunc.identity);
+			f = totcost(gencost.copy(ipol), xx.viewSelection(ipol)).aggregate(dfunc.plus, dfunc.identity);
 
 		/* piecewise linear cost of P and Q */
 //		DoubleMatrix1D ccost;
@@ -195,7 +199,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		df_dPgQg = DoubleFactory1D.dense.make(2 * ng);
 		ipol = Djp_util.nonzero(gencost.model.copy().assign(ifunc.equals(POLYNOMIAL)));
 		xx = DoubleFactory1D.dense.append(Pg, Qg).assign(dfunc.mult(baseMVA));
-		df_dPgQg.viewSelection(ipol).assign( Djp_polycost.polycost(gencost.copy(ipol), xx.viewSelection(ipol), 1).assign(dfunc.mult(baseMVA)) );
+		df_dPgQg.viewSelection(ipol).assign( polycost(gencost.copy(ipol), xx.viewSelection(ipol), 1).assign(dfunc.mult(baseMVA)) );
 		df = DoubleFactory1D.dense.make(nxyz);
 		df.viewSelection(iPg).assign( df_dPgQg.viewPart(0, ng) );
 		df.viewSelection(iQg).assign( df_dPgQg.viewPart(ng, ng) );
@@ -217,7 +221,7 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 				for (int k = 0; k < x.size(); k++) {
 					xxx = x.copy();
 					xxx.set(k, xxx.get(k) + step);
-//					ddff.set(k, Djp_opf_costfcn.jp_opf_costfcn(xx, om) - f / step);
+//					ddff.set(k, opf_costfcn(xx, om) - f / step);
 				}
 				df_diff = ddff.copy().assign(df, dfunc.minus).assign(dfunc.abs);
 				df_diff_max = df_diff.aggregate(dfunc.max, dfunc.identity);

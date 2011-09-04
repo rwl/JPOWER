@@ -19,6 +19,11 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_quiet;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_counter;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_not_ok_cnt;
+
 /**
  * Tests if a condition is true.
  *
@@ -50,17 +55,17 @@ public class Djp_t_ok {
 		}
 
 		if (cond) {
-			TestGlobals.t_ok_cnt += 1;
+			t_ok_cnt += 1;
 		} else {
-			TestGlobals.t_not_ok_cnt += 1;
-			if (!TestGlobals.t_quiet)
+			t_not_ok_cnt += 1;
+			if (!t_quiet)
 				System.out.printf("not ");
 		}
 
-		if (!TestGlobals.t_quiet)
-			System.out.printf("ok %d%s\n", TestGlobals.t_counter, msg);
+		if (!t_quiet)
+			System.out.printf("ok %d%s\n", t_counter, msg);
 
-		TestGlobals.t_counter += 1;
+		t_counter += 1;
 	}
 
 }

@@ -25,6 +25,7 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 
 /**
@@ -38,9 +39,6 @@ public class Djp_hasPQcap {
 
 	private static final DoubleFunctions dfunc = DoubleFunctions.functions;
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
-
-	private static int[] k;
-	private static DoubleMatrix1D L, U, Qmin_at_Pmax, Qmax_at_Pmax;
 
 	/**
 	 * Returns a column vector of 1's and 0's. The 1's
@@ -70,6 +68,9 @@ public class Djp_hasPQcap {
 	 */
 	@SuppressWarnings("static-access")
 	public static IntMatrix1D hasPQcap(Djp_gen gen, String hilo) {
+
+		int[] k;
+		DoubleMatrix1D L, U, Qmin_at_Pmax, Qmax_at_Pmax;
 
 		/* check for errors capability curve data */
 		if ( Djp_util.any(gen.Pc1.copy().assign(gen.Pc2, dfunc.greater)) )

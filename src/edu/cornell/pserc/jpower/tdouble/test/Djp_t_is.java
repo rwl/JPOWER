@@ -25,11 +25,13 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
+import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_ok.t_ok;
 
 /**
  * Tests if two matrices are identical to some tolerance.
@@ -66,8 +68,8 @@ public class Djp_t_is {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		boolean condition = prop.equals(got, expected);
 
-		Djp_t_ok.t_ok(condition, msg);
-//		if (!condition && !Djp_t_begin.t_quiet) {
+		t_ok(condition, msg);
+//		if (!condition && !t_quiet) {
 //			if (max_diff != 0.0) {
 //				System.out.printf("max diff = %g (allowed tol = %g)\n\n", max_diff, Math.pow(10, -prec));
 //			} else {
@@ -81,43 +83,43 @@ public class Djp_t_is {
 	public static void t_is(DoubleMatrix1D got, double[] expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(expected);
-		Djp_t_ok.t_ok(prop.equals(got, expected_matrix), msg);
+		t_ok(prop.equals(got, expected_matrix), msg);
 	}
 
 	public static void t_is(double got, double expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(1, expected);
-		Djp_t_ok.t_ok(prop.equals(expected_matrix, got), msg);
+		t_ok(prop.equals(expected_matrix, got), msg);
 	}
 
 	public static void t_is(Djp_bus got, Djp_bus expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Djp_branch got, Djp_branch expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Djp_gen got, Djp_gen expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Djp_gencost got, Djp_gencost expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Djp_areas got, Djp_areas expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(DComplexMatrix2D got, DComplexMatrix2D expected, int prec, String msg) {
 		DComplexProperty cprop = new DComplexProperty(Math.pow(10, -prec));
-		Djp_t_ok.t_ok(cprop.equals(got, expected), msg);
+		t_ok(cprop.equals(got, expected), msg);
 	}
 
 }

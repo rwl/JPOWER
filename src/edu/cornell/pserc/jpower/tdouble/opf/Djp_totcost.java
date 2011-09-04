@@ -42,12 +42,6 @@ public class Djp_totcost {
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
 	private static final int POLYNOMIAL = Djp_jpc.POLYNOMIAL;
 
-	private static int ng, ncost;
-	private static int[] ipwl, ipol;
-	private static double p1,  p2, c1, c2, m, b, Pgen;
-	private static DoubleMatrix1D totalcost;
-	private static DoubleMatrix2D p, c;
-
 	/**
 	 * Computes total cost for generators at given output level.
 	 *
@@ -57,6 +51,11 @@ public class Djp_totcost {
 	 */
 	@SuppressWarnings("static-access")
 	public static DoubleMatrix1D totcost(Djp_gencost gencost, DoubleMatrix1D Pg) {
+		int ng, ncost;
+		int[] ipwl, ipol;
+		double p1,  p2, c1, c2, m, b, Pgen;
+		DoubleMatrix1D totalcost;
+		DoubleMatrix2D p, c;
 
 		ng = gencost.size();
 

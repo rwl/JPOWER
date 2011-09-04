@@ -29,7 +29,8 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 
 /**
  * Solves the power flow using a Gauss-Seidel method.
@@ -164,7 +165,7 @@ public class Djp_gausspf {
 
 	public static Object[] gausspf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
-		return gausspf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jpoption());
+		return gausspf(Ybus, Sbus, V0, ref, pv, pq, jpoption());
 	}
 
 }

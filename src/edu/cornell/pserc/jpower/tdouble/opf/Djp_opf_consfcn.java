@@ -33,14 +33,16 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
+
 import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
+
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV.dSbus_dV;
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus.makeSbus;
 
 /**
  * Evaluates nonlinear constraints and their Jacobian for OPF.
@@ -139,7 +141,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		gen.Qg.assign(Qg.assign(dfunc.mult(baseMVA)));	// reactive generation in MVAr
 
 		/* rebuild Sbus */
-		Sbus = Djp_makeSbus.makeSbus(baseMVA, bus, gen);
+		Sbus = makeSbus(baseMVA, bus, gen);
 
 		/* ----- evaluate constraints ----- */
 
@@ -246,7 +248,7 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 		iQg = Djp_util.irange(vv.get("Qg").i0, vv.get("Qg").iN);
 
 		/* compute partials of injected bus powers */
-		dSbus_dV = Djp_dSbus_dV.dSbus_dV(Ybus, V);	// w.r.t. V
+		dSbus_dV = dSbus_dV(Ybus, V);	// w.r.t. V
 		dSbus_dVm = dSbus_dV[0]; dSbus_dVa = dSbus_dV[1];
 		// Pbus w.r.t. Pg, Qbus w.r.t. Qg
 		neg_Cg = new SparseRCDoubleMatrix2D(nb, ng, gen.gen_bus.toArray(), Djp_util.irange(ng), -1, false, false);

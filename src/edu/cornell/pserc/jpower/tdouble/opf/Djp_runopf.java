@@ -21,9 +21,11 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 
 import java.util.Map;
 
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.jpower.tdouble.Djp_printpf;
-import edu.cornell.pserc.jpower.tdouble.Djp_savecase;
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
+import static edu.cornell.pserc.jpower.tdouble.Djp_printpf.printpf;
+import static edu.cornell.pserc.jpower.tdouble.Djp_savecase.savecase;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_opf.opf;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
@@ -34,8 +36,6 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  *
  */
 public class Djp_runopf {
-
-	private static Djp_jpc r;
 
 	/**
 	 * Runs an optimal power flow (AC OPF by default), returning a
@@ -50,24 +50,26 @@ public class Djp_runopf {
 	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
+		Djp_jpc r;
+
 		/* -----  run the optimal power flow  ----- */
-		r = Djp_opf.opf(casedata, jpopt);
+		r = opf(casedata, jpopt);
 
 		/* -----  output results  ----- */
 		if (fname != "")
-			Djp_printpf.printpf(r, fname, jpopt);
+			printpf(r, fname, jpopt);
 
-		Djp_printpf.printpf(r, System.out, jpopt);
+		printpf(r, System.out, jpopt);
 
 		/* save solved case */
 		if (solvedcase != "")
-			Djp_savecase.savecase(solvedcase, r);
+			savecase(solvedcase, r);
 
 		return r;
 	}
 
 	public static Djp_jpc runopf(Djp_jpc casedata) {
-		return runopf(casedata, Djp_jpoption.jpoption());
+		return runopf(casedata, jpoption());
 	}
 
 	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt) {

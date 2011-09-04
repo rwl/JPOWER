@@ -34,7 +34,9 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV.dSbus_dV;
 
 /**
  * Solves the power flow using a full Newton's method.
@@ -134,7 +136,7 @@ public class Djp_newtonpf {
 			i += 1;
 
 			/* evaluate Jacobian */
-			dSbus_dV = Djp_dSbus_dV.dSbus_dV(Ybus, V);
+			dSbus_dV = dSbus_dV(Ybus, V);
 			dSbus_dVm = dSbus_dV[0];
 			dSbus_dVa = dSbus_dV[1];
 
@@ -190,7 +192,7 @@ public class Djp_newtonpf {
 
 	public static Object[] newtonpf(DComplexMatrix2D Ybus, DComplexMatrix1D Sbus,
 			DComplexMatrix1D V0, int ref, int[] pv, int[] pq) {
-		return newtonpf(Ybus, Sbus, V0, ref, pv, pq, Djp_jpoption.jpoption());
+		return newtonpf(Ybus, Sbus, V0, ref, pv, pq, jpoption());
 	}
 
 }

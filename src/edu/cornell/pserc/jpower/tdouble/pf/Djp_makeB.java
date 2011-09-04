@@ -22,6 +22,9 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdouble.DoubleFunctions;
+
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus.makeYbus;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 
@@ -64,7 +67,7 @@ public class Djp_makeB {
 		if (alg == 2)								// if XB method
 			temp_branch.br_r.assign(0);				// zero out line resistance
 
-		Ybus = Djp_makeYbus.makeYbus(baseMVA, temp_bus, temp_branch);
+		Ybus = makeYbus(baseMVA, temp_bus, temp_branch);
 		Bp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
 
 		/* -----  form Bpp (B double prime)  ----- */
@@ -73,7 +76,7 @@ public class Djp_makeB {
 		if (alg == 3)								// if BX method
 			temp_branch.br_b.assign(0);				// zero out line resistance
 
-		Ybus = Djp_makeYbus.makeYbus(baseMVA, temp_bus, temp_branch);
+		Ybus = makeYbus(baseMVA, temp_bus, temp_branch);
 		Bpp = Ybus[0].getImaginaryPart().assign(dfunc.neg);
 
 		return new DoubleMatrix2D[] {Bp, Bpp};

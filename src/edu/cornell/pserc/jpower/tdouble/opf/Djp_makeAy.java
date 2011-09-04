@@ -28,6 +28,7 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
@@ -44,11 +45,6 @@ public class Djp_makeAy {
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
 
 	private static final int PW_LINEAR = Djp_jpc.PW_LINEAR;
-
-	private static int ny, nnz, k, ns, sidx, j;
-	private static int[] iycost;
-	private static DoubleMatrix1D by, p, c, m, b;
-	private static DoubleMatrix2D Ay;
 
 	/**
 	 * Constructs the parameters for linear "basin constraints" on Pg, Qg
@@ -78,6 +74,10 @@ public class Djp_makeAy {
 	@SuppressWarnings("static-access")
 	public static AbstractMatrix[] makeAy(double baseMVA, int ng, Djp_gencost gencost,
 			int pgbas, int qgbas, int ybas) {
+		int ny, nnz, k, ns, sidx, j;
+		int[] iycost;
+		DoubleMatrix1D by, p, c, m, b;
+		DoubleMatrix2D Ay;
 
 		/* find all pwl cost rows in gencost, either real or reactive */
 		iycost = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );

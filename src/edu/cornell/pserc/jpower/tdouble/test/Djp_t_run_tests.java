@@ -6,6 +6,14 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tint.IntFunctions;
 
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_quiet;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_num_of_tests;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_counter;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_not_ok_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_skip_cnt;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_clock;
+
 public class Djp_t_run_tests {
 
 	private static final IntFunctions ifunc = IntFunctions.intFunctions;
@@ -22,10 +30,10 @@ public class Djp_t_run_tests {
 
 		/* figure out padding for printing */
 		if (!verbose) {
-		    len = IntFactory1D.dense.make(test_names.size());
-		    for (int k = 0; k < test_names.size(); k++)
+			len = IntFactory1D.dense.make(test_names.size());
+			for (int k = 0; k < test_names.size(); k++)
 				len.set(k, test_names.get(k).length());
-		    maxlen = len.aggregate(ifunc.min, ifunc.identity);
+			maxlen = len.aggregate(ifunc.min, ifunc.identity);
 		}
 
 		/* initialize statistics */
@@ -38,37 +46,37 @@ public class Djp_t_run_tests {
 		t0 = System.currentTimeMillis();
 		for (int k = 0; k < test_names.size(); k++) {
 			if (verbose) {
-		        System.out.printf("\n----------  %s  ----------\n", test_names.get(k));
+				System.out.printf("\n----------  %s  ----------\n", test_names.get(k));
 			} else {
-		        pad = maxlen + 4 - test_names.get(k).length();
-		        System.out.print(String.format("%s", test_names.get(k)));
-		        for (int m = 0; m < pad; m++)
-		        	System.out.print(".");
+				pad = maxlen + 4 - test_names.get(k).length();
+				System.out.print(String.format("%s", test_names.get(k)));
+				for (int m = 0; m < pad; m++)
+					System.out.print(".");
 			}
-		    //feval( test_names{k}, ~verbose );
+			//feval( test_names{k}, ~verbose );
 
-		    num_of_tests    = num_of_tests  + TestGlobals.t_num_of_tests;
-		    counter         = counter       + TestGlobals.t_counter;
-		    ok_cnt          = ok_cnt        + TestGlobals.t_ok_cnt;
-		    not_ok_cnt      = not_ok_cnt    + TestGlobals.t_not_ok_cnt;
-		    skip_cnt        = skip_cnt      + TestGlobals.t_skip_cnt;
+			num_of_tests    = num_of_tests  + t_num_of_tests;
+			counter         = counter       + t_counter;
+			ok_cnt          = ok_cnt        + t_ok_cnt;
+			not_ok_cnt      = not_ok_cnt    + t_not_ok_cnt;
+			skip_cnt        = skip_cnt      + t_skip_cnt;
 		}
 
 		if (verbose)
 			System.out.print("\n\n----------  Summary  ----------\n");
 
 		if ((counter == num_of_tests) & (counter == ok_cnt + skip_cnt) & (not_ok_cnt == 0)) {
-		    if (skip_cnt > 0) {
-		    	System.out.printf("All tests successful (%d passed, %d skipped of %d)",
-		            ok_cnt, skip_cnt, num_of_tests);
-		    } else {
-		    	System.out.printf("All tests successful (%d of %d)", ok_cnt, num_of_tests);
-		    }
+			if (skip_cnt > 0) {
+				System.out.printf("All tests successful (%d passed, %d skipped of %d)",
+						ok_cnt, skip_cnt, num_of_tests);
+			} else {
+				System.out.printf("All tests successful (%d of %d)", ok_cnt, num_of_tests);
+			}
 		} else {
 			System.out.printf("Ran %d of %d tests: %d passed, %d failed",
-		        counter, num_of_tests, ok_cnt, not_ok_cnt);
-		    if (skip_cnt > 0)
-		    	System.out.printf(", %d skipped", skip_cnt);
+					counter, num_of_tests, ok_cnt, not_ok_cnt);
+			if (skip_cnt > 0)
+				System.out.printf(", %d skipped", skip_cnt);
 		}
 		System.out.printf("\nElapsed time %.2f seconds.\n", ((System.currentTimeMillis() - t0) / 1000F));
 	}

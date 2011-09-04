@@ -32,15 +32,24 @@ import cern.colt.util.tdouble.Djp_util;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 
-import edu.cornell.pserc.jpower.tdouble.Djp_ext2int;
-import edu.cornell.pserc.jpower.tdouble.Djp_jpver;
-import edu.cornell.pserc.jpower.tdouble.Djp_run_userfcn;
+import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpver.jpver;
+import static edu.cornell.pserc.jpower.tdouble.Djp_run_userfcn.run_userfcn;
+import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc.makeBdc;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_args.opf_args;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_pqcost.pqcost;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAvl.makeAvl;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeApq.makeApq;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAang.makeAang;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAy.makeAy;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dcopf_solver.dcopf_solver;
+import static edu.cornell.pserc.jpower.tdouble.opf.Djp_jipsopf_solver.jipsopf_solver;
+
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
@@ -61,37 +70,6 @@ public class Djp_opf {
 
 	private static final int REF = Djp_jpc.REF;
 
-	private static long t0;
-	private static int alg, verbose, nb, nl, ng, nusr, nw, nl2, ny, nx, nz, nv, nq, q1;
-	private static int[] acc, p1, refs, il;;
-	private static boolean dc, success;
-	private static double baseMVA;
-	private static String userfcn;
-	private static String[] user_vars, ycon_vars;
-
-	private static Object[] opf_args, Alu_pq, r;
-
-	private static Djp_bus bus;
-	private static Djp_gen gen;
-	private static Djp_branch branch;
-	private static Djp_gencost gencost;
-	private static Djp_gencost[] pqcost;
-
-	private static DoubleMatrix1D x0, y0, x1, y1, m, b, lbu, ubu, Va, Vm, Pg, Qg,
-			Pmin, Pmax, Qmin, Qmax, Vau, Val, lang, uang, iang, by,
-			Pbusinj, Pfinj, bmis, lpf, upf, upt, lvl, uvl, ubpqh, ubpql, Apqdata;
-	private static DoubleMatrix2D Au, neg_Cg, Aang, Ay, B, Bf, Amis, Avl, Apqh, Apql;
-
-	private static AbstractMatrix[] Bdc, Alu_vl, Alu_ang;;
-
-	private static Djp_opf_model om;
-	private static Cost user_cost;
-
-	private static Map<String, Set>[] idx;
-	private static Map<String, Set> vv, ll, nn;
-	private static Map<String, AbstractMatrix> output, results, raw;
-	private static Map<String, String> v;
-
 	/**
 	 * Returns either a RESULTS struct and an optional SUCCESS flag, or individual
 	 * data matrices, the objective function value and a SUCCESS flag. In the
@@ -105,13 +83,47 @@ public class Djp_opf {
 	public static Djp_jpc opf(Djp_jpc jpc, DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			Map<String, Double> jpopt, DoubleMatrix2D N, DoubleMatrix2D fparm, DoubleMatrix2D H,
 			DoubleMatrix1D Cw, DoubleMatrix1D z0, DoubleMatrix1D zl, DoubleMatrix1D zu) {
+		long t0;
+		int alg, verbose, nb, nl, ng, nusr, nw, nl2, ny, nx, nz, nv, nq, q1;
+		int[] acc, p1, refs, il = null;;
+		boolean dc, success;
+		double baseMVA;
+		String userfcn;
+		String[] user_vars, ycon_vars;
+
+		Object[] opf_args, Alu_pq, r;
+
+		Djp_bus bus;
+		Djp_gen gen;
+		Djp_branch branch;
+		Djp_gencost gencost;
+		Djp_gencost[] pqcost;
+
+		DoubleMatrix1D x0, y0, x1, y1, m, b, lbu, ubu, Va, Vm, Pg, Qg,
+				Pmin, Pmax, Qmin, Qmax, Vau, Val, lang, uang, iang, by,
+				Pbusinj, Pfinj = null, bmis = null, lpf = null, upf = null,
+				upt = null, lvl = null, uvl = null, ubpqh = null, ubpql = null,
+				Apqdata;
+		DoubleMatrix2D Au, neg_Cg, Aang, Ay, B, Bf = null, Amis = null,
+				Avl = null, Apqh = null, Apql = null;
+
+		AbstractMatrix[] Bdc, Alu_vl, Alu_ang;;
+
+		Djp_opf_model om;
+		Cost user_cost;
+
+		Map<String, Set>[] idx;
+		Map<String, Set> vv, ll, nn;
+		Map<String, AbstractMatrix> output, results, raw;
+		Map<String, String> v;
+
 
 		/* ----- initialization ----- */
 
 		t0 = System.currentTimeMillis();	// start timer
 
 		/* process input arguments */
-		opf_args = Djp_opf_args.opf_args();
+		opf_args = opf_args();
 		jpc = (Djp_jpc) opf_args[0];
 		jpopt = (Map<String, Double>) opf_args[1];
 
@@ -147,7 +159,7 @@ public class Djp_opf {
 
 		if (dc) {
 			/* ignore reactive costs for DC */
-			pqcost = Djp_pqcost.pqcost(jpc.gencost, ng);
+			pqcost = pqcost(jpc.gencost, ng);
 			jpc.gencost = pqcost[0];
 
 			/* reduce A and/or N from AC dimensions to DC dimensions, if needed */
@@ -185,7 +197,7 @@ public class Djp_opf {
 		}
 
 		/* convert to internal numbering, remove out-of-service stuff */
-		jpc = Djp_ext2int.ext2int(jpc);
+		jpc = ext2int(jpc);
 
 		/* update dimensions */
 		nb = jpc.bus.size();			// number of buses
@@ -193,7 +205,7 @@ public class Djp_opf {
 		ng = jpc.gen.size();			// number of dispatchable injections
 
 		/* create (read-only) copies of individual fields for convenience */
-		opf_args = Djp_opf_args.opf_args(jpc, jpopt);
+		opf_args = opf_args(jpc, jpopt);
 		baseMVA = (Double) opf_args[0];
 		bus = (Djp_bus) opf_args[1];
 		gen = (Djp_gen) opf_args[2];
@@ -238,7 +250,7 @@ public class Djp_opf {
 			q1 = -1;	// index of 1st Qg column in Ay
 
 			/* power mismatch constraints */
-			Bdc = Djp_makeBdc.makeBdc(baseMVA, bus, branch);
+			Bdc = makeBdc(baseMVA, bus, branch);
 			B = (DoubleMatrix2D) Bdc[0];
 			Bf = (DoubleMatrix2D) Bdc[1];
 			Pbusinj = (DoubleMatrix1D) Bdc[2];
@@ -263,13 +275,13 @@ public class Djp_opf {
 			q1 = ng;	// index of 1st Qg column in Ay
 
 			/* dispatchable load, constant power factor constraints */
-			Alu_vl = Djp_makeAvl.makeAvl(baseMVA, gen);
+			Alu_vl = makeAvl(baseMVA, gen);
 			Avl = (DoubleMatrix2D) Alu_vl[0];
 			lvl = (DoubleMatrix1D) Alu_vl[1];
 			uvl = (DoubleMatrix1D) Alu_vl[2];
 
 			/* generator PQ capability curve constraints */
-			Alu_pq = Djp_makeApq.makeApq(baseMVA, gen);
+			Alu_pq = makeApq(baseMVA, gen);
 			Apqh  = (DoubleMatrix2D) Alu_pq[0];
 			ubpqh = (DoubleMatrix1D) Alu_pq[1];
 			Apql  = (DoubleMatrix2D) Alu_pq[2];
@@ -287,7 +299,7 @@ public class Djp_opf {
 		Val.viewSelection(refs).assign(Va.viewSelection(refs));
 
 		/* branch voltage angle difference limits */
-		Alu_ang = Djp_makeAang.makeAang(baseMVA, branch, nb, jpopt);
+		Alu_ang = makeAang(baseMVA, branch, nb, jpopt);
 		Aang = (DoubleMatrix2D) Alu_ang[0];
 		lang = (DoubleMatrix1D) Alu_ang[1];
 		uang = (DoubleMatrix1D) Alu_ang[2];
@@ -301,7 +313,7 @@ public class Djp_opf {
 		} else {
 			int[] ipwl = Djp_util.nonzero( gencost.model.copy().assign(ifunc.equals(PW_LINEAR)) );	// piece-wise linear costs
 			ny = ipwl.length;	// number of piece-wise linear cost vars
-			AbstractMatrix[] Ab_y = Djp_makeAy.makeAy(baseMVA, ng, gencost, 1, q1, ng+nq);
+			AbstractMatrix[] Ab_y = makeAy(baseMVA, ng, gencost, 1, q1, ng+nq);
 			Ay = (DoubleMatrix2D) Ab_y[0];
 			by = (DoubleMatrix1D) Ab_y[1];
 		}
@@ -377,7 +389,7 @@ public class Djp_opf {
 		}
 
 		/* execute userfcn callbacks for 'formulation' stage */
-		om = Djp_run_userfcn.run_userfcn(userfcn, "formulation", om);
+		om = run_userfcn(userfcn, "formulation", om);
 
 		/* build user-defined costs */
 		om = om.build_cost_params();
@@ -391,13 +403,13 @@ public class Djp_opf {
 
 		/* call the specific solver */
 		if (verbose > 0) {
-			v = Djp_jpver.jpver("all");
+			v = jpver("all");
 			System.out.printf("\nMATPOWER Version %s, %s", v.get("Version"), v.get("Date"));
 		}
 		if (dc) {
 			if (verbose > 0)
 				System.out.printf(" -- DC Optimal Power Flow\n");
-			r = Djp_dcopf_solver.dcopf_solver(om, jpopt, output);
+			r = dcopf_solver(om, jpopt, output);
 			results = (Map<String, AbstractMatrix>) r[0];
 			success = (Boolean) r[1];
 			raw = (Map<String, AbstractMatrix>) r[2];
@@ -408,7 +420,7 @@ public class Djp_opf {
 			if (alg != 560 || alg != 565)
 				System.err.println("Unsupported algorithm, using JIPS.");
 
-			r = Djp_jipsopf_solver.jipsopf_solver(om, jpopt, output);
+			r = jipsopf_solver(om, jpopt, output);
 			results = (Map<String, AbstractMatrix>) r[0];
 			success = (Boolean) r[1];
 			raw = (Map<String, AbstractMatrix>) r[2];

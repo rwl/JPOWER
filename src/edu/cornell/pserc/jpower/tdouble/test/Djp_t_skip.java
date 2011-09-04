@@ -19,6 +19,10 @@
 
 package edu.cornell.pserc.jpower.tdouble.test;
 
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_quiet;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_counter;
+import static edu.cornell.pserc.jpower.tdouble.test.TestGlobals.t_skip_cnt;
+
 public class Djp_t_skip {
 
 	public static void t_skip(int cnt) {
@@ -35,12 +39,12 @@ public class Djp_t_skip {
 		if (msg.length() > 0)
 			msg = " : " + msg;
 
-		TestGlobals.t_skip_cnt = TestGlobals.t_skip_cnt + cnt;
-		if (!TestGlobals.t_quiet)
-		    System.out.printf("skipped tests %d..%d%s\n",
-		    		TestGlobals.t_counter, TestGlobals.t_counter + cnt-1, msg);
+		t_skip_cnt = t_skip_cnt + cnt;
+		if (!t_quiet)
+			System.out.printf("skipped tests %d..%d%s\n",
+				t_counter, t_counter + cnt-1, msg);
 
-		TestGlobals.t_counter = TestGlobals.t_counter + cnt;
+		t_counter = t_counter + cnt;
 	}
 
 }

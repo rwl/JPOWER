@@ -21,7 +21,7 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 
 import java.util.Map;
 
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
@@ -43,12 +43,12 @@ public class Djp_rundcopf {
 	 * @return
 	 */
 	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		jpopt = Djp_jpoption.jpoption(jpopt, "PF_DC", 1.0);
+		jpopt = jpoption(jpopt, "PF_DC", 1.0);
 		return Djp_runopf.runopf(casedata, jpopt, fname, solvedcase);
 	}
 
 	public static Djp_jpc rundcopf(Djp_jpc casedata) {
-		return rundcopf(casedata, Djp_jpoption.jpoption());
+		return rundcopf(casedata, jpoption());
 	}
 
 	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt) {

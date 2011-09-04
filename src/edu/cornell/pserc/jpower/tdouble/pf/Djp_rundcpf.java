@@ -21,8 +21,8 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 
 import java.util.Map;
 
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
+import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
+import static edu.cornell.pserc.jpower.tdouble.Djp_loadcase.loadcase;
 import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
 
 /**
@@ -45,7 +45,7 @@ public class Djp_rundcpf {
 	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
-		jpopt = Djp_jpoption.jpoption(jpopt, "PF_DC", 1.0);
+		jpopt = jpoption(jpopt, "PF_DC", 1.0);
 
 		return Djp_runpf.runpf(casedata, jpopt, fname, solvedcase);
 	}
@@ -55,7 +55,7 @@ public class Djp_rundcpf {
 	}
 
 	public static Djp_jpc rundcpf(String casedata) {
-		return rundcpf(casedata, Djp_jpoption.jpoption());
+		return rundcpf(casedata, jpoption());
 	}
 
 	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt) {
@@ -67,12 +67,12 @@ public class Djp_rundcpf {
 	}
 
 	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = Djp_loadcase.loadcase(casedata);
+		Djp_jpc jpc = loadcase(casedata);
 		return rundcpf(jpc, jpopt, fname, "");
 	}
 
 	public static Djp_jpc rundcpf(Djp_jpc casedata) {
-		return rundcpf(casedata, Djp_jpoption.jpoption());
+		return rundcpf(casedata, jpoption());
 	}
 
 	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt) {

@@ -34,43 +34,39 @@ public class Djp_t_end {
 
 		t_counter = t_counter - 1;
 
-		if ((t_counter == t_num_of_tests) & (t_counter == t_ok_cnt + t_skip_cnt) &
-			(t_not_ok_cnt == 0)) {
-		all_ok = true;
+		if ((t_counter == t_num_of_tests) & (t_counter == t_ok_cnt + t_skip_cnt) & (t_not_ok_cnt == 0)) {
+			all_ok = true;
 		} else {
-		all_ok = false;
+			all_ok = false;
 		}
 
 		if (t_quiet) {
-		if (all_ok) {
-			System.out.print("ok");
-			if (t_skip_cnt > 0) {
-				System.out.printf(" (%d of %d skipped)", t_skip_cnt, t_num_of_tests);
-			}
-		} else {
-			System.out.print("not ok\n");
-			System.out.printf("\t#####  Ran %d of %d tests: %d passed, %d failed",
-					t_counter, t_num_of_tests, t_ok_cnt, t_not_ok_cnt);
-			if (t_skip_cnt > 0) {
-				System.out.printf(", %d skipped", t_skip_cnt);
-			}
-		}
-		System.out.print("\n");
-		} else {
-		if (all_ok) {
-			if (t_skip_cnt > 0) {
-				System.out.printf("All tests successful (%d passed, %d skipped of %d)",
-					t_ok_cnt, t_skip_cnt, t_num_of_tests);
+			if (all_ok) {
+				System.out.print("ok");
+				if (t_skip_cnt > 0)
+					System.out.printf(" (%d of %d skipped)", t_skip_cnt, t_num_of_tests);
 			} else {
-				System.out.printf("All tests successful (%d of %d)", t_ok_cnt, t_num_of_tests);
+				System.out.print("not ok\n");
+				System.out.printf("\t#####  Ran %d of %d tests: %d passed, %d failed",
+						t_counter, t_num_of_tests, t_ok_cnt, t_not_ok_cnt);
+				if (t_skip_cnt > 0)
+					System.out.printf(", %d skipped", t_skip_cnt);
 			}
+			System.out.print("\n");
 		} else {
-			System.out.printf("Ran %d of %d tests: %d passed, %d failed",
-					t_counter, t_num_of_tests, t_ok_cnt, t_not_ok_cnt);
-			if (t_skip_cnt > 0) {
-				System.out.printf(", %d skipped", t_skip_cnt);
+			if (all_ok) {
+				if (t_skip_cnt > 0) {
+					System.out.printf("All tests successful (%d passed, %d skipped of %d)",
+						t_ok_cnt, t_skip_cnt, t_num_of_tests);
+				} else {
+					System.out.printf("All tests successful (%d of %d)", t_ok_cnt, t_num_of_tests);
+				}
+			} else {
+				System.out.printf("Ran %d of %d tests: %d passed, %d failed",
+						t_counter, t_num_of_tests, t_ok_cnt, t_not_ok_cnt);
+				if (t_skip_cnt > 0)
+					System.out.printf(", %d skipped", t_skip_cnt);
 			}
-		}
 			System.out.printf("\nElapsed time %.2f seconds.\n",
 				((System.currentTimeMillis() - t_clock) / 1000F));
 		}
