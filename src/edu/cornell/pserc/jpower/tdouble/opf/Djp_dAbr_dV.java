@@ -24,7 +24,7 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Util.dfunc;
 
 /**
  * Partial derivatives of squared flow magnitudes w.r.t voltage.

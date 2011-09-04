@@ -34,22 +34,22 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.polar;
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.complex;
-import static cern.colt.util.tdouble.Djp_util.diff;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.polar;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.complex;
+import static cern.colt.util.tdouble.Util.diff;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.any;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  * Prints power flow results.
@@ -59,15 +59,15 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  */
 public class Djp_printpf {
 
-	public static void printpf(Djp_jpc results) {
+	public static void printpf(JPC results) {
 		printpf(results, System.out);
 	}
 
-	public static void printpf(Djp_jpc results, String fname) {
+	public static void printpf(JPC results, String fname) {
 		printpf(results, fname, Djp_jpoption.jpoption());
 	}
 
-	public static void printpf(Djp_jpc results, String fname, Map<String, Double> jpopt) {
+	public static void printpf(JPC results, String fname, Map<String, Double> jpopt) {
 		FileOutputStream output;
 		try {
 			output = new FileOutputStream(fname);
@@ -82,12 +82,12 @@ public class Djp_printpf {
 		}
 	}
 
-	public static void printpf(Djp_jpc results, OutputStream output) {
+	public static void printpf(JPC results, OutputStream output) {
 		printpf(results, output, Djp_jpoption.jpoption());
 	}
 
 	@SuppressWarnings("static-access")
-	public static void printpf(Djp_jpc results, OutputStream output, Map<String, Double> jpopt) {
+	public static void printpf(JPC results, OutputStream output, Map<String, Double> jpopt) {
 		PrintWriter pw;
 
 		int i, k, nb, nl, ng, nout, mini, maxi, a, nxfmr;
@@ -101,9 +101,9 @@ public class Djp_printpf {
 		String str;
 		Double f;
 
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
+		Bus bus;
+		Gen gen;
+		Branch branch;
 
 		IntMatrix1D i2e, e2i, tiesm, ld, sorted_areas, s_areasm, shunt,
 				isload, notload, gs, bs, a_gbus, a_bus, hasload, hasshunt,

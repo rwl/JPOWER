@@ -21,8 +21,8 @@ package edu.cornell.pserc.jpower.tdouble;
 import java.io.File;
 
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
-import cern.colt.util.tdouble.Djp_mm;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import cern.colt.util.tdouble.MMUtil;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
 
 /**
@@ -32,15 +32,15 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
  */
 public abstract class Djp_makeSbus_test extends Djp_base_test {
 
-	private Djp_jpc jpc;
+	private JPC jpc;
 
-	public Djp_makeSbus_test(String name, String caseName, Djp_jpc jpc) {
+	public Djp_makeSbus_test(String name, String caseName, JPC jpc) {
 		super(name, caseName, "makeSbus");
 		this.jpc = jpc;
 	}
 
 	public void test_makeBdc() {
-		Djp_jpc jpc;
+		JPC jpc;
 		DComplexMatrix1D Sbus, mpSbus;
 		File Sbus_file;
 
@@ -50,7 +50,7 @@ public abstract class Djp_makeSbus_test extends Djp_base_test {
 
 		Sbus_file = new File(fdir, "Sbus.mtx");;
 
-		mpSbus = (DComplexMatrix1D) Djp_mm.readMatrix(Sbus_file);
+		mpSbus = (DComplexMatrix1D) MMUtil.readMatrix(Sbus_file);
 
 		assertTrue(cprop.equals(Sbus, mpSbus));
 	}

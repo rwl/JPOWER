@@ -25,12 +25,12 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
+import edu.cornell.pserc.jpower.tdouble.jpc.Areas;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.tdouble.jpc.Order;
 
 /**
  * Converts internal to external bus numbering.
@@ -52,8 +52,8 @@ public class Djp_int2ext {
 	 * @param jpc
 	 * @return
 	 */
-	public static Djp_jpc int2ext(Djp_jpc jpc) {
-		Djp_order o;
+	public static JPC int2ext(JPC jpc) {
+		Order o;
 
 		if (jpc.order == null)
 			System.err.println("int2ext: jpc does not have the 'order' set, as required for conversion back to external numbering.");
@@ -66,7 +66,7 @@ public class Djp_int2ext {
 				jpc = Djp_run_userfcn.run_userfcn(jpc.userfcn, "int2ext", jpc);
 
 			/* save data matrices with internal ordering & restore originals */
-			o.internal = new Djp_jpc();
+			o.internal = new JPC();
 			o.internal.bus    = jpc.bus.copy();
 			o.internal.branch = jpc.branch.copy();
 			o.internal.gen    = jpc.gen.copy();
@@ -115,11 +115,11 @@ public class Djp_int2ext {
 		return jpc;
 	}
 
-	public static Djp_jpc int2ext(Djp_jpc jpc, String field, String[] ordering) {
+	public static JPC int2ext(JPC jpc, String field, String[] ordering) {
 		return int2ext(jpc, field, ordering, 1);
 	}
 
-	public static Djp_jpc int2ext(Djp_jpc jpc, String field, String[] ordering, int dim) {
+	public static JPC int2ext(JPC jpc, String field, String[] ordering, int dim) {
 		Field fld;
 		Class<?> type;
 		DoubleMatrix1D val1, oldval1;
@@ -154,7 +154,7 @@ public class Djp_int2ext {
 		return jpc;
 	}
 
-	public static Djp_jpc int2ext(Djp_jpc jpc, String[] field, String[] ordering) {
+	public static JPC int2ext(JPC jpc, String[] field, String[] ordering) {
 		return int2ext(jpc, field, ordering, 1);
 	}
 
@@ -166,7 +166,7 @@ public class Djp_int2ext {
 	 * @param dim
 	 * @return
 	 */
-	public static Djp_jpc int2ext(Djp_jpc jpc, String[] field, String[] ordering, int dim) {
+	public static JPC int2ext(JPC jpc, String[] field, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		Field fld;
@@ -205,13 +205,13 @@ public class Djp_int2ext {
 	}
 
 
-	public static DoubleMatrix1D int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String ordering) {
+	public static DoubleMatrix1D int2ext(JPC jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String ordering) {
 		return int2ext(jpc, val, oldval, ordering, 1);
 	}
 
-	public static DoubleMatrix1D int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String ordering, int dim) {
+	public static DoubleMatrix1D int2ext(JPC jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String ordering, int dim) {
 		int[] idx;
-		Djp_order o;
+		Order o;
 		DoubleMatrix1D int_val1, v1;
 
 		o = jpc.order;
@@ -235,7 +235,7 @@ public class Djp_int2ext {
 		return int_val1;
 	}
 
-	public static DoubleMatrix1D int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering) {
+	public static DoubleMatrix1D int2ext(JPC jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering) {
 		return int2ext(jpc, val, oldval, ordering, 1);
 	}
 
@@ -247,7 +247,7 @@ public class Djp_int2ext {
 	 * @param dim
 	 * @return
 	 */
-	public static DoubleMatrix1D int2ext(Djp_jpc jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering, int dim) {
+	public static DoubleMatrix1D int2ext(JPC jpc, DoubleMatrix1D val, DoubleMatrix1D oldval, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		int be, bi, ne, ni, k;
@@ -308,13 +308,13 @@ public class Djp_int2ext {
 
 
 
-	public static DoubleMatrix2D int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String ordering) {
+	public static DoubleMatrix2D int2ext(JPC jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String ordering) {
 		return int2ext(jpc, val, oldval, ordering, 1);
 	}
 
-	public static DoubleMatrix2D int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String ordering, int dim) {
+	public static DoubleMatrix2D int2ext(JPC jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String ordering, int dim) {
 		int[] idx;
-		Djp_order o;
+		Order o;
 		DoubleMatrix2D int_val2, v2;
 
 		o = jpc.order;
@@ -338,7 +338,7 @@ public class Djp_int2ext {
 		return int_val2;
 	}
 
-	public static DoubleMatrix2D int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering) {
+	public static DoubleMatrix2D int2ext(JPC jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering) {
 		return int2ext(jpc, val, oldval, ordering, 1);
 	}
 
@@ -350,7 +350,7 @@ public class Djp_int2ext {
 	 * @param dim
 	 * @return
 	 */
-	public static DoubleMatrix2D int2ext(Djp_jpc jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering, int dim) {
+	public static DoubleMatrix2D int2ext(JPC jpc, DoubleMatrix2D val, DoubleMatrix2D oldval, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		int be, bi, ne, ni, k;
@@ -426,8 +426,8 @@ public class Djp_int2ext {
 //		return int_val2;
 	}
 
-	public static Object[] int2ext(IntMatrix1D i2e, Djp_bus bus,
-			Djp_gen gen, Djp_branch branch) {
+	public static Object[] int2ext(IntMatrix1D i2e, Bus bus,
+			Gen gen, Branch branch) {
 		return int2ext(i2e, bus, gen, branch, null);
 	}
 
@@ -440,8 +440,8 @@ public class Djp_int2ext {
 	 * @param areas
 	 * @return
 	 */
-	public static Object[] int2ext(IntMatrix1D i2e, Djp_bus bus,
-			Djp_gen gen, Djp_branch branch, Djp_areas areas) {
+	public static Object[] int2ext(IntMatrix1D i2e, Bus bus,
+			Gen gen, Branch branch, Areas areas) {
 
 		bus.bus_i.assign( i2e.viewSelection(bus.bus_i.toArray()) );
 		gen.gen_bus.assign( i2e.viewSelection(gen.gen_bus.toArray()) );

@@ -30,12 +30,12 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.irange;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
 
 /**
  * Construct constraints for branch angle difference limits.
@@ -62,7 +62,7 @@ public class Djp_makeAang {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] makeAang(double baseMVA, Djp_branch branch, int nb, Map<String, Double> jpopt) {
+	public static AbstractMatrix[] makeAang(double baseMVA, Branch branch, int nb, Map<String, Double> jpopt) {
 		int nang;
 		int[] iang_min, iang_max, iang_a, iangl, iangh, ii, jj;
 		boolean ignore_ang_lim;

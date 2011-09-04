@@ -19,11 +19,11 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 public class Djp_savecase {
 
-	public static void savecase(String fname, Djp_jpc casestruct) {
+	public static void savecase(String fname, JPC casestruct) {
 		// TODO Auto-generated method stub
 	}
 

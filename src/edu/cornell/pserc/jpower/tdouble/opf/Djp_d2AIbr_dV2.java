@@ -24,8 +24,8 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
 
 /**
  * Computes 2nd derivatives of |complex current|^2 w.r.t. V.

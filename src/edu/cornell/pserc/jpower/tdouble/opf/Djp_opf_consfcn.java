@@ -31,18 +31,18 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.polar;
-import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.polar;
+import static cern.colt.util.tdouble.Util.complex;
 
 import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV.dSbus_dV;
@@ -113,10 +113,10 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 	public DoubleMatrix1D[] gh(DoubleMatrix1D x) {
 		int nb, nl;
 		double baseMVA;
-		Djp_jpc jpc;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
+		JPC jpc;
+		Bus bus;
+		Gen gen;
+		Branch branch;
 		Map<String, Set> vv;
 		DoubleMatrix1D Pg, Qg, Va, Vm, g, h, flow_max;
 		DComplexMatrix1D Sbus, V, mis, If, It, Sf, St;
@@ -204,10 +204,10 @@ public class Djp_opf_consfcn implements ConstraintEvaluator {
 	public DoubleMatrix2D[] dgh(DoubleMatrix1D x) {
 		int nb, ng, nxyz, nl2;
 		int[] iVa, iVm, iPg, iQg, idg;
-		Djp_jpc jpc;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
+		JPC jpc;
+		Bus bus;
+		Gen gen;
+		Branch branch;
 		Map<String, Set> vv;
 
 		AbstractMatrix[] dIbr_dV, dSbr_dV;

@@ -23,13 +23,13 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.any;
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.any;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.nonzero;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
 /**
  * Checks for P-Q capability curve constraints.
@@ -67,7 +67,7 @@ public class Djp_hasPQcap {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D hasPQcap(Djp_gen gen, String hilo) {
+	public static IntMatrix1D hasPQcap(Gen gen, String hilo) {
 
 		int[] k;
 		DoubleMatrix1D L, U, Qmin_at_Pmax, Qmax_at_Pmax;
@@ -108,7 +108,7 @@ public class Djp_hasPQcap {
 		return intm(L).assign(intm(U), ifunc.or);
 	}
 
-	public static IntMatrix1D hasPQcap(Djp_gen gen) {
+	public static IntMatrix1D hasPQcap(Gen gen) {
 		return hasPQcap(gen, "B");	// look at both top and bottom by default
 	}
 

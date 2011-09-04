@@ -31,14 +31,14 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.polar;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.polar;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
@@ -65,7 +65,7 @@ public class Djp_t_jacobian {
 	@SuppressWarnings("static-access")
 	public static void t_jacobian(boolean quiet) {
 		Map<String, Double> opt;
-		Djp_jpc jpc, r;
+		JPC jpc, r;
 		DComplexMatrix2D[] Y, dSbus_dV;
 		DComplexMatrix2D Ybus, Yf, Yt, Ybus_full, Yf_full, Yt_full,
 			dSbus_dVm_full, dSbus_dVa_full, dSbus_dVm, dSbus_dVa,
@@ -102,9 +102,9 @@ public class Djp_t_jacobian {
 		// switch to internal bus numbering and build admittance matrices
 		Object[] internal = ext2int(r.bus, r.gen, r.branch);
 		//int[] i2e = (int[]) internal[0];
-		Djp_bus bus = (Djp_bus) internal[1];
+		Bus bus = (Bus) internal[1];
 		//Djp_gen gen = (Djp_gen) internal[2];
-		Djp_branch branch = (Djp_branch) internal[3];
+		Branch branch = (Branch) internal[3];
 
 		Y = makeYbus(r.baseMVA, bus, branch);
 		Ybus = Y[0];

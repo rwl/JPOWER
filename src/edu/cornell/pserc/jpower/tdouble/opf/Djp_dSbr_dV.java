@@ -24,11 +24,11 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.j;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.j;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
 
 /**
  * Computes partial derivatives of power flows w.r.t. voltage.
@@ -86,7 +86,7 @@ public class Djp_dSbr_dV {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] dSbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
+	public static AbstractMatrix[] dSbr_dV(Branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
 		int nl, nb;
 		int[] f, t, il, ib;
 		DComplexMatrix1D If, It, Vnorm, Sf, St;

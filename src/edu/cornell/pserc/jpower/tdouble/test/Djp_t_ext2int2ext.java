@@ -24,10 +24,10 @@ import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
 import static edu.cornell.pserc.jpower.tdouble.Djp_int2ext.int2ext;
 import static edu.cornell.pserc.jpower.tdouble.Djp_loadcase.loadcase;
 
-import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Util.icat;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_is.t_is;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_begin.t_begin;
@@ -42,7 +42,7 @@ public class Djp_t_ext2int2ext {
 
 	public static void t_ext2int2ext(boolean quiet) {
 		String t;
-		Djp_jpc jpce, jpci, jpc;
+		JPC jpce, jpci, jpc;
 		int[] eVmQgcols, iVmQgcols;
 
 		t_begin(85, quiet);
@@ -118,11 +118,11 @@ public class Djp_t_ext2int2ext {
 		jpci = loadcase(Djp_t_case_int.t_case_int());
 		jpce.N = null;
 		jpci.N = null;
-		jpce.gencost = Djp_gencost.fromMatrix(DoubleFactory2D.dense.appendRows(
+		jpce.gencost = GenCost.fromMatrix(DoubleFactory2D.dense.appendRows(
 				jpce.gencost.toMatrix(),
 				jpce.gencost.toMatrix()
 		));
-		jpci.gencost = Djp_gencost.fromMatrix(DoubleFactory2D.dense.appendRows(
+		jpci.gencost = GenCost.fromMatrix(DoubleFactory2D.dense.appendRows(
 				jpci.gencost.toMatrix(),
 				jpci.gencost.toMatrix()
 		));

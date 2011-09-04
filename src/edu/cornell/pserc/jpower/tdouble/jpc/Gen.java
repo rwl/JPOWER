@@ -23,15 +23,15 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.dblm;
 
 /**
  *
  * @author Richard Lincoln
  *
  */
-public class Djp_gen {
+public class Gen {
 
 	public static final int GEN_BUS		= 0;
 	public static final int PG		= 1;
@@ -153,7 +153,7 @@ public class Djp_gen {
 	 *
 	 * @return a full copy of the generator data.
 	 */
-	public Djp_gen copy() {
+	public Gen copy() {
 		return copy(null);
 	}
 
@@ -161,8 +161,8 @@ public class Djp_gen {
 	 *
 	 * @return a copy of the generator data for the given indexes.
 	 */
-	public Djp_gen copy(int[] indexes) {
-		Djp_gen other = new Djp_gen();
+	public Gen copy(int[] indexes) {
+		Gen other = new Gen();
 
 		other.gen_bus = gen_bus.viewSelection(indexes).copy();
 		other.Pg = Pg.viewSelection(indexes).copy();
@@ -216,7 +216,7 @@ public class Djp_gen {
 	 * @param other generator data source
 	 * @param indexes generator indexes
 	 */
-	public void update(Djp_gen other, int[] indexes) {
+	public void update(Gen other, int[] indexes) {
 
 //		gen_bus.viewSelection(indexes).assign(other.gen_bus.viewSelection(indexes));
 //		Pg.viewSelection(indexes).assign(other.Pg.viewSelection(indexes));
@@ -333,8 +333,8 @@ public class Djp_gen {
 	 *
 	 * @param other
 	 */
-	public static Djp_gen fromMatrix(DoubleMatrix2D other) {
-		Djp_gen gen = new Djp_gen();
+	public static Gen fromMatrix(DoubleMatrix2D other) {
+		Gen gen = new Gen();
 
 		gen.gen_bus = intm(other.viewColumn(GEN_BUS));
 		gen.Pg = other.viewColumn(PG);
@@ -371,7 +371,7 @@ public class Djp_gen {
 		return gen;
 	}
 
-	public static Djp_gen fromMatrix(double[][] data) {
+	public static Gen fromMatrix(double[][] data) {
 		return fromMatrix(DoubleFactory2D.dense.make(data));
 	}
 

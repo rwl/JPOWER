@@ -24,7 +24,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model;
 
-public class Djp_jpc {
+public class JPC {
 
 	/* define bus types */
 	public static final int PQ = 1;
@@ -37,11 +37,11 @@ public class Djp_jpc {
 	public static final int POLYNOMIAL	= 2;
 
 	public double baseMVA = 100;
-	public Djp_bus bus = new Djp_bus();
-	public Djp_gen gen = new Djp_gen();
-	public Djp_branch branch = new Djp_branch();
-	public Djp_areas areas;
-	public Djp_gencost gencost;
+	public Bus bus = new Bus();
+	public Gen gen = new Gen();
+	public Branch branch = new Branch();
+	public Areas areas;
+	public GenCost gencost;
 	public DoubleMatrix2D A;
 	public DoubleMatrix2D N;
 	public String userfcn;
@@ -58,10 +58,10 @@ public class Djp_jpc {
 	public DoubleMatrix1D g, df;
 	public DoubleMatrix2D dg, d2f;
 
-	public Djp_order order;
+	public Order order;
 
-	public Djp_jpc copy() {
-		Djp_jpc cpy = new Djp_jpc();
+	public JPC copy() {
+		JPC cpy = new JPC();
 
 		cpy.baseMVA = this.baseMVA;
 		cpy.bus = this.bus.copy();

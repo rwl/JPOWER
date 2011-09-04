@@ -30,27 +30,27 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.complex;
 
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus.makeYbus;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.REF;
 import static edu.cornell.pserc.jips.tdouble.Dips_jips.jips;
 
 import edu.cornell.pserc.jips.tdouble.ConstraintEvaluator;
 import edu.cornell.pserc.jips.tdouble.HessianEvaluator;
 import edu.cornell.pserc.jips.tdouble.ObjectiveEvaluator;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
 /**
@@ -80,11 +80,11 @@ public class Djp_jipsopf_solver {
 		double feastol, gradtol, comptol, costtol, max_it, max_red,
 				step_control, baseMVA, c, f;
 		Map<String, Double> opt;
-		Djp_jpc jpc, results;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
-		Djp_gencost gencost;
+		JPC jpc, results;
+		Bus bus;
+		Gen gen;
+		Branch branch;
+		GenCost gencost;
 
 		Map<String, Set>[] idx;
 		Map<String, Set> vv, ll, nn;

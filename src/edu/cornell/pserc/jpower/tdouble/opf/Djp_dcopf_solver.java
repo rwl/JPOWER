@@ -30,26 +30,26 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.ones;
-import static cern.colt.util.tdouble.Djp_util.dblm;
-import static cern.colt.util.tdouble.Djp_util.any;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.ones;
+import static cern.colt.util.tdouble.Util.dblm;
+import static cern.colt.util.tdouble.Util.any;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.intm;
 
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.REF;
 
 import static edu.cornell.pserc.jips.tdouble.Dips_qps_jips.qps_jips;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
@@ -76,11 +76,11 @@ public class Djp_dcopf_solver {
 		int[] ipol, ipwl, iqdr, ilin, il;
 		double baseMVA, C0, c, feastol, gradtol, comptol, costtol, max_it, max_red, f;
 		boolean success;
-		Djp_jpc jpc;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
-		Djp_gencost gencost;
+		JPC jpc;
+		Bus bus;
+		Gen gen;
+		Branch branch;
+		GenCost gencost;
 		Cost cp;
 
 		Map<String, Set>[] idx;
@@ -314,7 +314,7 @@ public class Djp_dcopf_solver {
 		lin.put("u", mu_u);
 		mu.put("lin", lin);
 
-		Djp_jpc results = jpc.copy();
+		JPC results = jpc.copy();
 		results.bus = bus.copy();
 		results.branch = branch.copy();
 		results.gen = gen.copy();

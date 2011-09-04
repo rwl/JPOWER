@@ -26,7 +26,7 @@ import static edu.cornell.pserc.jpower.tdouble.Djp_printpf.printpf;
 import static edu.cornell.pserc.jpower.tdouble.Djp_savecase.savecase;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_opf.opf;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  * Runs an optimal power flow.
@@ -47,10 +47,10 @@ public class Djp_runopf {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt,
+	public static JPC runopf(JPC casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
-		Djp_jpc r;
+		JPC r;
 
 		/* -----  run the optimal power flow  ----- */
 		r = opf(casedata, jpopt);
@@ -68,15 +68,15 @@ public class Djp_runopf {
 		return r;
 	}
 
-	public static Djp_jpc runopf(Djp_jpc casedata) {
+	public static JPC runopf(JPC casedata) {
 		return runopf(casedata, jpoption());
 	}
 
-	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt) {
+	public static JPC runopf(JPC casedata, Map<String, Double> jpopt) {
 		return runopf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc runopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+	public static JPC runopf(JPC casedata, Map<String, Double> jpopt, String fname) {
 		return runopf(casedata, jpopt, fname, "");
 	}
 

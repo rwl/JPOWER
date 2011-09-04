@@ -45,7 +45,7 @@ import cern.colt.matrix.tdouble.impl.SparseDoubleMatrix2D;
  * @author Richard Lincoln
  *
  */
-public class Djp_mm {
+public class MMUtil {
 
 	private static int i, j;
 	private static int[] row, col;

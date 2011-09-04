@@ -26,16 +26,16 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.diff;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.any;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.diff;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.any;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
 
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PW_LINEAR;
 
 /**
  * Make the A matrix and RHS for the CCV formulation.
@@ -72,7 +72,7 @@ public class Djp_makeAy {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] makeAy(double baseMVA, int ng, Djp_gencost gencost,
+	public static AbstractMatrix[] makeAy(double baseMVA, int ng, GenCost gencost,
 			int pgbas, int qgbas, int ybas) {
 		int ny, nnz, k, ns, sidx, j;
 		int[] iycost;

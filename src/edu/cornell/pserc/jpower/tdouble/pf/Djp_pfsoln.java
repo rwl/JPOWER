@@ -27,16 +27,16 @@ import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.EPS;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.EPS;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
 /**
  * Updates bus, gen, branch data structures to match power flow soln.
@@ -64,11 +64,11 @@ public class Djp_pfsoln {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] pfsoln(double baseMVA, Djp_bus bus0, Djp_gen gen0, Djp_branch branch0,
+	public static Object[] pfsoln(double baseMVA, Bus bus0, Gen gen0, Branch branch0,
 			DComplexMatrix2D Ybus, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V, int ref, int[] pv, int[] pq) {
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
+		Bus bus;
+		Gen gen;
+		Branch branch;
 		int nb, ngon;
 		int[] on, gbus, ig, out, br;
 		double Pg_o;

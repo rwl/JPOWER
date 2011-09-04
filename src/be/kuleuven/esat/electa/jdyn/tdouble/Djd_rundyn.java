@@ -36,15 +36,15 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+import cern.colt.util.tdouble.Util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 import cern.jet.math.tint.IntFunctions;
 import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf;
 
 /**
@@ -88,10 +88,10 @@ public class Djd_rundyn {
 		DoubleMatrix1D[] I;
 
 		Map<String, Double> jpopt;
-		Djp_jpc jpc;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
+		JPC jpc;
+		Bus bus;
+		Gen gen;
+		Branch branch;
 
 		/* Begin timing */
 		t0 = System.currentTimeMillis();
@@ -154,10 +154,10 @@ public class Djd_rundyn {
 				System.out.println("Power flow converged");
 		}
 
-		U0 = Djp_util.polar(bus.Vm, bus.Va, false);
+		U0 = Util.polar(bus.Vm, bus.Va, false);
 		U00 = U0.copy();
 		// Get generator info
-		on = Djp_util.nonzero( gen.gen_status.copy().assign(ifunc.equals(1)) );	// which generators are on?
+		on = Util.nonzero( gen.gen_status.copy().assign(ifunc.equals(1)) );	// which generators are on?
 		gbus = gen.gen_bus.toArray();		// what buses are they at?
 		ngen = gbus.length;
 		nbus = (int) U0.size();

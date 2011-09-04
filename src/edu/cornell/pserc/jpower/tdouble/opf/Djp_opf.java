@@ -29,14 +29,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.any;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.scat;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.any;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.scat;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpver.jpver;
@@ -50,15 +50,15 @@ import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAang.makeAang;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_makeAy.makeAy;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dcopf_solver.dcopf_solver;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_jipsopf_solver.jipsopf_solver;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.REF;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
@@ -81,7 +81,7 @@ public class Djp_opf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Djp_jpc opf(Djp_jpc jpc, DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
+	public static JPC opf(JPC jpc, DoubleMatrix2D A, DoubleMatrix1D l, DoubleMatrix1D u,
 			Map<String, Double> jpopt, DoubleMatrix2D N, DoubleMatrix2D fparm, DoubleMatrix2D H,
 			DoubleMatrix1D Cw, DoubleMatrix1D z0, DoubleMatrix1D zl, DoubleMatrix1D zu) {
 		long t0;
@@ -94,11 +94,11 @@ public class Djp_opf {
 
 		Object[] opf_args, Alu_pq, r;
 
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
-		Djp_gencost gencost;
-		Djp_gencost[] pqcost;
+		Bus bus;
+		Gen gen;
+		Branch branch;
+		GenCost gencost;
+		GenCost[] pqcost;
 
 		DoubleMatrix1D x0, y0, x1, y1, m, b, lbu, ubu, Va, Vm, Pg, Qg,
 				Pmin, Pmax, Qmin, Qmax, Vau, Val, lang, uang, iang, by,
@@ -125,7 +125,7 @@ public class Djp_opf {
 
 		/* process input arguments */
 		opf_args = opf_args();
-		jpc = (Djp_jpc) opf_args[0];
+		jpc = (JPC) opf_args[0];
 		jpopt = (Map<String, Double>) opf_args[1];
 
 		/* options */
@@ -208,10 +208,10 @@ public class Djp_opf {
 		/* create (read-only) copies of individual fields for convenience */
 		opf_args = opf_args(jpc, jpopt);
 		baseMVA = (Double) opf_args[0];
-		bus = (Djp_bus) opf_args[1];
-		gen = (Djp_gen) opf_args[2];
-		branch = (Djp_branch) opf_args[3];
-		gencost = (Djp_gencost) opf_args[4];
+		bus = (Bus) opf_args[1];
+		gen = (Gen) opf_args[2];
+		branch = (Branch) opf_args[3];
+		gencost = (GenCost) opf_args[4];
 		Au  = (DoubleMatrix2D) opf_args[5];
 		lbu = (DoubleMatrix1D) opf_args[6];
 		ubu = (DoubleMatrix1D) opf_args[7];
@@ -433,7 +433,7 @@ public class Djp_opf {
 		return null;
 	}
 
-	public static Djp_jpc opf(Djp_jpc jpc, Map<String, Double> jpopt) {
+	public static JPC opf(JPC jpc, Map<String, Double> jpopt) {
 		return null;
 	}
 

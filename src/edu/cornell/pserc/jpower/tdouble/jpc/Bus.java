@@ -23,15 +23,15 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.dblm;
 
 /**
  *
  * @author Richard Lincoln
  *
  */
-public class Djp_bus {
+public class Bus {
 
 	public static final int BUS_I		= 0;
 	public static final int BUS_TYPE	= 1;
@@ -121,7 +121,7 @@ public class Djp_bus {
 	 *
 	 * @return a full copy of the bus data.
 	 */
-	public Djp_bus copy() {
+	public Bus copy() {
 		return copy(null);
 	}
 
@@ -130,8 +130,8 @@ public class Djp_bus {
 	 * @param indexes
 	 * @return a copy of the bus data for the given indexes.
 	 */
-	public Djp_bus copy(int[] indexes) {
-		Djp_bus other = new Djp_bus();
+	public Bus copy(int[] indexes) {
+		Bus other = new Bus();
 
 		other.bus_i = this.bus_i.viewSelection(indexes).copy();
 		other.bus_type = this.bus_type.viewSelection(indexes).copy();
@@ -165,7 +165,7 @@ public class Djp_bus {
 	 * @param other source bus data.
 	 * @param indexes bus indices.
 	 */
-	public void update(Djp_bus other, int[] indexes) {
+	public void update(Bus other, int[] indexes) {
 
 //		this.bus_i.viewSelection(indexes).assign(other.bus_i.viewSelection(indexes));
 //		this.bus_type.viewSelection(indexes).assign(other.bus_type.viewSelection(indexes));
@@ -242,8 +242,8 @@ public class Djp_bus {
 //		}
 //	}
 
-	public static Djp_bus fromMatrix(DoubleMatrix2D data) {
-		Djp_bus bus = new Djp_bus();
+	public static Bus fromMatrix(DoubleMatrix2D data) {
+		Bus bus = new Bus();
 
 		bus.bus_i = intm(data.viewColumn(BUS_I));
 		bus.bus_type = intm(data.viewColumn(BUS_TYPE));
@@ -269,7 +269,7 @@ public class Djp_bus {
 		return bus;
 	}
 
-	public static Djp_bus fromMatrix(double[][] data) {
+	public static Bus fromMatrix(double[][] data) {
 		return fromMatrix(DoubleFactory2D.dense.make(data));
 	}
 

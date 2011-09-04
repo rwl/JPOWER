@@ -22,7 +22,7 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import java.util.Map;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  * Runs a DC optimal power flow.
@@ -42,20 +42,20 @@ public class Djp_rundcopf {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+	public static JPC rundcopf(JPC casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
 		jpopt = jpoption(jpopt, "PF_DC", 1.0);
 		return Djp_runopf.runopf(casedata, jpopt, fname, solvedcase);
 	}
 
-	public static Djp_jpc rundcopf(Djp_jpc casedata) {
+	public static JPC rundcopf(JPC casedata) {
 		return rundcopf(casedata, jpoption());
 	}
 
-	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt) {
+	public static JPC rundcopf(JPC casedata, Map<String, Double> jpopt) {
 		return rundcopf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc rundcopf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+	public static JPC rundcopf(JPC casedata, Map<String, Double> jpopt, String fname) {
 		return rundcopf(casedata, jpopt, fname, "");
 	}
 

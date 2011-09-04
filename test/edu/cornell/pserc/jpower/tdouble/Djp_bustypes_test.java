@@ -22,10 +22,10 @@ import java.io.File;
 
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_mm;
-import cern.colt.util.tdouble.Djp_util;
+import cern.colt.util.tdouble.MMUtil;
+import cern.colt.util.tdouble.Util;
 import cern.jet.math.tint.IntFunctions;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  *
@@ -34,15 +34,15 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  */
 public abstract class Djp_bustypes_test extends Djp_base_test {
 
-	private Djp_jpc jpc;
+	private JPC jpc;
 
-	public Djp_bustypes_test(String name, String caseName, Djp_jpc jpc) {
+	public Djp_bustypes_test(String name, String caseName, JPC jpc) {
 		super(name, caseName, "bustypes");
 		this.jpc = jpc;
 	}
 
 	public void test_bustypes() {
-		Djp_jpc jpc;
+		JPC jpc;
 		IntMatrix1D[] bustypes;
 		File ref_file, pv_file, pq_file;
 		IntMatrix1D ref, pv, pq;
@@ -55,9 +55,9 @@ public abstract class Djp_bustypes_test extends Djp_base_test {
 		pv_file = new File(fdir, "pv.mtx");
 		pq_file = new File(fdir, "pq.mtx");
 
-		ref = Djp_util.intm((DoubleMatrix1D) Djp_mm.readMatrix(ref_file));
-		pv  = Djp_util.intm((DoubleMatrix1D) Djp_mm.readMatrix(pv_file));
-		pq  = Djp_util.intm((DoubleMatrix1D) Djp_mm.readMatrix(pq_file));
+		ref = Util.intm((DoubleMatrix1D) MMUtil.readMatrix(ref_file));
+		pv  = Util.intm((DoubleMatrix1D) MMUtil.readMatrix(pv_file));
+		pq  = Util.intm((DoubleMatrix1D) MMUtil.readMatrix(pq_file));
 
 		ref.assign(IntFunctions.minus(1)); // Correct for Matlab indexing.
 		pv .assign(IntFunctions.minus(1));

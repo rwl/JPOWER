@@ -24,9 +24,9 @@ import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.cfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
 
 /**
  * Computes partial derivatives of branch currents w.r.t. voltage.
@@ -66,7 +66,7 @@ public class Djp_dIbr_dV {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] dIbr_dV(Djp_branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
+	public static AbstractMatrix[] dIbr_dV(Branch branch, DComplexMatrix2D Yf, DComplexMatrix2D Yt, DComplexMatrix1D V) {
 		DComplexMatrix1D Vnorm, If, It;
 		DComplexMatrix2D diagV, diagVnorm, dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm;
 

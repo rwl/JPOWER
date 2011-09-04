@@ -22,12 +22,12 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+import cern.colt.util.tdouble.Util;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_totcost.totcost;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PW_LINEAR;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
 
 /**
  * Converts polynomial cost variable to piecewise linear.
@@ -51,10 +51,10 @@ public class Djp_poly2pwl {
 	 * @param npts
 	 * @return
 	 */
-	public static Djp_gencost poly2pwl(Djp_gencost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
+	public static GenCost poly2pwl(GenCost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
 		int i, m;
 		double pmin, pmax, step;
-		Djp_gencost pwlcost;
+		GenCost pwlcost;
 		DoubleMatrix1D xx, yy;
 
 		pwlcost = polycost.copy();
@@ -69,21 +69,21 @@ public class Djp_poly2pwl {
 
 			if (pmin == 0) {
 				step = (pmax - pmin) / (npts - 1);
-				xx = DoubleFactory1D.dense.make(Djp_util.drange(pmin, pmax, step));
+				xx = DoubleFactory1D.dense.make(Util.drange(pmin, pmax, step));
 			} else if (pmin > 0) {
 				step = (pmax - pmin) / (npts - 1);
-				double[] x = Djp_util.dcat(new double[] {0}, Djp_util.drange(pmin, pmax, step));
+				double[] x = Util.dcat(new double[] {0}, Util.drange(pmin, pmax, step));
 				xx = DoubleFactory1D.dense.make(x);
 			} else if (pmin < 0 && pmax > 0) {
 				step = (pmax - pmin) / (npts - 1);
-				xx = DoubleFactory1D.dense.make(Djp_util.drange(pmin, pmax, step));
+				xx = DoubleFactory1D.dense.make(Util.drange(pmin, pmax, step));
 			} else {
 				// FIXME Pmin < 0 && Pmax <= 0
 				xx = DoubleFactory1D.dense.make(0);
 			}
 			yy = totcost(polycost.copy(new int[] {i}), xx);
-			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(0, 2 * (npts - 1)    , 2)).assign(xx);
-			pwlcost.cost.viewRow(i).viewSelection(Djp_util.irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
+			pwlcost.cost.viewRow(i).viewSelection(Util.irange(0, 2 * (npts - 1)    , 2)).assign(xx);
+			pwlcost.cost.viewRow(i).viewSelection(Util.irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
 		}
 		return pwlcost;
 	}

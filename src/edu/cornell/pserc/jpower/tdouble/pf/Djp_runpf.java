@@ -29,14 +29,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.polar;
-import static cern.colt.util.tdouble.Djp_util.complex;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.polar;
+import static cern.colt.util.tdouble.Util.complex;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.intm;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_bustypes.bustypes;
 import static edu.cornell.pserc.jpower.tdouble.Djp_ext2int.ext2int;
@@ -55,10 +55,10 @@ import static edu.cornell.pserc.jpower.tdouble.pf.Djp_fdpf.fdpf;
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeB.makeB;
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_pfsoln.pfsoln;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  * Runs a power flow
@@ -104,7 +104,7 @@ public class Djp_runpf {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Djp_jpc runpf(Djp_jpc casedata, Map<String, Double> jpopt,
+	public static JPC runpf(JPC casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 		int i, verbose, qlim, ref, refgen, ref0, /*iterations, */k, bi, ref_temp;
 		int[] pv, pq, on, gbus, limited, mx, mn;
@@ -112,10 +112,10 @@ public class Djp_runpf {
 		boolean dc, repeat, success;
 		double baseMVA, Varef0;
 		double[] maxloc;
-		Djp_jpc jpc, results;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
+		JPC jpc, results;
+		Bus bus;
+		Gen gen;
+		Branch branch;
 		Map<String, String> v;
 		IntMatrix1D[] bustypes;
 		DoubleMatrix1D Va0, Pbusinj, Pfinj, Pbus, Va, fixedQg;
@@ -260,9 +260,9 @@ public class Djp_runpf {
 
 				/* update data matrices with solution */
 				data = pfsoln(baseMVA, bus, gen, branch, Ybus, Yf, Yt, V, ref, pv, pq);
-				bus = (Djp_bus) data[0];
-				gen = (Djp_gen) data[1];
-				branch = (Djp_branch) data[2];
+				bus = (Bus) data[0];
+				gen = (Gen) data[1];
+				branch = (Branch) data[2];
 
 				if (qlim > 0) {		// enforce generator Q limits
 					/* find gens with violated Q constraints */
@@ -315,7 +315,7 @@ public class Djp_runpf {
 							bi = gen.gen_bus.get(mx[i]);						//  they may be at same bus)
 							bus.Pd.set(bi, bus.Pd.get(bi) - gen.Pg.get(mx[i]));		// adjust load accordingly,
 							bus.Qd.set(bi, bus.Qd.get(bi) - gen.Qg.get(mx[i]));
-							bus.bus_type.set(gen.gen_bus.get(mx[i]), Djp_jpc.PQ);	// & set bus type to PQ
+							bus.bus_type.set(gen.gen_bus.get(mx[i]), JPC.PQ);	// & set bus type to PQ
 						}
 
 						/* update bus index lists of each type of bus */
@@ -385,36 +385,36 @@ public class Djp_runpf {
 		return results;
 	}
 
-	public static Djp_jpc runpf() {
+	public static JPC runpf() {
 		return runpf("case9");
 	}
 
-	public static Djp_jpc runpf(String casedata) {
+	public static JPC runpf(String casedata) {
 		return runpf(casedata, jpoption());
 	}
 
-	public static Djp_jpc runpf(String casedata, Map<String, Double> jpopt) {
+	public static JPC runpf(String casedata, Map<String, Double> jpopt) {
 		return runpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc runpf(String casedata, Map<String, Double> jpopt, String fname) {
+	public static JPC runpf(String casedata, Map<String, Double> jpopt, String fname) {
 		return runpf(casedata, jpopt, fname, "");
 	}
 
-	public static Djp_jpc runpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = loadcase(casedata);
+	public static JPC runpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		JPC jpc = loadcase(casedata);
 		return runpf(jpc, jpopt, fname, "");
 	}
 
-	public static Djp_jpc runpf(Djp_jpc casedata) {
+	public static JPC runpf(JPC casedata) {
 		return runpf(casedata, jpoption());
 	}
 
-	public static Djp_jpc runpf(Djp_jpc casedata, Map<String, Double> jpopt) {
+	public static JPC runpf(JPC casedata, Map<String, Double> jpopt) {
 		return runpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc runpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+	public static JPC runpf(JPC casedata, Map<String, Double> jpopt, String fname) {
 		return runpf(casedata, jpopt, "", "");
 	}
 

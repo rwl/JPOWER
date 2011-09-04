@@ -20,18 +20,18 @@
 package edu.cornell.pserc.jpower.tdouble;
 
 import cern.colt.matrix.tdouble.DoubleFactory1D;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 public class Djp_loadcase {
 
-	public static Djp_jpc loadcase(String casefile) {
+	public static JPC loadcase(String casefile) {
 		// TODO Implement this method
 		throw new UnsupportedOperationException();
 	}
 
-	public static Djp_jpc loadcase(Djp_jpc jpc) {
+	public static JPC loadcase(JPC jpc) {
 		jpc = jpc.copy();
 
 		// TODO: -----  check contents of case  -----
@@ -44,7 +44,7 @@ public class Djp_loadcase {
 		return jpc;
 	}
 
-	private static Djp_gen jpc_1to2(Djp_gen gen) {
+	private static Gen jpc_1to2(Gen gen) {
 		gen = gen.copy();
 		int ng = gen.size();
 
@@ -72,7 +72,7 @@ public class Djp_loadcase {
 		return gen;
 	}
 
-	private static Djp_branch jpc_1to2(Djp_branch branch) {
+	private static Branch jpc_1to2(Branch branch) {
 		branch = branch.copy();
 		int nl = branch.size();
 

@@ -18,7 +18,7 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  *
@@ -27,9 +27,9 @@ import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
  */
 public abstract class Djp_loadcase_test extends Djp_base_test {
 
-	private Djp_jpc jpc;
+	private JPC jpc;
 
-	public Djp_loadcase_test(String name, String caseName, Djp_jpc jpc) {
+	public Djp_loadcase_test(String name, String caseName, JPC jpc) {
 		super(name, caseName, "loadcase");
 		this.jpc = jpc;
 	}

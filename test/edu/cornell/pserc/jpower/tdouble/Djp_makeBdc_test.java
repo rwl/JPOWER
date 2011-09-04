@@ -23,8 +23,8 @@ import java.io.File;
 import cern.colt.matrix.AbstractMatrix;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
-import cern.colt.util.tdouble.Djp_mm;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import cern.colt.util.tdouble.MMUtil;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
 
 /**
@@ -34,15 +34,15 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
  */
 public abstract class Djp_makeBdc_test extends Djp_base_test {
 
-	private Djp_jpc jpc;
+	private JPC jpc;
 
-	public Djp_makeBdc_test(String name, String caseName, Djp_jpc jpc) {
+	public Djp_makeBdc_test(String name, String caseName, JPC jpc) {
 		super(name, caseName, "makeBdc");
 		this.jpc = jpc;
 	}
 
 	public void test_makeBdc() {
-		Djp_jpc jpc;
+		JPC jpc;
 		AbstractMatrix[] Bdc;
 		File Bbus_file, Bf_file, Pbusinj_file, Pfinj_file;
 		DoubleMatrix2D Bbus, Bf;
@@ -57,10 +57,10 @@ public abstract class Djp_makeBdc_test extends Djp_base_test {
 		Pbusinj_file = new File(fdir, "Pbusinj.mtx");
 		Pfinj_file   = new File(fdir, "Pfinj.mtx");
 
-		Bbus    = (DoubleMatrix2D) Djp_mm.readMatrix(Bbus_file);
-		Bf      = (DoubleMatrix2D) Djp_mm.readMatrix(Bf_file);
-		Pbusinj = (DoubleMatrix1D) Djp_mm.readMatrix(Pbusinj_file);
-		Pfinj   = (DoubleMatrix1D) Djp_mm.readMatrix(Pfinj_file);
+		Bbus    = (DoubleMatrix2D) MMUtil.readMatrix(Bbus_file);
+		Bf      = (DoubleMatrix2D) MMUtil.readMatrix(Bf_file);
+		Pbusinj = (DoubleMatrix1D) MMUtil.readMatrix(Pbusinj_file);
+		Pfinj   = (DoubleMatrix1D) MMUtil.readMatrix(Pfinj_file);
 
 		assertTrue(dprop.equals((DoubleMatrix2D) Bdc[0], Bbus));
 		assertTrue(dprop.equals((DoubleMatrix2D) Bdc[1], Bf));

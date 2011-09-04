@@ -24,14 +24,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.jet.math.tdouble.Polynomial;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.nonzero;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
 
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PW_LINEAR;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PW_LINEAR;
 
 /**
  * Computes total cost for generators at given output level.
@@ -50,7 +50,7 @@ public class Djp_totcost {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D totcost(Djp_gencost gencost, DoubleMatrix1D Pg) {
+	public static DoubleMatrix1D totcost(GenCost gencost, DoubleMatrix1D Pg) {
 		int ng, ncost;
 		int[] ipwl, ipol;
 		double p1,  p2, c1, c2, m, b, Pgen;

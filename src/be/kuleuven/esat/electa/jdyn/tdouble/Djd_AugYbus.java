@@ -25,10 +25,10 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 //import cern.colt.matrix.tdcomplex.algo.SparseDComplexAlgebra;
 //import cern.colt.matrix.tdcomplex.algo.decomposition.SparseDComplexLUDecomposition;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+import cern.colt.util.tdouble.Util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus;
 
 /**

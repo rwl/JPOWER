@@ -27,18 +27,18 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntFactory1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.any;
-import static cern.colt.util.tdouble.Djp_util.dblm;
-import static cern.colt.util.tdouble.Djp_util.complex;
-import static cern.colt.util.tdouble.Djp_util.polar;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.any;
+import static cern.colt.util.tdouble.Util.dblm;
+import static cern.colt.util.tdouble.Util.complex;
+import static cern.colt.util.tdouble.Util.polar;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.irange;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
 
 /**
  * Builds the bus admittance matrix and branch admittance matrices.
@@ -63,8 +63,8 @@ public class Djp_makeYbus {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix2D[] makeYbus(double baseMVA, Djp_bus bus,
-			Djp_branch branch) {
+	public static DComplexMatrix2D[] makeYbus(double baseMVA, Bus bus,
+			Branch branch) {
 		int nb, nl;
 		int[] i, f, t, il;
 		DoubleMatrix1D dstat, Bc, dtap;

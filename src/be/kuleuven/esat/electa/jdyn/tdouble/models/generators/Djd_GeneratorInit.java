@@ -5,11 +5,11 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
 public class Djd_GeneratorInit {
 
-	public static Djd_gen[] jd_GeneratorInit(Djd_gen pgen0, DComplexMatrix1D viewSelection, Djp_gen gen, double baseMVA, IntMatrix1D genmodel) {
+	public static Djd_gen[] jd_GeneratorInit(Djd_gen pgen0, DComplexMatrix1D viewSelection, Gen gen, double baseMVA, IntMatrix1D genmodel) {
 		// TODO Auto-generated method stub
 		return null;
 	}

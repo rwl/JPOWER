@@ -25,8 +25,8 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
 import cern.colt.matrix.tint.algo.IntProperty;
-import cern.colt.util.tdouble.Djp_mm;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import cern.colt.util.tdouble.MMUtil;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import junit.framework.TestCase;
 
 abstract class Djp_base_test extends TestCase {
@@ -69,7 +69,7 @@ abstract class Djp_base_test extends TestCase {
 	 * @param pf Does the case have PF results?
 	 * @param opf Does the case have OPF results?
 	 */
-	protected void test_jpc(Djp_jpc jpc, boolean pf, boolean opf) {
+	protected void test_jpc(JPC jpc, boolean pf, boolean opf) {
 		File mm_version, mm_baseMVA, mm_bus, mm_gen, mm_branch;
 		DoubleMatrix1D version, baseMVA;
 		DoubleMatrix2D bus, gen, branch, busout, genout, branchout;
@@ -80,11 +80,11 @@ abstract class Djp_base_test extends TestCase {
 		mm_gen = new File(fdir, "gen.mtx");
 		mm_branch = new File(fdir, "branch.mtx");
 
-		version = (DoubleMatrix1D) Djp_mm.readMatrix(mm_version);
-		baseMVA = (DoubleMatrix1D) Djp_mm.readMatrix(mm_baseMVA);
-		bus     = (DoubleMatrix2D) Djp_mm.readMatrix(mm_bus);
-		gen     = (DoubleMatrix2D) Djp_mm.readMatrix(mm_gen);
-		branch  = (DoubleMatrix2D) Djp_mm.readMatrix(mm_branch);
+		version = (DoubleMatrix1D) MMUtil.readMatrix(mm_version);
+		baseMVA = (DoubleMatrix1D) MMUtil.readMatrix(mm_baseMVA);
+		bus     = (DoubleMatrix2D) MMUtil.readMatrix(mm_bus);
+		gen     = (DoubleMatrix2D) MMUtil.readMatrix(mm_gen);
+		branch  = (DoubleMatrix2D) MMUtil.readMatrix(mm_branch);
 
 		busout = jpc.bus.toMatrix(opf);
 		genout = jpc.gen.toMatrix(opf);
@@ -97,11 +97,11 @@ abstract class Djp_base_test extends TestCase {
 		assertTrue(dprop.equals(branchout, branch));
 	}
 
-	protected void test_jpc(Djp_jpc jpc) {
+	protected void test_jpc(JPC jpc) {
 		test_jpc(jpc, false, false);
 	}
 
-	protected void test_jpc(Djp_jpc jpc, boolean pf) {
+	protected void test_jpc(JPC jpc, boolean pf) {
 		test_jpc(jpc, pf, false);
 	}
 

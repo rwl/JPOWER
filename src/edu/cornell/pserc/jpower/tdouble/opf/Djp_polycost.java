@@ -24,12 +24,12 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.nonzero;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
 
 /**
  * Evaluates polynomial generator cost & derivatives.
@@ -48,7 +48,7 @@ public class Djp_polycost {
 	 * @return the vector of derivatives of costs evaluated at PG
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D polycost(Djp_gencost gencost, DoubleMatrix1D Pg, int der) {
+	public static DoubleMatrix1D polycost(GenCost gencost, DoubleMatrix1D Pg, int der) {
 		int ng, maxN, minN;
 		int[] k;
 		DoubleMatrix1D f;
@@ -95,7 +95,7 @@ public class Djp_polycost {
 	 * @param Pg is in MW, not p.u. (works for QG too).
 	 * @return the vector of costs evaluated at Pg.
 	 */
-	public static DoubleMatrix1D polycost(Djp_gencost gencost, DoubleMatrix1D Pg) {
+	public static DoubleMatrix1D polycost(GenCost gencost, DoubleMatrix1D Pg) {
 		return polycost(gencost, Pg, 0);
 	}
 

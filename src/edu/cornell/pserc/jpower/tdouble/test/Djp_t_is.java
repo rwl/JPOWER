@@ -26,11 +26,11 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
+import edu.cornell.pserc.jpower.tdouble.jpc.Areas;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_ok.t_ok;
 
 /**
@@ -92,27 +92,27 @@ public class Djp_t_is {
 		t_ok(prop.equals(expected_matrix, got), msg);
 	}
 
-	public static void t_is(Djp_bus got, Djp_bus expected, int prec, String msg) {
+	public static void t_is(Bus got, Bus expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void t_is(Djp_branch got, Djp_branch expected, int prec, String msg) {
+	public static void t_is(Branch got, Branch expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void t_is(Djp_gen got, Djp_gen expected, int prec, String msg) {
+	public static void t_is(Gen got, Gen expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void t_is(Djp_gencost got, Djp_gencost expected, int prec, String msg) {
+	public static void t_is(GenCost got, GenCost expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void t_is(Djp_areas got, Djp_areas expected, int prec, String msg) {
+	public static void t_is(Areas got, Areas expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}

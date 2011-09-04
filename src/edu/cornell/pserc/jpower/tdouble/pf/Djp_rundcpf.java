@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 import static edu.cornell.pserc.jpower.tdouble.Djp_loadcase.loadcase;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  * Runs a DC power flow.
@@ -42,7 +42,7 @@ public class Djp_rundcpf {
 	 * @param solvedcase
 	 * @return
 	 */
-	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt,
+	public static JPC rundcpf(JPC casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
 
 		jpopt = jpoption(jpopt, "PF_DC", 1.0);
@@ -50,36 +50,36 @@ public class Djp_rundcpf {
 		return Djp_runpf.runpf(casedata, jpopt, fname, solvedcase);
 	}
 
-	public static Djp_jpc rundcpf() {
+	public static JPC rundcpf() {
 		return rundcpf("case9");
 	}
 
-	public static Djp_jpc rundcpf(String casedata) {
+	public static JPC rundcpf(String casedata) {
 		return rundcpf(casedata, jpoption());
 	}
 
-	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt) {
+	public static JPC rundcpf(String casedata, Map<String, Double> jpopt) {
 		return rundcpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt, String fname) {
+	public static JPC rundcpf(String casedata, Map<String, Double> jpopt, String fname) {
 		return rundcpf(casedata, jpopt, fname, "");
 	}
 
-	public static Djp_jpc rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
-		Djp_jpc jpc = loadcase(casedata);
+	public static JPC rundcpf(String casedata, Map<String, Double> jpopt, String fname, String solvedcase) {
+		JPC jpc = loadcase(casedata);
 		return rundcpf(jpc, jpopt, fname, "");
 	}
 
-	public static Djp_jpc rundcpf(Djp_jpc casedata) {
+	public static JPC rundcpf(JPC casedata) {
 		return rundcpf(casedata, jpoption());
 	}
 
-	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt) {
+	public static JPC rundcpf(JPC casedata, Map<String, Double> jpopt) {
 		return rundcpf(casedata, jpopt, "");
 	}
 
-	public static Djp_jpc rundcpf(Djp_jpc casedata, Map<String, Double> jpopt, String fname) {
+	public static JPC rundcpf(JPC casedata, Map<String, Double> jpopt, String fname) {
 		return rundcpf(casedata, jpopt, "", "");
 	}
 

@@ -41,7 +41,7 @@ import edu.emory.mathcs.utils.ConcurrencyUtils;
  * @author Richard Lincoln
  *
  */
-public class Djp_util extends Object {
+public class Util extends Object {
 
 	public static final IntFunctions ifunc = IntFunctions.intFunctions;
 	public static final DoubleFunctions dfunc = DoubleFunctions.functions;
@@ -50,13 +50,13 @@ public class Djp_util extends Object {
 	public static final double[] j = {0.0, 1.0};
 
 	// singleton
-	public static final Djp_util util = new Djp_util();
+	public static final Util util = new Util();
 
 	/**
 	 * Makes this class non instantiable, but still let's others inherit from
 	 * it.
 	 */
-	protected Djp_util() {
+	protected Util() {
 	}
 
 	/**

@@ -28,24 +28,24 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseCCIntMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.max;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.zeros;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.max;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.zeros;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_areas;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_order;
+import edu.cornell.pserc.jpower.tdouble.jpc.Areas;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.tdouble.jpc.Order;
 
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PV;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PQ;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.NONE;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PV;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PQ;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.NONE;
 
 /**
  * Converts external to internal indexing.
@@ -127,10 +127,10 @@ public class Djp_ext2int {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Djp_jpc ext2int(Djp_jpc jpc) {
+	public static JPC ext2int(JPC jpc) {
 		int i, nb, ng, ng0;
 		boolean first, dc;
-		Djp_order o;
+		Order o;
 		IntMatrix1D n2i;
 
 		jpc = jpc.copy();
@@ -138,7 +138,7 @@ public class Djp_ext2int {
 		first = (jpc.order == null);
 		if (first || jpc.order.state.equals('e')) {
 			/* initialize order */
-			o = first ? new Djp_order() : jpc.order;
+			o = first ? new Order() : jpc.order;
 
 			/* sizes */
 			nb = jpc.bus.size();
@@ -247,11 +247,11 @@ public class Djp_ext2int {
 				jpc.order.external.gencost = jpc.gencost.copy();	// Save with external ordering.
 				if (jpc.gencost.size() == 2*ng0) {
 					String[] ordering = new String[] {"gen", "gen"};  // include Qg cost
-					jpc.gencost = Djp_gencost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					jpc.gencost = GenCost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
 
 				} else {
 					String ordering = "gen";  // Pg cost only
-					jpc.gencost = Djp_gencost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					jpc.gencost = GenCost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
 				}
 			}
 //			if (jpc.A != null | jpc.N != null) {
@@ -275,12 +275,12 @@ public class Djp_ext2int {
 	}
 
 
-	public static Djp_jpc ext2int(Djp_jpc jpc, String field, String[] ordering) {
+	public static JPC ext2int(JPC jpc, String field, String[] ordering) {
 		int dim = 1;
 		return ext2int(jpc, field, ordering, dim);
 	}
 
-	public static Djp_jpc ext2int(Djp_jpc jpc, String field, String[] ordering, int dim) {
+	public static JPC ext2int(JPC jpc, String field, String[] ordering, int dim) {
 		DoubleMatrix1D val1;
 		DoubleMatrix2D val2;
 		Field fld;
@@ -313,7 +313,7 @@ public class Djp_ext2int {
 		return jpc;
 	}
 
-	public static Djp_jpc ext2int(Djp_jpc jpc, String[] field, String[] ordering) {
+	public static JPC ext2int(JPC jpc, String[] field, String[] ordering) {
 		return ext2int(jpc, field, ordering, 1);
 	}
 
@@ -325,7 +325,7 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	public static Djp_jpc ext2int(Djp_jpc jpc, String[] field, String[] ordering, int dim) {
+	public static JPC ext2int(JPC jpc, String[] field, String[] ordering, int dim) {
 //		DoubleMatrix1D val1;
 //		DoubleMatrix2D val2;
 //		Field fld;
@@ -361,13 +361,13 @@ public class Djp_ext2int {
 	}
 
 
-	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String ordering) {
+	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String ordering) {
 		return ext2int(jpc, val, ordering, 1);
 	}
 
-	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String ordering, int dim) {
+	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String ordering, int dim) {
 		int[] idx;
-		Djp_order o;
+		Order o;
 		DoubleMatrix1D int_val1;
 
 		o = jpc.order;
@@ -388,7 +388,7 @@ public class Djp_ext2int {
 		return int_val1;
 	}
 
-	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering) {
+	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String[] ordering) {
 		return ext2int(jpc, val, ordering, 1);
 	}
 
@@ -400,7 +400,7 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	public static DoubleMatrix1D ext2int(Djp_jpc jpc, DoubleMatrix1D val, String[] ordering, int dim) {
+	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		int b, n, k;
@@ -450,13 +450,13 @@ public class Djp_ext2int {
 
 
 
-	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String ordering) {
+	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String ordering) {
 		return ext2int(jpc, val, ordering, 1);
 	}
 
-	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String ordering, int dim) {
+	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String ordering, int dim) {
 		int[] idx;
-		Djp_order o;
+		Order o;
 		DoubleMatrix2D int_val2;
 
 		o = jpc.order;
@@ -476,7 +476,7 @@ public class Djp_ext2int {
 		return int_val2;
 	}
 
-	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering) {
+	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String[] ordering) {
 		return ext2int(jpc, val, ordering, 1);
 	}
 
@@ -488,7 +488,7 @@ public class Djp_ext2int {
 	 * @param dim
 	 * @return
 	 */
-	public static DoubleMatrix2D ext2int(Djp_jpc jpc, DoubleMatrix2D val, String[] ordering, int dim) {
+	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String[] ordering, int dim) {
 		throw new UnsupportedOperationException();
 
 //		int b, n, k;
@@ -561,7 +561,7 @@ public class Djp_ext2int {
 	 * @param branch
 	 * @return
 	 */
-	public static Object[] ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch) {
+	public static Object[] ext2int(Bus bus, Gen gen, Branch branch) {
 		return ext2int(bus, gen, branch, null);
 	}
 
@@ -574,7 +574,7 @@ public class Djp_ext2int {
 	 * @param areas
 	 * @return
 	 */
-	public static Object[] ext2int(Djp_bus bus, Djp_gen gen, Djp_branch branch, Djp_areas areas) {
+	public static Object[] ext2int(Bus bus, Gen gen, Branch branch, Areas areas) {
 		int[] i2e;
 		IntMatrix1D e2i;
 

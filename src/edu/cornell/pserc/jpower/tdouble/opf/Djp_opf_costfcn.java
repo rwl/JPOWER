@@ -27,22 +27,22 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.ones;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.ones;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.icat;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_totcost.totcost;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_polycost.polycost;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.POLYNOMIAL;
 
 import edu.cornell.pserc.jips.tdouble.ObjectiveEvaluator;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
@@ -73,8 +73,8 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		int ny, nxyz, nw;
 		int[] ipol, iLT, iEQ, iGT, iND, iL, iQ;
 		double baseMVA, f;
-		Djp_jpc jpc;
-		Djp_gencost gencost;
+		JPC jpc;
+		GenCost gencost;
 		Cost cp;
 
 		Map<String, Set> vv;
@@ -160,9 +160,9 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		int ng, ny, nxyz;
 		int[] iPg, iQg, ipol, idx;
 		double baseMVA, step, tol, df_diff_max;
-		Djp_jpc jpc;
-		Djp_gen gen;
-		Djp_gencost gencost;
+		JPC jpc;
+		Gen gen;
+		GenCost gencost;
 		Cost cp;
 
 		Map<String, Set> vv;
@@ -247,10 +247,10 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		int ng, nxyz;
 		int[] iPg, iQg, ipolp, ipolq, i;
 		double baseMVA;
-		Djp_jpc jpc;
-		Djp_gen gen;
-		Djp_gencost gencost;
-		Djp_gencost pcost, qcost;
+		JPC jpc;
+		Gen gen;
+		GenCost gencost;
+		GenCost pcost, qcost;
 		Cost cp;
 
 		Map<String, Set> vv;

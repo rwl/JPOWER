@@ -28,8 +28,8 @@ import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 import static edu.cornell.pserc.jpower.tdouble.Djp_loadcase.loadcase;
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf.runpf;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_begin.t_begin;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_case9_pf.t_case9_pf;
@@ -37,7 +37,7 @@ import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_is.t_is;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_ok.t_ok;
 import static edu.cornell.pserc.jpower.tdouble.test.Djp_t_end.t_end;
 
-import static cern.colt.util.tdouble.Djp_mm.readMatrix;
+import static cern.colt.util.tdouble.MMUtil.readMatrix;
 
 /**
  * Tests for power flow solvers.
@@ -68,13 +68,13 @@ public class Djp_t_pf {
 	public static void t_pf(boolean quiet) {
 
 		String t;
-		Djp_jpc jpc, r;
+		JPC jpc, r;
 		DoubleMatrix2D bus_soln, gen_soln, branch_soln;
 		Map<String, Double> jpopt;
 
 		t_begin(25, quiet);
 
-		Djp_jpc casefile = t_case9_pf();
+		JPC casefile = t_case9_pf();
 		jpopt = jpoption("OUT_ALL", 0.0, "VERBOSE", quiet ? 0.0 : 1.0);
 
 		/* get solved AC power flow case from MatrixMarket file. */
@@ -140,7 +140,7 @@ public class Djp_t_pf {
 		r = runpf(jpc, jpopt);
 		t_is(r.gen.Qg.get(0), 24.07, 2, t + "single gen, Qmin = Qmax");
 
-		jpc.gen = Djp_gen.fromMatrix( DoubleFactory2D.dense.appendRows(
+		jpc.gen = Gen.fromMatrix( DoubleFactory2D.dense.appendRows(
 			jpc.gen.toMatrix().viewSelection(new int[] {0}, null),
 			jpc.gen.toMatrix()
 		) );

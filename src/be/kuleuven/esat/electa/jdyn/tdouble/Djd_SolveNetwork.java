@@ -26,7 +26,7 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_util;
+import cern.colt.util.tdouble.Util;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tint.IntFunctions;
 

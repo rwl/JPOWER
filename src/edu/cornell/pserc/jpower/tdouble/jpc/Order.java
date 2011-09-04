@@ -20,7 +20,7 @@ package edu.cornell.pserc.jpower.tdouble.jpc;
 
 import cern.colt.matrix.tint.IntMatrix1D;
 
-public class Djp_order {
+public class Order {
 
 //	public class Case {
 //		public Djp_areas areas;
@@ -79,15 +79,15 @@ public class Djp_order {
 	}
 
 	public String state;		// 'i' or 'e'
-	public Djp_jpc internal = new Djp_jpc();
-	public Djp_jpc external = new Djp_jpc();
+	public JPC internal = new JPC();
+	public JPC external = new JPC();
 	public BusGen bus = new BusGen();
 	public BusGen gen = new BusGen();
 	public BranchAreas branch = new BranchAreas();
 	public BranchAreas areas = new BranchAreas();
 
-	public Djp_order copy() {
-		Djp_order cpy = new Djp_order();
+	public Order copy() {
+		Order cpy = new Order();
 
 		cpy.state = this.state;
 		if (this.internal != null)

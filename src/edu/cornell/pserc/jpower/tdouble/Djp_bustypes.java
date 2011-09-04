@@ -23,16 +23,16 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.impl.SparseRCIntMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.nonzero;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.REF;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PV;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.PQ;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.REF;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PV;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.PQ;
 
 /**
  * Builds index lists for each type of bus (REF, PV, PQ).
@@ -53,7 +53,7 @@ public class Djp_bustypes {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D[] bustypes(Djp_bus bus, Djp_gen gen) {
+	public static IntMatrix1D[] bustypes(Bus bus, Gen gen) {
 		int nb, ng;
 		SparseRCIntMatrix2D Cg;
 		IntMatrix1D bus_gen_status, ref_types, ref, pv_types, pv, pq_types, pq;

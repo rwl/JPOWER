@@ -23,16 +23,16 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.dblm;
 
 /**
  *
  * @author Richard Lincoln
  *
  */
-public class Djp_gencost {
+public class GenCost {
 
 	private static final int MODEL    = 0;
 	private static final int STARTUP  = 1;
@@ -79,7 +79,7 @@ public class Djp_gencost {
 	 *
 	 * @return
 	 */
-	public Djp_gencost copy() {
+	public GenCost copy() {
 		return copy(null);
 	}
 
@@ -87,8 +87,8 @@ public class Djp_gencost {
 	 *
 	 * @return a copy of the gencost data.
 	 */
-	public Djp_gencost copy(int[] indexes) {
-		Djp_gencost other = new Djp_gencost();
+	public GenCost copy(int[] indexes) {
+		GenCost other = new GenCost();
 
 		other.model = this.model.viewSelection(indexes).copy();
 		other.startup = this.startup.viewSelection(indexes).copy();
@@ -112,8 +112,8 @@ public class Djp_gencost {
 //		this.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
 //	}
 
-	public static Djp_gencost fromMatrix(DoubleMatrix2D other) {
-		Djp_gencost gencost = new Djp_gencost();
+	public static GenCost fromMatrix(DoubleMatrix2D other) {
+		GenCost gencost = new GenCost();
 
 		gencost.model = intm(other.viewColumn(MODEL));
 		gencost.startup = other.viewColumn(STARTUP);
@@ -124,7 +124,7 @@ public class Djp_gencost {
 		return gencost;
 	}
 
-	public static Djp_gencost fromMatrix(double[][] data) {
+	public static GenCost fromMatrix(double[][] data) {
 		return fromMatrix(DoubleFactory2D.dense.make(data));
 	}
 

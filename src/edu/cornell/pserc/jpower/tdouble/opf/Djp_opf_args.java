@@ -2,7 +2,7 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 
 import java.util.Map;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 public class Djp_opf_args {
 
@@ -11,7 +11,7 @@ public class Djp_opf_args {
 		return null;
 	}
 
-	public static Object[] opf_args(Djp_jpc jpc, Map<String, Double> jpopt) {
+	public static Object[] opf_args(JPC jpc, Map<String, Double> jpopt) {
 		// TODO Auto-generated method stub
 		return null;
 	}

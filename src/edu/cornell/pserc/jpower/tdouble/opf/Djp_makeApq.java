@@ -31,11 +31,11 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.irange;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_hasPQcap.hasPQcap;
 
@@ -68,7 +68,7 @@ public class Djp_makeApq {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static Object[] makeApq(double baseMVA, Djp_gen gen) {
+	public static Object[] makeApq(double baseMVA, Gen gen) {
 		int i, ng, npqh, npql;
 		int[] ipqh, ipql;
 		double tmp;

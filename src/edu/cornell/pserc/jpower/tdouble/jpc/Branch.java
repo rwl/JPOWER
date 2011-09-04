@@ -23,15 +23,15 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.intm;
-import static cern.colt.util.tdouble.Djp_util.dblm;
+import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.dblm;
 
 /**
  *
  * @author Richard Lincoln
  *
  */
-public class Djp_branch {
+public class Branch {
 
 	public static final int F_BUS		= 0;
 	public static final int T_BUS		= 1;
@@ -142,7 +142,7 @@ public class Djp_branch {
 	 *
 	 * @return a full copy of the branch data.
 	 */
-	public Djp_branch copy() {
+	public Branch copy() {
 		return copy(null);
 	}
 
@@ -151,8 +151,8 @@ public class Djp_branch {
 	 * @param indexes
 	 * @return
 	 */
-	public Djp_branch copy(int[] indexes) {
-		Djp_branch other = new Djp_branch();
+	public Branch copy(int[] indexes) {
+		Branch other = new Branch();
 
 		other.f_bus = f_bus.viewSelection(indexes).copy();
 		other.t_bus = t_bus.viewSelection(indexes).copy();
@@ -198,7 +198,7 @@ public class Djp_branch {
 	 * @param other branch data source
 	 * @param indexes branch indexes
 	 */
-	public void update(Djp_branch other, int[] indexes) {
+	public void update(Branch other, int[] indexes) {
 
 //		f_bus.viewSelection(indexes).assign(other.f_bus.viewSelection(indexes));
 //		t_bus.viewSelection(indexes).assign(other.t_bus.viewSelection(indexes));
@@ -303,8 +303,8 @@ public class Djp_branch {
 //		}
 //	}
 
-	public static Djp_branch fromMatrix(DoubleMatrix2D data) {
-		Djp_branch branch = new Djp_branch();
+	public static Branch fromMatrix(DoubleMatrix2D data) {
+		Branch branch = new Branch();
 
 		branch.f_bus = intm(data.viewColumn(F_BUS));
 		branch.t_bus = intm(data.viewColumn(T_BUS));
@@ -340,7 +340,7 @@ public class Djp_branch {
 		return branch;
 	}
 
-	public static Djp_branch fromMatrix(double[][] data) {
+	public static Branch fromMatrix(double[][] data) {
 		return fromMatrix(DoubleFactory2D.dense.make(data));
 	}
 

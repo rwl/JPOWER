@@ -28,8 +28,8 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.icat;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.icat;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 

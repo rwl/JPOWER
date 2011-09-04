@@ -31,11 +31,11 @@ import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.decomposition.SparseDoubleLUDecomposition;
 import cern.colt.matrix.tdouble.impl.SparseCCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.polar;
-import static cern.colt.util.tdouble.Djp_util.complex;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.polar;
+import static cern.colt.util.tdouble.Util.complex;
 
 import static edu.cornell.pserc.jpower.tdouble.Djp_jpoption.jpoption;
 

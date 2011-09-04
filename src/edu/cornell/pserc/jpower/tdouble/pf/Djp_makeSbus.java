@@ -22,13 +22,13 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
-import static cern.colt.util.tdouble.Djp_util.cfunc;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.complex;
-import static cern.colt.util.tdouble.Djp_util.irange;
+import static cern.colt.util.tdouble.Util.cfunc;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.complex;
+import static cern.colt.util.tdouble.Util.irange;
 
 /**
  * Builds the vector of complex bus power injections.
@@ -51,7 +51,7 @@ public class Djp_makeSbus {
 	 * @return vector of complex bus power injections
 	 */
 	@SuppressWarnings("static-access")
-	public static DComplexMatrix1D makeSbus(double baseMVA, Djp_bus bus, Djp_gen gen) {
+	public static DComplexMatrix1D makeSbus(double baseMVA, Bus bus, Gen gen) {
 		int nb, ngon;
 		int[] on, gbus;
 		DComplexMatrix1D Sg, Sd, Sbus;

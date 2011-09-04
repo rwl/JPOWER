@@ -22,12 +22,12 @@ package edu.cornell.pserc.jpower.tdouble.pf;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Djp_util.dfunc;
+import static cern.colt.util.tdouble.Util.dfunc;
 
 import static edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus.makeYbus;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
 
 /**
  * Builds the FDPF matrices, B prime and B double prime.
@@ -51,9 +51,9 @@ public class Djp_makeB {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix2D[] makeB(double baseMVA, Djp_bus bus, Djp_branch branch, int alg) {
-		Djp_branch temp_branch;
-		Djp_bus temp_bus;
+	public static DoubleMatrix2D[] makeB(double baseMVA, Bus bus, Branch branch, int alg) {
+		Branch temp_branch;
+		Bus temp_bus;
 		DComplexMatrix2D[] Ybus;
 		DoubleMatrix2D Bp, Bpp;
 

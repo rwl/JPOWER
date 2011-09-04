@@ -22,14 +22,14 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Util.intm;
 
 /**
  *
  * @author Richard Lincoln
  *
  */
-public class Djp_areas {
+public class Areas {
 
 	private static final int AREA_I			= 0;
 	private static final int PRICE_REF_BUS	= 1;
@@ -52,7 +52,7 @@ public class Djp_areas {
 	 *
 	 * @return a full copy of the areas data.
 	 */
-	public Djp_areas copy() {
+	public Areas copy() {
 		return copy(null);
 	}
 
@@ -61,8 +61,8 @@ public class Djp_areas {
 	 * @param indexes
 	 * @return a copy of the areas data.
 	 */
-	public Djp_areas copy(int[] indexes) {
-		Djp_areas other = new Djp_areas();
+	public Areas copy(int[] indexes) {
+		Areas other = new Areas();
 
 		other.area_i = this.area_i.viewSelection(indexes).copy();
 		other.price_ref_bus = this.price_ref_bus.viewSelection(indexes).copy();
@@ -75,7 +75,7 @@ public class Djp_areas {
 	 * @param other
 	 * @param indexes
 	 */
-	public void update(Djp_areas other, int[] indexes) {
+	public void update(Areas other, int[] indexes) {
 
 //		this.area_i.viewSelection(indexes).assign(other.area_i.viewSelection(indexes));
 //		this.price_ref_bus.viewSelection(indexes).assign(other.price_ref_bus.viewSelection(indexes));
@@ -94,8 +94,8 @@ public class Djp_areas {
 //		this.price_ref_bus = intm(other.viewColumn(PRICE_REF_BUS));
 //	}
 
-	public static Djp_areas fromMatrix(DoubleMatrix2D other) {
-		Djp_areas area = new Djp_areas();
+	public static Areas fromMatrix(DoubleMatrix2D other) {
+		Areas area = new Areas();
 
 		area.area_i = intm(other.viewColumn(AREA_I));
 		area.price_ref_bus = intm(other.viewColumn(PRICE_REF_BUS));
@@ -103,7 +103,7 @@ public class Djp_areas {
 		return area;
 	}
 
-	public static Djp_areas fromMatrix(double[][] data) {
+	public static Areas fromMatrix(double[][] data) {
 		return fromMatrix(DoubleFactory2D.dense.make(data));
 	}
 

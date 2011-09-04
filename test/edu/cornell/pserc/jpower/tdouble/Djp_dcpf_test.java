@@ -25,9 +25,9 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.util.tdouble.Djp_mm;
+import cern.colt.util.tdouble.MMUtil;
 import cern.jet.math.tdouble.DoubleFunctions;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_dcpf;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeBdc;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
@@ -39,15 +39,15 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeSbus;
  */
 public abstract class Djp_dcpf_test extends Djp_base_test {
 
-	private Djp_jpc jpc;
+	private JPC jpc;
 
-	public Djp_dcpf_test(String name, String caseName, Djp_jpc jpc) {
+	public Djp_dcpf_test(String name, String caseName, JPC jpc) {
 		super(name, caseName, "dcpf");
 		this.jpc = jpc;
 	}
 
 	public void test_dcpf() {
-		Djp_jpc jpc;
+		JPC jpc;
 		IntMatrix1D[] bustypes;
 		int ref;
 		int[] pv, pq;
@@ -76,7 +76,7 @@ public abstract class Djp_dcpf_test extends Djp_base_test {
 
 		Va = Djp_dcpf.dcpf(Bbus, Pbus, Va0, ref, pv, pq);
 
-		mpVa = (DoubleMatrix1D) Djp_mm.readMatrix(new File(fdir, "Va.mtx"));
+		mpVa = (DoubleMatrix1D) MMUtil.readMatrix(new File(fdir, "Va.mtx"));
 
 		assertTrue(dprop.equals(Va, mpVa));
 	}

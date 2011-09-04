@@ -19,12 +19,12 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model;
 
 public class Djp_run_userfcn {
 
-	public static Djp_jpc run_userfcn(String userfcn, String stage, Djp_jpc jpc) {
+	public static JPC run_userfcn(String userfcn, String stage, JPC jpc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -18,7 +18,7 @@
 
 package edu.cornell.pserc.jpower.tdouble;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.pf.Djp_rundcpf;
 
 /**
@@ -28,9 +28,9 @@ import edu.cornell.pserc.jpower.tdouble.pf.Djp_rundcpf;
  */
 public abstract class Djp_rundcpf_test extends Djp_base_test {
 
-	protected Djp_jpc jpc;
+	protected JPC jpc;
 
-	public Djp_rundcpf_test(String name, String caseName, Djp_jpc jpc) {
+	public Djp_rundcpf_test(String name, String caseName, JPC jpc) {
 		super(name, caseName, "rundcpf");
 		this.jpc = jpc;
 	}

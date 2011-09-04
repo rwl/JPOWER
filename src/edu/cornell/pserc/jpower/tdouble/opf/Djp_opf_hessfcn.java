@@ -33,14 +33,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.irange;
-import static cern.colt.util.tdouble.Djp_util.polar;
-import static cern.colt.util.tdouble.Djp_util.nonzero;
-import static cern.colt.util.tdouble.Djp_util.icat;
-import static cern.colt.util.tdouble.Djp_util.complex;
-import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.polar;
+import static cern.colt.util.tdouble.Util.nonzero;
+import static cern.colt.util.tdouble.Util.icat;
+import static cern.colt.util.tdouble.Util.complex;
+import static cern.colt.util.tdouble.Util.intm;
 
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_polycost.polycost;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_d2Sbus_dV2.d2Sbus_dV2;
@@ -48,14 +48,14 @@ import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dIbr_dV.dIbr_dV;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_d2AIbr_dV2.d2AIbr_dV2;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_dSbr_dV.dSbr_dV;
 import static edu.cornell.pserc.jpower.tdouble.opf.Djp_d2ASbr_dV2.d2ASbr_dV2;
-import static edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc.POLYNOMIAL;
+import static edu.cornell.pserc.jpower.tdouble.jpc.JPC.POLYNOMIAL;
 
 import edu.cornell.pserc.jips.tdouble.HessianEvaluator;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gencost;
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_jpc;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Cost;
 import edu.cornell.pserc.jpower.tdouble.opf.Djp_opf_model.Set;
 
@@ -104,11 +104,11 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		int nb, ng, nxyz, nl2, nxtra, nw, nlam, nmu;
 		int[] i, ipolp, ipolq, iLT, iEQ, iGT, iND, iL, iQ;
 		double baseMVA;
-		Djp_jpc jpc;
-		Djp_bus bus;
-		Djp_gen gen;
-		Djp_branch branch;
-		Djp_gencost gencost, pcost, qcost;
+		JPC jpc;
+		Bus bus;
+		Gen gen;
+		Branch branch;
+		GenCost gencost, pcost, qcost;
 		Cost cp;
 
 		Map<String, Set> vv;

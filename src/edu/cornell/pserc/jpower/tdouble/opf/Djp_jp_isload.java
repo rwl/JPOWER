@@ -21,11 +21,11 @@ package edu.cornell.pserc.jpower.tdouble.opf;
 
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Djp_util.ifunc;
-import static cern.colt.util.tdouble.Djp_util.dfunc;
-import static cern.colt.util.tdouble.Djp_util.intm;
+import static cern.colt.util.tdouble.Util.ifunc;
+import static cern.colt.util.tdouble.Util.dfunc;
+import static cern.colt.util.tdouble.Util.intm;
 
-import edu.cornell.pserc.jpower.tdouble.jpc.Djp_gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
 
 /**
  * Checks for dispatchable loads.
@@ -47,7 +47,7 @@ public class Djp_jp_isload {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static IntMatrix1D isload(Djp_gen gen) {
+	public static IntMatrix1D isload(Gen gen) {
 
 		return intm( gen.Pmin.copy().assign(dfunc.less(0)) ).assign(intm( gen.Pmax.copy().assign(dfunc.equals(0)) ), ifunc.and);
 	}
