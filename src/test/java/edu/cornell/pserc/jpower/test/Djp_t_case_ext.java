@@ -20,18 +20,22 @@
 package edu.cornell.pserc.jpower.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
+
+import static cern.colt.util.tdouble.Util.drange;
+import static cern.colt.util.tdouble.Util.irange;
+
 import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
 import edu.cornell.pserc.jpower.jpc.GenCost;
-import edu.cornell.pserc.jpower.jpc.JPC;
 
 public class Djp_t_case_ext {
 
-	public static JPC t_case_ext() {
+	public static JPCExt t_case_ext() {
 
-		JPC jpc = new JPC();
+		JPCExt jpc = new JPCExt();
 
 		/* JPOWER Case Format : Version 2 */
 		jpc.version = "2";
@@ -108,6 +112,21 @@ public class Djp_t_case_ext {
 			{30,	29,	28,	27,	26,	25,	24,	23,	22,	21,	20,	19,	18,	17,	16,	15,	14,	13,	12,	11,	10,	9,	8,	7,	6,	5,	4,	3,	2,	1},
 			{60,	58,	56,	54,	52,	50,	48,	46,	44,	42,	40,	38,	36,	34,	32,	30,	28,	26,	24,	22,	20,	18,	16,	14,	12,	10,	8,	6,	4,	2},
 		});
+
+		jpc.xbus = DoubleFactory2D.dense.make(10, 10).assign( drange(100) );
+
+		jpc.xgen = DoubleFactory2D.dense.make(4, 4).assign( drange(16) );
+
+		jpc.xbranch = jpc.xbus.copy();
+
+		jpc.xrows = DoubleFactory2D.dense.compose(new DoubleMatrix2D[][] {
+				{jpc.xbranch.viewSelection(null, irange(4)),
+					jpc.xgen,
+					jpc.xbus.viewSelection(null, irange(4)),
+					DoubleFactory2D.dense.make(2, 4, -1.0)}
+		});
+
+		jpc.xcols = jpc.xrows.viewDice().copy();
 
 		return jpc;
 	}
