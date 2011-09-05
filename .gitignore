@@ -1,2 +1,2 @@
-bin
-src/edu/cornell/pserc/jpower/tfloat
+target/*
+.settings/
