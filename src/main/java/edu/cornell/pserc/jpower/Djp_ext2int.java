@@ -274,10 +274,18 @@ public class Djp_ext2int {
 		return jpc;
 	}
 
+	public static JPC ext2int(JPC jpc, String field, String ordering) {
+		return ext2int(jpc, field, new String[] {ordering});
+	}
+
 
 	public static JPC ext2int(JPC jpc, String field, String[] ordering) {
 		int dim = 1;
 		return ext2int(jpc, field, ordering, dim);
+	}
+
+	public static JPC ext2int(JPC jpc, String field, String ordering, int dim) {
+		return ext2int(jpc, field, new String[] {ordering}, dim);
 	}
 
 	public static JPC ext2int(JPC jpc, String field, String[] ordering, int dim) {
@@ -313,8 +321,16 @@ public class Djp_ext2int {
 		return jpc;
 	}
 
+	public static JPC ext2int(JPC jpc, String[] field, String ordering) {
+		return ext2int(jpc, field, new String[] {ordering});
+	}
+
 	public static JPC ext2int(JPC jpc, String[] field, String[] ordering) {
 		return ext2int(jpc, field, ordering, 1);
+	}
+
+	public static JPC ext2int(JPC jpc, String[] field, String ordering, int dim) {
+		return ext2int(jpc, field, new String[] {ordering}, 1);
 	}
 
 	/**

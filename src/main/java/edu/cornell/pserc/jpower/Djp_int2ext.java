@@ -115,8 +115,16 @@ public class Djp_int2ext {
 		return jpc;
 	}
 
+	public static JPC int2ext(JPC jpc, String field, String ordering) {
+		return int2ext(jpc, field, new String[] {ordering});
+	}
+
 	public static JPC int2ext(JPC jpc, String field, String[] ordering) {
 		return int2ext(jpc, field, ordering, 1);
+	}
+
+	public static JPC int2ext(JPC jpc, String field, String ordering, int dim) {
+		return int2ext(jpc, field, new String[] {ordering}, dim);
 	}
 
 	public static JPC int2ext(JPC jpc, String field, String[] ordering, int dim) {
@@ -154,8 +162,16 @@ public class Djp_int2ext {
 		return jpc;
 	}
 
+	public static JPC int2ext(JPC jpc, String[] field, String ordering) {
+		return int2ext(jpc, field, new String[] {ordering}, 1);
+	}
+
 	public static JPC int2ext(JPC jpc, String[] field, String[] ordering) {
 		return int2ext(jpc, field, ordering, 1);
+	}
+
+	public static JPC int2ext(JPC jpc, String[] field, String ordering, int dim) {
+		return int2ext(jpc, field, new String[] {ordering}, dim);
 	}
 
 	/**

@@ -45,7 +45,7 @@ public class Djp_t_ext2int2ext {
 
 	public static void t_ext2int2ext(boolean quiet) {
 		String t;
-		JPCExt jpce;
+		JPCExt jpce, jpcgot;
 		JPC jpci, jpc;
 		int[] eVmQgcols, iVmQgcols;
 		DoubleMatrix2D got, ex, tmp, tmp1, tmp2, tmp3;
@@ -195,91 +195,101 @@ public class Djp_t_ext2int2ext {
 		t = "jpc = ext2int(jpc, field, \"bus\")";
 		jpc = ext2int(jpce);
 		ex = jpce.xbus;
-		ex(6, :) = [];
-		got = ext2int(jpc, "xbus", "bus");
-		t_is(got.xbus, ex, 12, t);
+		ex = delete(ex, 5);
+		jpcgot = (JPCExt) ext2int(jpc, "xbus", "bus");
+		t_is(jpcgot.xbus, ex, 12, t);
 		t = "jpc = int2ext(jpc, field, \"bus\")";
-		got = int2ext(got, "xbus", "bus");
-		t_is(got.xbus, jpce.xbus, 12, t);
+		jpcgot = (JPCExt) int2ext(jpcgot, "xbus", "bus");
+		t_is(jpcgot.xbus, jpce.xbus, 12, t);
 
-		t = "jpc = ext2int(jpc, field, \"bus\", 2)";
+		t = "jpc = ext2int(jpc, field, \"bus\", 1)";
 		ex = jpce.xbus;
-		ex(:, 6) = [];
-		got = ext2int(jpc, "xbus", "bus", 2);
-		t_is(got.xbus, ex, 12, t);
-		t = "jpc = int2ext(jpc, field, \"bus\", 2)";
-		got = int2ext(got, "xbus", "bus", 2);
-		t_is(got.xbus, jpce.xbus, 12, t);
+		ex = delete(ex, 5);
+		jpcgot = (JPCExt) ext2int(jpc, "xbus", "bus", 1);
+		t_is(jpcgot.xbus, ex, 12, t);
+		t = "jpc = int2ext(jpc, field, \"bus\", 1)";
+		jpcgot = (JPCExt) int2ext(jpcgot, "xbus", "bus", 1);
+		t_is(jpcgot.xbus, jpce.xbus, 12, t);
 
 		t = "jpc = ext2int(jpc, field, \"gen\")";
-		ex = jpce.xgen([4 2 1], :);
-		got = ext2int(jpc, "xgen", "gen");
-		t_is(got.xgen, ex, 12, t);
+		ex = jpce.xgen.viewSelection(new int[] {3, 1, 0}, null);
+		jpcgot = (JPCExt) ext2int(jpc, "xgen", "gen");
+		t_is(jpcgot.xgen, ex, 12, t);
 		t = "jpc = int2ext(jpc, field, \"gen\")";
-		got = int2ext(got, "xgen", "gen");
-		t_is(got.xgen, jpce.xgen, 12, t);
+		jpcgot = (JPCExt) int2ext(jpcgot, "xgen", "gen");
+		t_is(jpcgot.xgen, jpce.xgen, 12, t);
 
-		t = "jpc = ext2int(jpc, field, \"gen\", 2)";
-		ex = jpce.xgen(:, [4 2 1]);
-		got = ext2int(jpc, "xgen", "gen", 2);
-		t_is(got.xgen, ex, 12, t);
-		t = "jpc = int2ext(jpc, field, \"gen\", 2)";
-		got = int2ext(got, "xgen", "gen", 2);
-		t_is(got.xgen, jpce.xgen, 12, t);
+		t = "jpc = ext2int(jpc, field, \"gen\", 1)";
+		ex = jpce.xgen.viewSelection(null, new int[] {3, 1, 0});
+		jpcgot = (JPCExt) ext2int(jpc, "xgen", "gen", 1);
+		t_is(jpcgot.xgen, ex, 12, t);
+		t = "jpc = int2ext(jpc, field, \"gen\", 1)";
+		jpcgot = (JPCExt) int2ext(jpcgot, "xgen", "gen", 1);
+		t_is(jpcgot.xgen, jpce.xgen, 12, t);
 
 		t = "jpc = ext2int(jpc, field, \"branch\")";
 		ex = jpce.xbranch;
-		ex(7, :) = [];
-		got = ext2int(jpc, "xbranch", "branch");
-		t_is(got.xbranch, ex, 12, t);
+		ex = delete(ex, 6);
+		jpcgot = (JPCExt) ext2int(jpc, "xbranch", "branch");
+		t_is(jpcgot.xbranch, ex, 12, t);
 		t = "jpc = int2ext(jpc, field, \"branch\")";
-		got = int2ext(got, "xbranch", "branch");
-		t_is(got.xbranch, jpce.xbranch, 12, t);
+		jpcgot = (JPCExt) int2ext(jpcgot, "xbranch", "branch");
+		t_is(jpcgot.xbranch, jpce.xbranch, 12, t);
 
-		t = "jpc = ext2int(jpc, field, \"branch\", 2)";
-		ex = jpce.xbranch;
-		ex(:, 7) = [];
-		got = ext2int(jpc, "xbranch", "branch", 2);
-		t_is(got.xbranch, ex, 12, t);
-		t = "jpc = int2ext(jpc, field, \"branch\", 2)";
-		got = int2ext(got, "xbranch", "branch", 2);
-		t_is(got.xbranch, jpce.xbranch, 12, t);
+		t = "jpc = ext2int(jpc, field, \"branch\", 1)";
+		ex = jpce.xbranch.copy();
+		ex = delete(ex, 6);
+		jpcgot = (JPCExt) ext2int(jpc, "xbranch", "branch", 1);
+		t_is(jpcgot.xbranch, ex, 12, t);
+		t = "jpc = int2ext(jpc, field, \"branch\", 1)";
+		jpcgot = (JPCExt) int2ext(jpcgot, "xbranch", "branch", 1);
+		t_is(jpcgot.xbranch, jpce.xbranch, 12, t);
 
 		t = "jpc = ext2int(jpc, field, {\"branch\", \"gen\", \"bus\"})";
-		ex = [jpce.xbranch([1:6, 8:10], 1:4); jpce.xgen([4 2 1], :); jpce.xbus([1:5, 7:10], 1:4); -ones(2, 4)];
-		got = ext2int(jpc, "xrows", {"branch", "gen", "bus"});
-		t_is(got.xrows, ex, 12, t);
+		ex = DoubleFactory2D.dense.compose(new DoubleMatrix2D[][] {
+				{jpce.xbranch.viewSelection(icat(irange(6), irange(7, 10)), irange(4))},
+				{jpce.xgen.viewSelection(new int[] {3, 1, 0}, null)},
+				{jpce.xbus.viewSelection(icat(irange(5), irange(6, 10)), irange(4))},
+				{DoubleFactory2D.dense.make(2, 4, -1.0)}
+		});
+		jpcgot = (JPCExt) ext2int(jpc, "xrows", new String[] {"branch", "gen", "bus"});
+		t_is(jpcgot.xrows, ex, 12, t);
 		t = "jpc = int2ext(jpc, field, {\"branch\", \"gen\", \"bus\"})";
-		got = int2ext(got, "xrows", {"branch", "gen", "bus"});
-		t_is(got.xrows, jpce.xrows, 12, t);
+		jpcgot = (JPCExt) int2ext(jpcgot, "xrows", new String[] {"branch", "gen", "bus"});
+		t_is(jpcgot.xrows, jpce.xrows, 12, t);
 
-		t = "jpc = ext2int(jpc, field, {\"branch\", \"gen\", \"bus\"}, 2)";
-		ex = [jpce.xbranch([1:6, 8:10], 1:4); jpce.xgen([4 2 1], :); jpce.xbus([1:5, 7:10], 1:4); -ones(2, 4)]";
-		got = ext2int(jpc, "xcols", {"branch", "gen", "bus"}, 2);
-		t_is(got.xcols, ex, 12, t);
+		t = "jpc = ext2int(jpc, field, {\"branch\", \"gen\", \"bus\"}, 1)";
+		ex = DoubleFactory2D.dense.compose(new DoubleMatrix2D[][] {
+				{jpce.xbranch.viewSelection(icat(irange(6), irange(7, 10)), irange(4))},
+				{jpce.xgen.viewSelection(new int[] {3, 1, 0}, null)},
+				{jpce.xbus.viewSelection(icat(irange(5), irange(6, 10)), irange(4))},
+				{DoubleFactory2D.dense.make(2, 4, -1.0)}
+		}).viewDice();
+		jpcgot = (JPCExt) ext2int(jpc, "xcols", new String[] {"branch", "gen", "bus"}, 1);
+		t_is(jpcgot.xcols, ex, 12, t);
 		t = "jpc = int2ext(jpc, field, {\"branch\", \"gen\", \"bus\"})";
-		got = int2ext(got, "xcols", {"branch", "gen", "bus"}, 2);
-		t_is(got.xcols, jpce.xcols, 12, t);
+		jpcgot = (JPCExt) int2ext(jpcgot, "xcols", new String[] {"branch", "gen", "bus"}, 1);
+		t_is(jpcgot.xcols, jpce.xcols, 12, t);
 
 		t = "jpc = ext2int(jpc, {\"field1\", \"field2\"}, ordering)";
-		ex = jpce.x.more([4 2 1], :);
-		got = ext2int(jpc, {"x", "more"}, "gen");
-		t_is(got.x.more, ex, 12, t);
+		ex = jpce.x.get("more").viewSelection(new int[] {3, 1, 0}, null);
+		jpcgot = (JPCExt) ext2int(jpc, new String[] {"x", "more"}, "gen");
+		t_is(jpcgot.x.get("more"), ex, 12, t);
 		t = "jpc = int2ext(jpc, {\"field1\", \"field2\"}, ordering)";
-		got = int2ext(got, {"x", "more"}, "gen");
-		t_is(got.x.more, jpce.x.more, 12, t);
+		jpcgot = (JPCExt) int2ext(jpcgot, new String[] {"x", "more"}, "gen");
+		t_is(jpcgot.x.get("more"), jpce.x.get("more"), 12, t);
 
-		t = "jpc = ext2int(jpc, {\"field1\", \"field2\"}, ordering, 2)";
-		ex = jpce.x.more(:, [4 2 1]);
-		got = ext2int(jpc, {"x", "more"}, "gen", 2);
-		t_is(got.x.more, ex, 12, t);
-		t = "jpc = int2ext(jpc, {\"field1\", \"field2\"}, ordering, 2)";
-		got = int2ext(got, {"x", "more"}, "gen", 2);
-		t_is(got.x.more, jpce.x.more, 12, t);
+		t = "jpc = ext2int(jpc, {\"field1\", \"field2\"}, ordering, 1)";
+		ex = jpce.x.get("more").viewSelection(null, new int[] {3, 1, 0});
+		jpcgot = (JPCExt) ext2int(jpc, new String[] {"x", "more"}, "gen", 1);
+		t_is(jpcgot.x.get("more"), ex, 12, t);
+		t = "jpc = int2ext(jpc, {\"field1\", \"field2\"}, ordering, 1)";
+		jpcgot = (JPCExt) int2ext(jpcgot, new String[] {"x", "more"}, "gen", 1);
+		t_is(jpcgot.x.get("more"), jpce.x.get("more"), 12, t);
 
 		/* -----  more jpc = ext2int/int2ext(jpc)  ----- */
 		t = "jpc = ext2int(jpc) - bus/gen/branch only : ";
-		jpce = loadcase(t_case_ext());
+		jpce = (JPCExt) loadcase(t_case_ext());
 		jpci = loadcase(t_case_int());
 		jpce.gencost = null;
 		jpce.areas = null;
@@ -295,7 +305,7 @@ public class Djp_t_ext2int2ext {
 		t_is(jpc.gen, jpci.gen, 12, t + "gen");
 
 		t = "jpc = ext2int(jpc) - no areas/A : ";
-		jpce = loadcase(Djp_t_case_ext.t_case_ext());
+		jpce = (JPCExt) loadcase(Djp_t_case_ext.t_case_ext());
 		jpci = loadcase(Djp_t_case_int.t_case_int());
 		jpce.areas = null;
 		jpce.A = null;
@@ -309,7 +319,7 @@ public class Djp_t_ext2int2ext {
 		t_is(jpc.N, jpci.N, 12, t + "N");
 
 		t = "jpc = ext2int(jpc) - Qg cost, no N : ";
-		jpce = loadcase(Djp_t_case_ext.t_case_ext());
+		jpce = (JPCExt) loadcase(Djp_t_case_ext.t_case_ext());
 		jpci = loadcase(Djp_t_case_int.t_case_int());
 		jpce.N = null;
 		jpci.N = null;
