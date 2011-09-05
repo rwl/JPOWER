@@ -25,6 +25,9 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
+import cern.colt.matrix.tint.IntFactory1D;
+import cern.colt.matrix.tint.IntMatrix1D;
+import cern.colt.matrix.tint.algo.IntProperty;
 
 import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
@@ -84,6 +87,17 @@ public class Djp_t_is {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(expected);
 		t_ok(prop.equals(got, expected_matrix), msg);
+	}
+
+	public static void t_is(IntMatrix1D got, IntMatrix1D expected, int prec, String msg) {
+		IntProperty prop = new IntProperty();
+		boolean condition = prop.equals(got, expected);
+
+		t_ok(condition, msg);
+	}
+
+	public static void t_is(IntMatrix1D got, int[] expected, int prec, String msg) {
+		t_is(got, IntFactory1D.dense.make(expected), prec, msg);
 	}
 
 	public static void t_is(double got, double expected, int prec, String msg) {
