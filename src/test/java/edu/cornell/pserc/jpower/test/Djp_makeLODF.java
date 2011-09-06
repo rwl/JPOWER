@@ -19,25 +19,25 @@
 
 package edu.cornell.pserc.jpower.test;
 
+import static edu.cornell.pserc.jpower.test.Djp_t_auction_case.t_auction_case;
+
 import static edu.cornell.pserc.jpower.test.Djp_t_begin.t_begin;
 import static edu.cornell.pserc.jpower.test.Djp_t_end.t_end;
+import static edu.cornell.pserc.jpower.test.Djp_t_is.t_is;
+import static edu.cornell.pserc.jpower.test.Djp_t_ok.t_ok;
 
-public class Djp_t_loadcase {
+public class Djp_makeLODF {
 
-	public static void t_loadcase() {
-		t_loadcase(false);
+	public static void t_makeLODF() {
+		t_makeLODF(false);
 	}
 
-	public static void t_loadcase(boolean quiet) {
+	public static void t_makeLODF(boolean quiet) {
 
-		t_begin(240, quiet);
+		t_begin(31, quiet);
 
 		t_end();
 
-	}
-
-	public static void main(String[] args) {
-		t_loadcase(false);
 	}
 
 }
