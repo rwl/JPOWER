@@ -31,7 +31,9 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseCCDComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
+import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.impl.SparseCCIntMatrix2D;
 
 import static cern.colt.util.tdouble.Util.dfunc;
@@ -52,6 +54,11 @@ import static edu.cornell.pserc.jpower.pf.Djp_dSbus_dV.dSbus_dV;
 import static edu.cornell.pserc.jpower.opf.Djp_d2Sbus_dV2.d2Sbus_dV2;
 import static edu.cornell.pserc.jpower.opf.Djp_dSbr_dV.dSbr_dV;
 import static edu.cornell.pserc.jpower.opf.Djp_d2Sbr_dV2.d2Sbr_dV2;
+import static edu.cornell.pserc.jpower.opf.Djp_dIbr_dV.dIbr_dV;
+import static edu.cornell.pserc.jpower.opf.Djp_d2Ibr_dV2.d2Ibr_dV2;
+import static edu.cornell.pserc.jpower.opf.Djp_dAbr_dV.dAbr_dV;
+import static edu.cornell.pserc.jpower.opf.Djp_d2ASbr_dV2.d2ASbr_dV2;
+import static edu.cornell.pserc.jpower.opf.Djp_d2AIbr_dV2.d2AIbr_dV2;
 
 import static edu.cornell.pserc.jpower.test.Djp_t_begin.t_begin;
 import static edu.cornell.pserc.jpower.test.Djp_t_is.t_is;
@@ -66,6 +73,7 @@ public class Djp_t_hessian {
 		t_hasPQcap(false);
 	}
 
+	@SuppressWarnings("static-access")
 	public static void t_hasPQcap(boolean quiet) {
 		String tt;
 		Map<String, Double> opt;
@@ -76,6 +84,12 @@ public class Djp_t_hessian {
 		Branch branch;
 		Object[] jpc;
 		DoubleMatrix1D Vm, Va;
+		DoubleMatrix2D[] dAft_dV, Gf2, Gt2, dAft_dV_ap, dAft_dV_mp;
+		DoubleMatrix2D dAf_dVm, dAf_dVa, dAt_dVm, dAt_dVa,
+			Gfaa2, Gfav2, Gfva2, Gfvv2,
+			Gtaa2, Gtav2, Gtva2, Gtvv2,
+			dAf_dVm_ap, dAf_dVa_ap, dAt_dVm_ap, dAt_dVa_ap,
+			dAf_dVm_mp, dAf_dVa_mp, dAt_dVm_mp, dAt_dVa_mp;
 		DComplexMatrix2D[] Y, dSbus_dV, H, dSbus_dV_ap, dSbus_dV_mp, Gf, Gt;
 		DComplexMatrix2D Ybus, Yf, Yt, Cf, Ct, num_Haa, num_Hav, num_Hva, num_Hvv,
 			dSbus_dVm, dSbus_dVa, Haa, Hav, Hva, Hvv,
@@ -87,11 +101,16 @@ public class Djp_t_hessian {
 			Gfaa, Gfav, Gfva, Gfvv,
 			Gtaa, Gtav, Gtva, Gtvv,
 			dSf_dVm_ap, dSf_dVa_ap, dSt_dVm_ap, dSt_dVa_ap,
-			dSf_dVm_mp, dSf_dVa_mp, dSt_dVm_mp, dSt_dVa_mp;
-		DComplexMatrix1D V, lam, Vap, Vmp, Sf, St, Sf_ap, St_ap, Sf_mp, St_mp;
+			dSf_dVm_mp, dSf_dVa_mp, dSt_dVm_mp, dSt_dVa_mp,
+			dIf_dVm, dIf_dVa, dIt_dVm, dIt_dVa,
+			dIf_dVm_ap, dIf_dVa_ap, dIt_dVm_ap, dIt_dVa_ap,
+			dIf_dVm_mp, dIf_dVa_mp, dIt_dVm_mp, dIt_dVa_mp;
+		DComplexMatrix1D V, lam, Vap, Vmp, Sf, St, Sf_ap, St_ap,
+			Sf_mp, St_mp, If, It, If_ap, It_ap, If_mp, It_mp;
 		int[] f, t;
 		int nl, nb, i;
-		AbstractMatrix[] dSft_dV, dSft_dV_ap, dSft_dV_mp;
+		AbstractMatrix[] dSft_dV, dSft_dV_ap, dSft_dV_mp, dIft_dV,
+			dIft_dV_ap, dIft_dV_mp;
 
 		t_begin(44, quiet);
 
@@ -233,201 +252,381 @@ public class Djp_t_hessian {
 
 		//-----  check d2Ibr_dV2 code  -----
 		tt = " - d2Ibr_dV2 (complex currents)";
-		lam = 10 * rand(nl, 1);
+		lam = DComplexFactory1D.dense.make(nl);
+		lam.assignReal( DoubleFactory1D.dense.random(nl).assign(dfunc.mult(10)) );
 		// lam = [1; zeros(nl-1, 1)];
-		num_Gfaa = zeros(nb, nb);
-		num_Gfav = zeros(nb, nb);
-		num_Gfva = zeros(nb, nb);
-		num_Gfvv = zeros(nb, nb);
-		num_Gtaa = zeros(nb, nb);
-		num_Gtav = zeros(nb, nb);
-		num_Gtva = zeros(nb, nb);
-		num_Gtvv = zeros(nb, nb);
-		[dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm, If, It] = dIbr_dV(branch, Yf, Yt, V);
-		[Gfaa, Gfav, Gfva, Gfvv] = d2Ibr_dV2(Yf, V, lam);
-		[Gtaa, Gtav, Gtva, Gtvv] = d2Ibr_dV2(Yt, V, lam);
-		for i = 1:nb
-		    Vap = V;
-		    Vap(i) = Vm(i) * exp(1j * (Va(i) + pert));
-		    [dIf_dVa_ap, dIf_dVm_ap, dIt_dVa_ap, dIt_dVm_ap, If_ap, It_ap] = ...
-		        dIbr_dV(branch, Yf, Yt, Vap);
-		    num_Gfaa(:, i) = (dIf_dVa_ap - dIf_dVa)." * lam / pert;
-		    num_Gfva(:, i) = (dIf_dVm_ap - dIf_dVm)." * lam / pert;
-		    num_Gtaa(:, i) = (dIt_dVa_ap - dIt_dVa)." * lam / pert;
-		    num_Gtva(:, i) = (dIt_dVm_ap - dIt_dVm)." * lam / pert;
+		num_Gfaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfvv = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtvv = DComplexFactory2D.sparse.make(nb, nb);
 
-		    Vmp = V;
-		    Vmp(i) = (Vm(i) + pert) * exp(1j * Va(i));
-		    [dIf_dVa_mp, dIf_dVm_mp, dIt_dVa_mp, dIt_dVm_mp, If_mp, It_mp] = ...
-		        dIbr_dV(branch, Yf, Yt, Vmp);
-		    num_Gfav(:, i) = (dIf_dVa_mp - dIf_dVa)." * lam / pert;
-		    num_Gfvv(:, i) = (dIf_dVm_mp - dIf_dVm)." * lam / pert;
-		    num_Gtav(:, i) = (dIt_dVa_mp - dIt_dVa)." * lam / pert;
-		    num_Gtvv(:, i) = (dIt_dVm_mp - dIt_dVm)." * lam / pert;
-		end
+		dIft_dV = dIbr_dV(branch, Yf, Yt, V);
+		dIf_dVa = (DComplexMatrix2D) dIft_dV[0];
+		dIf_dVm = (DComplexMatrix2D) dIft_dV[1];
+		dIt_dVa = (DComplexMatrix2D) dIft_dV[2];
+		dIt_dVm = (DComplexMatrix2D) dIft_dV[3];
+		If = (DComplexMatrix1D) dIft_dV[4];
+		It = (DComplexMatrix1D) dIft_dV[5];
 
-		t_is(full(Gfaa), num_Gfaa, 4, ["Gfaa" t]);
-		t_is(full(Gfav), num_Gfav, 4, ["Gfav" t]);
-		t_is(full(Gfva), num_Gfva, 4, ["Gfva" t]);
-		t_is(full(Gfvv), num_Gfvv, 4, ["Gfvv" t]);
+		Gf = d2Ibr_dV2(Yf, V, lam);
+		Gfaa = Gf[0]; Gfav = Gf[1]; Gfva = Gf[2]; Gfvv = Gf[3];
+		Gt = d2Ibr_dV2(Yt, V, lam);
+		Gtaa = Gt[0]; Gtav = Gt[1]; Gtva = Gt[2]; Gtvv = Gt[3];
 
-		t_is(full(Gtaa), num_Gtaa, 4, ["Gtaa" t]);
-		t_is(full(Gtav), num_Gtav, 4, ["Gtav" t]);
-		t_is(full(Gtva), num_Gtva, 4, ["Gtva" t]);
-		t_is(full(Gtvv), num_Gtvv, 4, ["Gtvv" t]);
+		for (i = 0; i < nb; i++) {
+			Vap = V.copy();
+			Vap.set(i, Vm.get(i) * Math.exp(1j * (Va.get(i) + pert));
 
-		//-----  check d2ASbr_dV2 code  -----
-		t = " - d2ASbr_dV2 (squared apparent power flows)";
-		lam = 10 * rand(nl, 1);
-		% lam = [1; zeros(nl-1, 1)];
-		num_Gfaa = zeros(nb, nb);
-		num_Gfav = zeros(nb, nb);
-		num_Gfva = zeros(nb, nb);
-		num_Gfvv = zeros(nb, nb);
-		num_Gtaa = zeros(nb, nb);
-		num_Gtav = zeros(nb, nb);
-		num_Gtva = zeros(nb, nb);
-		num_Gtvv = zeros(nb, nb);
-		[dSf_dVa, dSf_dVm, dSt_dVa, dSt_dVm, Sf, St] = dSbr_dV(branch, Yf, Yt, V);
-		[dAf_dVa, dAf_dVm, dAt_dVa, dAt_dVm] = ...
-		                        dAbr_dV(dSf_dVa, dSf_dVm, dSt_dVa, dSt_dVm, Sf, St);
-		[Gfaa, Gfav, Gfva, Gfvv] = d2ASbr_dV2(dSf_dVa, dSf_dVm, Sf, Cf, Yf, V, lam);
-		[Gtaa, Gtav, Gtva, Gtvv] = d2ASbr_dV2(dSt_dVa, dSt_dVm, St, Ct, Yt, V, lam);
-		for i = 1:nb
-		    Vap = V;
-		    Vap(i) = Vm(i) * exp(1j * (Va(i) + pert));
-		    [dSf_dVa_ap, dSf_dVm_ap, dSt_dVa_ap, dSt_dVm_ap, Sf_ap, St_ap] = ...
-		        dSbr_dV(branch, Yf, Yt, Vap);
-		    [dAf_dVa_ap, dAf_dVm_ap, dAt_dVa_ap, dAt_dVm_ap] = ...
-		        dAbr_dV(dSf_dVa_ap, dSf_dVm_ap, dSt_dVa_ap, dSt_dVm_ap, Sf_ap, St_ap);
-		    num_Gfaa(:, i) = (dAf_dVa_ap - dAf_dVa)." * lam / pert;
-		    num_Gfva(:, i) = (dAf_dVm_ap - dAf_dVm)." * lam / pert;
-		    num_Gtaa(:, i) = (dAt_dVa_ap - dAt_dVa)." * lam / pert;
-		    num_Gtva(:, i) = (dAt_dVm_ap - dAt_dVm)." * lam / pert;
+			dIft_dV_ap = dIbr_dV(branch, Yf, Yt, Vap);
+			dIf_dVa_ap = (DComplexMatrix2D) dIft_dV_ap[0];
+			dIf_dVm_ap = (DComplexMatrix2D) dIft_dV_ap[1];
+			dIt_dVa_ap = (DComplexMatrix2D) dIft_dV_ap[2];
+			dIt_dVm_ap = (DComplexMatrix2D) dIft_dV_ap[3];
+			If_ap = (DComplexMatrix1D) dIft_dV_ap[4];
+			It_ap = (DComplexMatrix1D) dIft_dV_ap[5];
 
-		    Vmp = V;
-		    Vmp(i) = (Vm(i) + pert) * exp(1j * Va(i));
-		    [dSf_dVa_mp, dSf_dVm_mp, dSt_dVa_mp, dSt_dVm_mp, Sf_mp, St_mp] = ...
-		        dSbr_dV(branch, Yf, Yt, Vmp);
-		    [dAf_dVa_mp, dAf_dVm_mp, dAt_dVa_mp, dAt_dVm_mp] = ...
-		        dAbr_dV(dSf_dVa_mp, dSf_dVm_mp, dSt_dVa_mp, dSt_dVm_mp, Sf_mp, St_mp);
-		    num_Gfav(:, i) = (dAf_dVa_mp - dAf_dVa)." * lam / pert;
-		    num_Gfvv(:, i) = (dAf_dVm_mp - dAf_dVm)." * lam / pert;
-		    num_Gtav(:, i) = (dAt_dVa_mp - dAt_dVa)." * lam / pert;
-		    num_Gtvv(:, i) = (dAt_dVm_mp - dAt_dVm)." * lam / pert;
-		end
+			num_Gfaa.viewColumn(i).assign( dIf_dVa_ap.copy().assign(dIf_dVa, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gfaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfva.viewColumn(i).assign( dIf_dVm_ap.copy().assign(dIf_dVm, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gfva.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtaa.viewColumn(i).assign( dIt_dVa_ap.copy().assign(dIt_dVa, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gtaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtva.viewColumn(i).assign( dIt_dVm_ap.copy().assign(dIt_dVm, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gtva.viewColumn(i).assign( cfunc.div(pert) );
 
-		t_is(full(Gfaa), num_Gfaa, 2, ["Gfaa" t]);
-		t_is(full(Gfav), num_Gfav, 2, ["Gfav" t]);
-		t_is(full(Gfva), num_Gfva, 2, ["Gfva" t]);
-		t_is(full(Gfvv), num_Gfvv, 2, ["Gfvv" t]);
+			Vmp = V.copy();
+			Vmp.set(i, (Vm.get(i) + pert) * Math.exp(1j * Va.get(i));
 
-		t_is(full(Gtaa), num_Gtaa, 2, ["Gtaa" t]);
-		t_is(full(Gtav), num_Gtav, 2, ["Gtav" t]);
-		t_is(full(Gtva), num_Gtva, 2, ["Gtva" t]);
-		t_is(full(Gtvv), num_Gtvv, 2, ["Gtvv" t]);
+			dIft_dV_mp = dIbr_dV(branch, Yf, Yt, Vmp);
+			dIf_dVa_mp = (DComplexMatrix2D) dIft_dV_mp[0];
+			dIf_dVm_mp = (DComplexMatrix2D) dIft_dV_mp[1];
+			dIt_dVa_mp = (DComplexMatrix2D) dIft_dV_mp[2];
+			dIt_dVm_mp = (DComplexMatrix2D) dIft_dV_mp[3];
+			If_mp = (DComplexMatrix1D) dIft_dV_mp[4];
+			It_mp = (DComplexMatrix1D) dIft_dV_mp[5];
+
+			num_Gfav.viewColumn(i).assign( dIf_dVa_mp.copy().assign(dIf_dVa, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gfav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfvv.viewColumn(i).assign( dIf_dVm_mp.copy().assign(dIf_dVm, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gfvv.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtav.viewColumn(i).assign( dIt_dVa_mp.copy().assign(dIt_dVa, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gtav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtvv.viewColumn(i).assign( dIt_dVm_mp.copy().assign(dIt_dVm, cfunc.minus).viewDice().zMult(lam, null) );
+			num_Gtvv.viewColumn(i).assign( cfunc.div(pert) );
+		}
+
+		t_is(DComplexFactory2D.dense.make(Gfaa.toArray()), num_Gfaa, 4, "Gfaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfav.toArray()), num_Gfav, 4, "Gfav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfva.toArray()), num_Gfva, 4, "Gfva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfvv.toArray()), num_Gfvv, 4, "Gfvv" + tt);
+
+		t_is(DComplexFactory2D.dense.make(Gtaa.toArray()), num_Gtaa, 4, "Gtaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtav.toArray()), num_Gtav, 4, "Gtav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtva.toArray()), num_Gtva, 4, "Gtva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtvv.toArray()), num_Gtvv, 4, "Gtvv" + tt);
 
 		//-----  check d2ASbr_dV2 code  -----
-		t = " - d2ASbr_dV2 (squared real power flows)";
-		lam = 10 * rand(nl, 1);
-		% lam = [1; zeros(nl-1, 1)];
-		num_Gfaa = zeros(nb, nb);
-		num_Gfav = zeros(nb, nb);
-		num_Gfva = zeros(nb, nb);
-		num_Gfvv = zeros(nb, nb);
-		num_Gtaa = zeros(nb, nb);
-		num_Gtav = zeros(nb, nb);
-		num_Gtva = zeros(nb, nb);
-		num_Gtvv = zeros(nb, nb);
-		[dSf_dVa, dSf_dVm, dSt_dVa, dSt_dVm, Sf, St] = dSbr_dV(branch, Yf, Yt, V);
-		[dAf_dVa, dAf_dVm, dAt_dVa, dAt_dVm] = ...
-		                        dAbr_dV(real(dSf_dVa), real(dSf_dVm), real(dSt_dVa), real(dSt_dVm), real(Sf), real(St));
-		[Gfaa, Gfav, Gfva, Gfvv] = d2ASbr_dV2(real(dSf_dVa), real(dSf_dVm), real(Sf), Cf, Yf, V, lam);
-		[Gtaa, Gtav, Gtva, Gtvv] = d2ASbr_dV2(real(dSt_dVa), real(dSt_dVm), real(St), Ct, Yt, V, lam);
-		for i = 1:nb
-		    Vap = V;
-		    Vap(i) = Vm(i) * exp(1j * (Va(i) + pert));
-		    [dSf_dVa_ap, dSf_dVm_ap, dSt_dVa_ap, dSt_dVm_ap, Sf_ap, St_ap] = ...
-		        dSbr_dV(branch, Yf, Yt, Vap);
-		    [dAf_dVa_ap, dAf_dVm_ap, dAt_dVa_ap, dAt_dVm_ap] = ...
-		        dAbr_dV(real(dSf_dVa_ap), real(dSf_dVm_ap), real(dSt_dVa_ap), real(dSt_dVm_ap), real(Sf_ap), real(St_ap));
-		    num_Gfaa(:, i) = (dAf_dVa_ap - dAf_dVa)." * lam / pert;
-		    num_Gfva(:, i) = (dAf_dVm_ap - dAf_dVm)." * lam / pert;
-		    num_Gtaa(:, i) = (dAt_dVa_ap - dAt_dVa)." * lam / pert;
-		    num_Gtva(:, i) = (dAt_dVm_ap - dAt_dVm)." * lam / pert;
+		tt = " - d2ASbr_dV2 (squared apparent power flows)";
+		lam = DComplexFactory1D.dense.make(nl);
+		lam.assignReal( DoubleFactory1D.dense.random(nl).assign(dfunc.mult(10)) );
+		// lam = [1; zeros(nl-1, 1)];
+		num_Gfaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfvv = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtvv = DComplexFactory2D.sparse.make(nb, nb);
 
-		    Vmp = V;
-		    Vmp(i) = (Vm(i) + pert) * exp(1j * Va(i));
-		    [dSf_dVa_mp, dSf_dVm_mp, dSt_dVa_mp, dSt_dVm_mp, Sf_mp, St_mp] = ...
-		        dSbr_dV(branch, Yf, Yt, Vmp);
-		    [dAf_dVa_mp, dAf_dVm_mp, dAt_dVa_mp, dAt_dVm_mp] = ...
-		        dAbr_dV(real(dSf_dVa_mp), real(dSf_dVm_mp), real(dSt_dVa_mp), real(dSt_dVm_mp), real(Sf_mp), real(St_mp));
-		    num_Gfav(:, i) = (dAf_dVa_mp - dAf_dVa)." * lam / pert;
-		    num_Gfvv(:, i) = (dAf_dVm_mp - dAf_dVm)." * lam / pert;
-		    num_Gtav(:, i) = (dAt_dVa_mp - dAt_dVa)." * lam / pert;
-		    num_Gtvv(:, i) = (dAt_dVm_mp - dAt_dVm)." * lam / pert;
-		end
+		dSft_dV = dSbr_dV(branch, Yf, Yt, V);
+		dSf_dVa = (DComplexMatrix2D) dSft_dV[0];
+		dSf_dVm = (DComplexMatrix2D) dSft_dV[1];
+		dSt_dVa = (DComplexMatrix2D) dSft_dV[2];
+		dSt_dVm = (DComplexMatrix2D) dSft_dV[3];
+		Sf = (DComplexMatrix1D) dSft_dV[4];
+		St = (DComplexMatrix1D) dSft_dV[5];
 
-		t_is(full(Gfaa), num_Gfaa, 2, ["Gfaa" t]);
-		t_is(full(Gfav), num_Gfav, 2, ["Gfav" t]);
-		t_is(full(Gfva), num_Gfva, 2, ["Gfva" t]);
-		t_is(full(Gfvv), num_Gfvv, 2, ["Gfvv" t]);
+		dAft_dV = dAbr_dV(dSf_dVa, dSf_dVm, dSt_dVa, dSt_dVm, Sf, St);
+		dAf_dVa = dAft_dV[0]; dAf_dVm = dAft_dV[1];
+		dAt_dVa = dAft_dV[2]; dAt_dVm = dAft_dV[3];
 
-		t_is(full(Gtaa), num_Gtaa, 2, ["Gtaa" t]);
-		t_is(full(Gtav), num_Gtav, 2, ["Gtav" t]);
-		t_is(full(Gtva), num_Gtva, 2, ["Gtva" t]);
-		t_is(full(Gtvv), num_Gtvv, 2, ["Gtvv" t]);
+		Gf2 = d2ASbr_dV2(dSf_dVa, dSf_dVm, Sf, Cf, Yf, V, lam);
+		Gfaa2 = Gf2[0]; Gfav2 = Gf2[1]; Gfva2 = Gf2[2]; Gfvv2 = Gf2[3];
+
+		Gt2 = d2ASbr_dV2(dSt_dVa, dSt_dVm, St, Ct, Yt, V, lam);
+		Gtaa2 = Gt2[0]; Gtav2 = Gt2[1]; Gtva2 = Gt2[2]; Gtvv2 = Gt2[3];
+		for (i = 0; i < nb; i++) {
+			Vap = V.copy();
+			Vap.set(i, Vm.get(i) * Math.exp(1j * (Va.get(i) + pert));
+
+			dSft_dV_ap = dSbr_dV(branch, Yf, Yt, Vap);
+			dSf_dVa_ap = (DComplexMatrix2D) dSft_dV_ap[0];
+			dSf_dVm_ap = (DComplexMatrix2D) dSft_dV_ap[1];
+			dSt_dVa_ap = (DComplexMatrix2D) dSft_dV_ap[2];
+			dSt_dVm_ap = (DComplexMatrix2D) dSft_dV_ap[3];
+			Sf_ap = (DComplexMatrix1D) dSft_dV_ap[4];
+			St_ap = (DComplexMatrix1D) dSft_dV_ap[5];
+
+			dAft_dV_ap = dAbr_dV(dSf_dVa_ap, dSf_dVm_ap, dSt_dVa_ap, dSt_dVm_ap, Sf_ap, St_ap);
+			dAf_dVa_ap = dAft_dV_ap[0]; dAf_dVm_ap = dAft_dV_ap[1];
+			dAt_dVa_ap = dAft_dV_ap[2]; dAt_dVm_ap = dAft_dV_ap[3];
+
+			num_Gfaa.viewColumn(i).assignReal( dAf_dVa_ap.copy().assign(dAf_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfva.viewColumn(i).assignReal( dAf_dVm_ap.copy().assign(dAf_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfva.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtaa.viewColumn(i).assignReal( dAt_dVa_ap.copy().assign(dAt_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtva.viewColumn(i).assignReal( dAt_dVm_ap.copy().assign(dAt_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtva.viewColumn(i).assign( cfunc.div(pert) );
+
+			Vmp = V.copy();
+			Vmp.set(i, (Vm.get(i) + pert) * Math.exp(1j * Va.get(i)));
+
+			dSft_dV_mp = dSbr_dV(branch, Yf, Yt, Vmp);
+			dSf_dVa_mp = (DComplexMatrix2D) dSft_dV_mp[0];
+			dSf_dVm_mp = (DComplexMatrix2D) dSft_dV_mp[1];
+			dSt_dVa_mp = (DComplexMatrix2D) dSft_dV_mp[2];
+			dSt_dVm_mp = (DComplexMatrix2D) dSft_dV_mp[3];
+			Sf_mp = (DComplexMatrix1D) dSft_dV_mp[4];
+			St_mp = (DComplexMatrix1D) dSft_dV_mp[5];
+
+			dAft_dV_mp = dAbr_dV(dSf_dVa_mp, dSf_dVm_mp, dSt_dVa_mp, dSt_dVm_mp, Sf_mp, St_mp);
+			dAf_dVa_mp = dAft_dV_mp[0]; dAf_dVm_mp = dAft_dV_mp[1];
+			dAt_dVa_mp = dAft_dV_mp[2]; dAt_dVm_mp = dAft_dV_mp[3];
+
+			num_Gfav.viewColumn(i).assignReal( dAf_dVa_mp.copy().assign(dAf_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfvv.viewColumn(i).assignReal( dAf_dVm_mp.copy().assign(dAf_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfvv.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtav.viewColumn(i).assignReal( dAt_dVa_mp.copy().assign(dAt_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtvv.viewColumn(i).assignReal( dAt_dVm_mp.copy().assign(dAt_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtvv.viewColumn(i).assign( cfunc.div(pert) );
+		}
+
+		t_is(DComplexFactory2D.dense.make(Gfaa.toArray()), num_Gfaa, 2, "Gfaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfav.toArray()), num_Gfav, 2, "Gfav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfva.toArray()), num_Gfva, 2, "Gfva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfvv.toArray()), num_Gfvv, 2, "Gfvv" + tt);
+
+		t_is(DComplexFactory2D.dense.make(Gtaa.toArray()), num_Gtaa, 2, "Gtaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtav.toArray()), num_Gtav, 2, "Gtav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtva.toArray()), num_Gtva, 2, "Gtva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtvv.toArray()), num_Gtvv, 2, "Gtvv" + tt);
+
+		//-----  check d2ASbr_dV2 code  -----
+		tt = " - d2ASbr_dV2 (squared real power flows)";
+		lam = DComplexFactory1D.dense.make(nl);
+		lam.assignReal( DoubleFactory1D.dense.random(nl).assign(dfunc.mult(10)) );
+		// lam = [1; zeros(nl-1, 1)];
+		num_Gfaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfvv = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtvv = DComplexFactory2D.sparse.make(nb, nb);
+
+		dSft_dV = dSbr_dV(branch, Yf, Yt, V);
+		dSf_dVa = (DComplexMatrix2D) dSft_dV[0];
+		dSf_dVm = (DComplexMatrix2D) dSft_dV[1];
+		dSt_dVa = (DComplexMatrix2D) dSft_dV[2];
+		dSt_dVm = (DComplexMatrix2D) dSft_dV[3];
+		Sf = (DComplexMatrix1D) dSft_dV[4];
+		St = (DComplexMatrix1D) dSft_dV[5];
+
+		// zero imaginary parts
+		dSf_dVa.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+		dSf_dVm.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+		dSt_dVa.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+		dSt_dVm.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+		Sf.assignImaginary( DoubleFactory1D.dense.make(nl) );
+		St.assignImaginary( DoubleFactory1D.dense.make(nl) );
+
+		dAft_dV = dAbr_dV(dSf_dVa, dSf_dVm, dSt_dVa, dSt_dVm, Sf, St);
+		dAf_dVa = dAft_dV[0]; dAf_dVm = dAft_dV[1];
+		dAt_dVa = dAft_dV[2]; dAt_dVm = dAft_dV[3];
+
+		Gf2 = d2ASbr_dV2(dSf_dVa, dSf_dVm, Sf, Cf, Yf, V, lam);
+		Gfaa2 = Gf2[0]; Gfav2 = Gf2[1]; Gfva2 = Gf2[2]; Gfvv2 = Gf2[3];
+
+		Gt2 = d2ASbr_dV2(dSt_dVa, dSt_dVm, St, Ct, Yt, V, lam);
+		Gtaa2 = Gt2[0]; Gtav2 = Gt2[1]; Gtva2 = Gt2[2]; Gtvv2 = Gt2[3];
+
+		for (i = 0; i < nb; i++) {
+			Vap = V.copy();
+			Vap.set(i, Vm.get(i) * Math.exp(1j * (Va.get(i) + pert));
+
+			dSft_dV_ap = dSbr_dV(branch, Yf, Yt, Vap);
+			dSf_dVa_ap = (DComplexMatrix2D) dSft_dV_ap[0];
+			dSf_dVm_ap = (DComplexMatrix2D) dSft_dV_ap[1];
+			dSt_dVa_ap = (DComplexMatrix2D) dSft_dV_ap[2];
+			dSt_dVm_ap = (DComplexMatrix2D) dSft_dV_ap[3];
+			Sf_ap = (DComplexMatrix1D) dSft_dV_ap[4];
+			St_ap = (DComplexMatrix1D) dSft_dV_ap[5];
+
+			// zero imaginary parts
+			dSf_dVa_ap.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			dSf_dVm_ap.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			dSt_dVa_ap.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			dSt_dVm_ap.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			Sf_ap.assignImaginary( DoubleFactory1D.dense.make(nl) );
+			St_ap.assignImaginary( DoubleFactory1D.dense.make(nl) );
+
+			dAft_dV_ap = dAbr_dV(dSf_dVa_ap, dSf_dVm_ap, dSt_dVa_ap, dSt_dVm_ap, Sf_ap, St_ap);
+			dAf_dVa_ap = dAft_dV_ap[0]; dAf_dVm_ap = dAft_dV_ap[1];
+			dAt_dVa_ap = dAft_dV_ap[2]; dAt_dVm_ap = dAft_dV_ap[3];
+
+			num_Gfaa.viewColumn(i).assignReal( dAf_dVa_ap.copy().assign(dAf_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfva.viewColumn(i).assignReal( dAf_dVm_ap.copy().assign(dAf_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfva.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtaa.viewColumn(i).assignReal( dAt_dVa_ap.copy().assign(dAt_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtva.viewColumn(i).assignReal( dAt_dVm_ap.copy().assign(dAt_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtva.viewColumn(i).assign( cfunc.div(pert) );
+
+			Vmp = V.copy();
+			Vmp.set(i, (Vm.get(i) + pert) * Math.exp(1j * Va.get(i));
+
+			dSft_dV_mp = dSbr_dV(branch, Yf, Yt, Vmp);
+			dSf_dVa_mp = (DComplexMatrix2D) dSft_dV_mp[0];
+			dSf_dVm_mp = (DComplexMatrix2D) dSft_dV_mp[1];
+			dSt_dVa_mp = (DComplexMatrix2D) dSft_dV_mp[2];
+			dSt_dVm_mp = (DComplexMatrix2D) dSft_dV_mp[3];
+			Sf_mp = (DComplexMatrix1D) dSft_dV_mp[4];
+			St_mp = (DComplexMatrix1D) dSft_dV_mp[5];
+
+			// zero imaginary parts
+			dSf_dVa_mp.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			dSf_dVm_mp.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			dSt_dVa_mp.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			dSt_dVm_mp.assignImaginary( DoubleFactory2D.dense.make(nl, nl) );
+			Sf_mp.assignImaginary( DoubleFactory1D.dense.make(nl) );
+			St_mp.assignImaginary( DoubleFactory1D.dense.make(nl) );
+
+			dAft_dV_mp = dAbr_dV(dSf_dVa_mp, dSf_dVm_mp, dSt_dVa_mp, dSt_dVm_mp, Sf_mp, St_mp);
+			dAf_dVa_mp = dAft_dV_mp[0]; dAf_dVm_mp = dAft_dV_mp[1];
+			dAt_dVa_mp = dAft_dV_mp[2]; dAt_dVm_mp = dAft_dV_mp[3];
+
+			num_Gfav.viewColumn(i).assignReal( dAf_dVa_mp.copy().assign(dAf_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfvv.viewColumn(i).assignReal( dAf_dVm_mp.copy().assign(dAf_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfvv.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtav.viewColumn(i).assignReal( dAt_dVa_mp.copy().assign(dAt_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtvv.viewColumn(i).assignReal( dAt_dVm_mp.copy().assign(dAt_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtvv.viewColumn(i).assign( cfunc.div(pert) );
+		}
+
+		t_is(DComplexFactory2D.dense.make(Gfaa.toArray()), num_Gfaa, 2, "Gfaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfav.toArray()), num_Gfav, 2, "Gfav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfva.toArray()), num_Gfva, 2, "Gfva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfvv.toArray()), num_Gfvv, 2, "Gfvv" + tt);
+
+		t_is(DComplexFactory2D.dense.make(Gtaa.toArray()), num_Gtaa, 2, "Gtaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtav.toArray()), num_Gtav, 2, "Gtav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtva.toArray()), num_Gtva, 2, "Gtva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtvv.toArray()), num_Gtvv, 2, "Gtvv" + tt);
 
 		//-----  check d2AIbr_dV2 code  -----
-		t = " - d2AIbr_dV2 (squared current magnitudes)";
-		lam = 10 * rand(nl, 1);
-		% lam = [1; zeros(nl-1, 1)];
-		num_Gfaa = zeros(nb, nb);
-		num_Gfav = zeros(nb, nb);
-		num_Gfva = zeros(nb, nb);
-		num_Gfvv = zeros(nb, nb);
-		num_Gtaa = zeros(nb, nb);
-		num_Gtav = zeros(nb, nb);
-		num_Gtva = zeros(nb, nb);
-		num_Gtvv = zeros(nb, nb);
-		[dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm, If, It] = dIbr_dV(branch, Yf, Yt, V);
-		[dAf_dVa, dAf_dVm, dAt_dVa, dAt_dVm] = ...
-		                        dAbr_dV(dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm, If, It);
-		[Gfaa, Gfav, Gfva, Gfvv] = d2AIbr_dV2(dIf_dVa, dIf_dVm, If, Yf, V, lam);
-		[Gtaa, Gtav, Gtva, Gtvv] = d2AIbr_dV2(dIt_dVa, dIt_dVm, It, Yt, V, lam);
-		for i = 1:nb
-		    Vap = V;
-		    Vap(i) = Vm(i) * exp(1j * (Va(i) + pert));
-		    [dIf_dVa_ap, dIf_dVm_ap, dIt_dVa_ap, dIt_dVm_ap, If_ap, It_ap] = ...
-		        dIbr_dV(branch, Yf, Yt, Vap);
-		    [dAf_dVa_ap, dAf_dVm_ap, dAt_dVa_ap, dAt_dVm_ap] = ...
-		        dAbr_dV(dIf_dVa_ap, dIf_dVm_ap, dIt_dVa_ap, dIt_dVm_ap, If_ap, It_ap);
-		    num_Gfaa(:, i) = (dAf_dVa_ap - dAf_dVa)." * lam / pert;
-		    num_Gfva(:, i) = (dAf_dVm_ap - dAf_dVm)." * lam / pert;
-		    num_Gtaa(:, i) = (dAt_dVa_ap - dAt_dVa)." * lam / pert;
-		    num_Gtva(:, i) = (dAt_dVm_ap - dAt_dVm)." * lam / pert;
+		tt = " - d2AIbr_dV2 (squared current magnitudes)";
+		lam = DComplexFactory1D.dense.make(nl);
+		lam.assignReal( DoubleFactory1D.dense.random(nl).assign(dfunc.mult(10)) );
+		// lam = [1; zeros(nl-1, 1)];
+		num_Gfaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gfvv = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtaa = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtav = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtva = DComplexFactory2D.sparse.make(nb, nb);
+		num_Gtvv = DComplexFactory2D.sparse.make(nb, nb);
 
-		    Vmp = V;
-		    Vmp(i) = (Vm(i) + pert) * exp(1j * Va(i));
-		    [dIf_dVa_mp, dIf_dVm_mp, dIt_dVa_mp, dIt_dVm_mp, If_mp, It_mp] = ...
-		        dIbr_dV(branch, Yf, Yt, Vmp);
-		    [dAf_dVa_mp, dAf_dVm_mp, dAt_dVa_mp, dAt_dVm_mp] = ...
-		        dAbr_dV(dIf_dVa_mp, dIf_dVm_mp, dIt_dVa_mp, dIt_dVm_mp, If_mp, It_mp);
-		    num_Gfav(:, i) = (dAf_dVa_mp - dAf_dVa)." * lam / pert;
-		    num_Gfvv(:, i) = (dAf_dVm_mp - dAf_dVm)." * lam / pert;
-		    num_Gtav(:, i) = (dAt_dVa_mp - dAt_dVa)." * lam / pert;
-		    num_Gtvv(:, i) = (dAt_dVm_mp - dAt_dVm)." * lam / pert;
-		end
+		dIft_dV = dIbr_dV(branch, Yf, Yt, V);
+		dIf_dVa = (DComplexMatrix2D) dIft_dV[0];
+		dIf_dVm = (DComplexMatrix2D) dIft_dV[1];
+		dIt_dVa = (DComplexMatrix2D) dIft_dV[2];
+		dIt_dVm = (DComplexMatrix2D) dIft_dV[3];
+		If = (DComplexMatrix1D) dIft_dV[4];
+		It = (DComplexMatrix1D) dIft_dV[5];
 
-		t_is(full(Gfaa), num_Gfaa, 3, ["Gfaa" t]);
-		t_is(full(Gfav), num_Gfav, 3, ["Gfav" t]);
-		t_is(full(Gfva), num_Gfva, 3, ["Gfva" t]);
-		t_is(full(Gfvv), num_Gfvv, 2, ["Gfvv" t]);
+		dAft_dV = dAbr_dV(dIf_dVa, dIf_dVm, dIt_dVa, dIt_dVm, If, It);
+		dAf_dVa = dAft_dV[0]; dAf_dVm = dAft_dV[1];
+		dAt_dVa = dAft_dV[2]; dAt_dVm = dAft_dV[3];
 
-		t_is(full(Gtaa), num_Gtaa, 3, ["Gtaa" t]);
-		t_is(full(Gtav), num_Gtav, 3, ["Gtav" t]);
-		t_is(full(Gtva), num_Gtva, 3, ["Gtva" t]);
-		t_is(full(Gtvv), num_Gtvv, 2, ["Gtvv" t]);
+		Gf2 = d2AIbr_dV2(dIf_dVa, dIf_dVm, If, Yf, V, lam);
+		Gfaa2 = Gf2[0]; Gfav2 = Gf2[1]; Gfva2 = Gf2[2]; Gfvv2 = Gf2[3];
+
+		Gt2 = d2AIbr_dV2(dIt_dVa, dIt_dVm, It, Yt, V, lam);
+		Gtaa2 = Gt2[0]; Gtav2 = Gt2[1]; Gtva2 = Gt2[2]; Gtvv2 = Gt2[3];
+
+		for (i = 0; i < nb; i++) {
+			Vap = V.copy();
+			Vap.set(i, Vm.get(i) * Math.exp(1j * (Va.get(i) + pert));
+
+			dIft_dV_ap = dIbr_dV(branch, Yf, Yt, Vap);
+			dIf_dVa_ap = (DComplexMatrix2D) dIft_dV_ap[0];
+			dIf_dVm_ap = (DComplexMatrix2D) dIft_dV_ap[1];
+			dIt_dVa_ap = (DComplexMatrix2D) dIft_dV_ap[2];
+			dIt_dVm_ap = (DComplexMatrix2D) dIft_dV_ap[3];
+			If_ap = (DComplexMatrix1D) dIft_dV_ap[4];
+			It_ap = (DComplexMatrix1D) dIft_dV_ap[5];
+
+			dAft_dV_ap = dAbr_dV(dIf_dVa_ap, dIf_dVm_ap, dIt_dVa_ap, dIt_dVm_ap, If_ap, It_ap);
+			dAf_dVa_ap = dAft_dV_ap[0]; dAf_dVm_ap = dAft_dV_ap[1];
+			dAt_dVa_ap = dAft_dV_ap[2]; dAt_dVm_ap = dAft_dV_ap[3];
+
+			num_Gfaa.viewColumn(i).assignReal( dAf_dVa_ap.copy().assign(dAf_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfva.viewColumn(i).assignReal( dAf_dVm_ap.copy().assign(dAf_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfva.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtaa.viewColumn(i).assignReal( dAt_dVa_ap.copy().assign(dAt_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtaa.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtva.viewColumn(i).assignReal( dAt_dVm_ap.copy().assign(dAt_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtva.viewColumn(i).assign( cfunc.div(pert) );
+
+			Vmp = V.copy();
+			Vmp.set(i, (Vm.get(i) + pert) * Math.exp(1j * Va.get(i));
+
+			dIft_dV_mp = dIbr_dV(branch, Yf, Yt, Vmp);
+			dIf_dVa_mp = (DComplexMatrix2D) dIft_dV_mp[0];
+			dIf_dVm_mp = (DComplexMatrix2D) dIft_dV_mp[1];
+			dIt_dVa_mp = (DComplexMatrix2D) dIft_dV_mp[2];
+			dIt_dVm_mp = (DComplexMatrix2D) dIft_dV_mp[3];
+			If_mp = (DComplexMatrix1D) dIft_dV_mp[4];
+			It_mp = (DComplexMatrix1D) dIft_dV_mp[5];
+
+			dAft_dV_mp = dAbr_dV(dIf_dVa_mp, dIf_dVm_mp, dIt_dVa_mp, dIt_dVm_mp, If_mp, It_mp);
+			dAf_dVa_mp = dAft_dV_mp[0]; dAf_dVm_mp = dAft_dV_mp[1];
+			dAt_dVa_mp = dAft_dV_mp[2]; dAt_dVm_mp = dAft_dV_mp[3];
+
+			num_Gfav.viewColumn(i).assignReal( dAf_dVa_mp.copy().assign(dAf_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gfvv.viewColumn(i).assignReal( dAf_dVm_mp.copy().assign(dAf_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gfvv.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtav.viewColumn(i).assignReal( dAt_dVa_mp.copy().assign(dAt_dVa, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtav.viewColumn(i).assign( cfunc.div(pert) );
+			num_Gtvv.viewColumn(i).assignReal( dAt_dVm_mp.copy().assign(dAt_dVm, dfunc.minus).viewDice().zMult(lam.getRealPart(), null) );
+			num_Gtvv.viewColumn(i).assign( cfunc.div(pert) );
+		}
+
+		t_is(DComplexFactory2D.dense.make(Gfaa.toArray()), num_Gfaa, 3, "Gfaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfav.toArray()), num_Gfav, 3, "Gfav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfva.toArray()), num_Gfva, 3, "Gfva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gfvv.toArray()), num_Gfvv, 2, "Gfvv" + tt);
+
+		t_is(DComplexFactory2D.dense.make(Gtaa.toArray()), num_Gtaa, 3, "Gtaa" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtav.toArray()), num_Gtav, 3, "Gtav" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtva.toArray()), num_Gtva, 3, "Gtva" + tt);
+		t_is(DComplexFactory2D.dense.make(Gtvv.toArray()), num_Gtvv, 2, "Gtvv" + tt);
 
 		t_end();
 	}
