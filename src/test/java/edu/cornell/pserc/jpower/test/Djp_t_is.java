@@ -89,6 +89,11 @@ public class Djp_t_is {
 		t_ok(prop.equals(got, expected_matrix), msg);
 	}
 
+	public static void t_is(DoubleMatrix1D got, DoubleMatrix1D expected, int prec, String msg) {
+		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
+		t_ok(prop.equals(got, expected), msg);
+	}
+
 	public static void t_is(IntMatrix1D got, IntMatrix1D expected, int prec, String msg) {
 		IntProperty prop = new IntProperty();
 		boolean condition = prop.equals(got, expected);

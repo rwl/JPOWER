@@ -27,17 +27,25 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import static edu.cornell.pserc.jpower.Djp_jpoption.jpoption;
 import static edu.cornell.pserc.jpower.Djp_loadcase.loadcase;
 import static edu.cornell.pserc.jpower.pf.Djp_runpf.runpf;
+import static edu.cornell.pserc.jpower.pf.Djp_rundcpf.rundcpf;
 
+import edu.cornell.pserc.jpower.jpc.Branch;
+import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
 import edu.cornell.pserc.jpower.jpc.JPC;
 
+import static edu.cornell.pserc.jpower.jpc.Bus.VA;
+import static edu.cornell.pserc.jpower.jpc.Gen.PG;
+
 import static edu.cornell.pserc.jpower.test.Djp_t_begin.t_begin;
-import static edu.cornell.pserc.jpower.test.Djp_t_case9_pf.t_case9_pf;
 import static edu.cornell.pserc.jpower.test.Djp_t_end.t_end;
 import static edu.cornell.pserc.jpower.test.Djp_t_is.t_is;
 import static edu.cornell.pserc.jpower.test.Djp_t_ok.t_ok;
+import static edu.cornell.pserc.jpower.test.Djp_t_case9_pf.t_case9_pf;
 
 import static cern.colt.util.tdouble.MMUtil.readMatrix;
+import static cern.colt.util.tdouble.Util.irange;
+import static cern.colt.util.tdouble.Util.ifunc;
 
 /**
  * Tests for power flow solvers.
@@ -65,17 +73,22 @@ public class Djp_t_pf {
 	 *
 	 * @param quiet
 	 */
+	@SuppressWarnings("static-access")
 	public static void t_pf(boolean quiet) {
 
 		String t;
-		JPC jpc, r;
+		int nb;
+		double verbose;
+		double[] Pg;
+		JPC jpc, jpc0, jpc1, r;
 		DoubleMatrix2D bus_soln, gen_soln, branch_soln;
 		Map<String, Double> jpopt;
 
-		t_begin(25, quiet);
+		t_begin(33, quiet);
 
 		JPC casefile = t_case9_pf();
-		jpopt = jpoption("OUT_ALL", 0.0, "VERBOSE", quiet ? 0.0 : 1.0);
+		verbose = quiet ? 0.0 : 1.0;
+		jpopt = jpoption("OUT_ALL", 0.0, "VERBOSE", verbose);
 
 		/* get solved AC power flow case from MatrixMarket file. */
 		bus_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(BUS_SOLN9).getFile());
@@ -179,6 +192,58 @@ public class Djp_t_pf {
 		t_is(r.gen.Qg.viewSelection(new int[] {0, 1}),
 				new double[] {-50+8.02, 50+16.05}, 2,
 				t + "2 gens, proportional");
+
+
+		/* Network with islands */
+		t = "network w/islands : DC PF : ";
+		jpc0 = loadcase(casefile);
+		jpc0.gen.Pg.set(0, 60);
+		jpc0.gen.Pmin.set(0, jpc0.gen.Pmin.get(0) / 2);
+		jpc0.gen.Pmax.set(0, jpc0.gen.Pmax.get(0) / 2);
+		jpc0.gen.Qmin.set(0, jpc0.gen.Qmin.get(0) / 2);
+		jpc0.gen.Qmax.set(0, jpc0.gen.Qmax.get(0) / 2);
+		jpc0.gen.Pg.set(0, jpc0.gen.Pg.get(0) / 2);
+		jpc0.gen.Qg.set(0, jpc0.gen.Qg.get(0) / 2);
+
+		jpc0.gen = Gen.fromMatrix(DoubleFactory2D.dense.appendRows(
+			jpc0.gen.toMatrix().viewSelection(new int[] {0}, null),
+			jpc0.gen.toMatrix())
+		);
+		jpc1 = jpc0.copy();
+		jpc  = jpc0.copy();
+		nb = jpc.bus.size();
+		jpc1.bus.bus_i.assign(ifunc.plus(nb));
+		jpc1.branch.f_bus.assign(ifunc.plus(nb));
+		jpc1.branch.t_bus.assign(ifunc.plus(nb));
+		jpc1.gen.gen_bus.assign(ifunc.plus(nb));
+		jpc.bus = Bus.fromMatrix(
+			DoubleFactory2D.dense.appendRows(jpc.bus.toMatrix(), jpc1.bus.toMatrix()));
+		jpc.branch = Branch.fromMatrix(
+			DoubleFactory2D.dense.appendRows(jpc.branch.toMatrix(), jpc1.branch.toMatrix()));
+		jpc.gen = Gen.fromMatrix(
+			DoubleFactory2D.dense.appendRows(jpc.gen.toMatrix(), jpc1.gen.toMatrix()));
+		//jpopt = jpoption(jpopt, "OUT_BUS", 1, "OUT_GEN", 1, "OUT_ALL", -1, "VERBOSE", 2);
+		jpopt = jpoption(jpopt, "VERBOSE", verbose);
+		r = rundcpf(jpc, jpopt);
+		t_is(r.bus.Va.viewSelection(irange(9)), bus_soln.viewColumn(VA),
+				8, t + "voltage angles 1");
+		t_is(r.bus.Va.viewSelection(irange(9, 18)), bus_soln.viewColumn(VA),
+				8, t + "voltage angles 2");
+		Pg = new double[] {gen_soln.get(0, PG) - 30, 30, gen_soln.get(1, PG), gen_soln.get(2, PG)};
+		t_is(r.gen.Pg.viewSelection(irange(4)), Pg, 8, t + "active power generation 1");
+		t_is(r.gen.Pg.viewSelection(irange(4, 8)), Pg, 8, t + "active power generation 1");
+
+		t = "network w/islands : AC PF : ";
+		/* get solved AC power flow case from MM-files */
+		bus_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(BUS_SOLN9).getFile());
+		gen_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(GEN_SOLN9).getFile());
+		branch_soln = (DoubleMatrix2D) readMatrix(Djp_t_pf.class.getResource(BRANCH_SOLN9).getFile());
+		r = runpf(jpc, jpopt);
+		t_is(r.bus.Va.viewSelection(irange(9)), bus_soln.viewColumn(VA), 8, t + "voltage angles 1");
+		t_is(r.bus.Va.viewSelection(irange(9, 18)), bus_soln.viewColumn(VA), 8, t + "voltage angles 2");
+		Pg = new double[] {gen_soln.get(0, PG) - 30, 30, gen_soln.get(1, PG), gen_soln.get(2, PG)};
+		t_is(r.gen.Pg.viewSelection(irange(4)), Pg, 8, t + "active power generation 1");
+		t_is(r.gen.Pg.viewSelection(irange(4, 8)), Pg, 8, t + "active power generation 1");
 
 		t_end();
 	}
