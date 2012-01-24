@@ -19,10 +19,6 @@
 
 package edu.cornell.pserc.jpower;
 
-import java.lang.reflect.Field;
-
-import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
@@ -38,7 +34,6 @@ import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 import edu.cornell.pserc.jpower.jpc.Order;
 
@@ -46,6 +41,8 @@ import static edu.cornell.pserc.jpower.jpc.JPC.NONE;
 import static edu.cornell.pserc.jpower.jpc.JPC.PQ;
 import static edu.cornell.pserc.jpower.jpc.JPC.PV;
 import static edu.cornell.pserc.jpower.jpc.JPC.REF;
+import static edu.cornell.pserc.jpower.Djp_e2i_field.e2i_field;
+import static edu.cornell.pserc.jpower.Djp_run_userfcn.run_userfcn;
 
 /**
  * Converts external to internal indexing.
@@ -67,9 +64,9 @@ import static edu.cornell.pserc.jpower.jpc.JPC.REF;
  *     [i2e, bus, gen, branch, areas] = ext2int(bus, gen, branch, areas);
  *     [i2e, bus, gen, branch] = ext2int(bus, gen, branch);
  *
- * 2.  ppc = EXT2INT(ppc)
+ * 2.  jpc = ext2int(jpc)
  *
- * If the input is a single MATPOWER case struct, then all isolated
+ * If the input is a single JPOWER case object, then all isolated
  * buses, off-line generators and branches are removed along with any
  * generators, branches or areas connected to isolated buses. Then the
  * buses are renumbered consecutively, beginning at 1, and the
@@ -80,40 +77,7 @@ import static edu.cornell.pserc.jpower.jpc.JPC.REF;
  * numbering it is returned unchanged.
  *
  * Example:
- *     ppc = ext2int(ppc);
- *
- * 3.  VAL = EXT2INT(ppc, VAL, ORDERING)
- *     VAL = EXT2INT(ppc, VAL, ORDERING, DIM)
- *     ppc = EXT2INT(ppc, FIELD, ORDERING)
- *     ppc = EXT2INT(ppc, FIELD, ORDERING, DIM)
- *
- * When given a case struct that has already been converted to
- * internal indexing, this function can be used to convert other data
- * structures as well by passing in 2 or 3 extra parameters in
- * addition to the case struct. If the value passed in the 2nd
- * argument is a column vector, it will be converted according to the
- * ORDERING specified by the 3rd argument (described below). If VAL
- * is an n-dimensional matrix, then the optional 4th argument (DIM,
- * default = 1) can be used to specify which dimension to reorder.
- * The return value in this case is the value passed in, converted
- * to internal indexing.
- *
- * If the 2nd argument is a string or cell array of strings, it
- * specifies a field in the case struct whose value should be
- * converted as described above. In this case, the converted value
- * is stored back in the specified field, the original value is
- * saved for later use and the updated case struct is returned.
- * If FIELD is a cell array of strings, they specify nested fields.
- *
- * The 3rd argument, ORDERING, is used to indicate whether the data
- * corresponds to bus-, gen- or branch-ordered data. It can be one
- * of the following three strings: 'bus', 'gen' or 'branch'. For
- * data structures with multiple blocks of data, ordered by bus,
- * gen or branch, they can be converted with a single call by
- * specifying ORDERING as a cell array of strings.
- *
- * Any extra elements, rows, columns, etc. beyond those indicated
- * in ORDERING, are not disturbed.
+ *     jpc = ext2int(jpc);
  *
  * @author Ray Zimmerman
  * @author Richard Lincoln
@@ -132,6 +96,7 @@ public class Djp_ext2int {
 		boolean first, dc;
 		Order o;
 		IntMatrix1D n2i;
+		Ordering[] ordering;
 
 		jpc = jpc.copy();
 
@@ -245,344 +210,35 @@ public class Djp_ext2int {
 			/* update gencost, A and N */
 			if (jpc.gencost != null) {
 				jpc.order.external.gencost = jpc.gencost.copy();	// Save with external ordering.
-				if (jpc.gencost.size() == 2*ng0) {
-					String[] ordering = new String[] {"gen", "gen"};  // include Qg cost
-					jpc.gencost = Cost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+				if (jpc.gencost.size() == 2 * ng0) {
+					ordering = new Ordering[] {Ordering.GEN, Ordering.GEN};  // include Qg cost
 
 				} else {
-					String ordering = "gen";  // Pg cost only
-					jpc.gencost = Cost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					ordering = new Ordering[] {Ordering.GEN};	// Pg cost only
 				}
+				jpc = e2i_field(jpc, "gencost", ordering);
 			}
-//			if (jpc.A != null | jpc.N != null) {
-//				String[] ordering;
-//				if (dc) {
-//					ordering = new String[] {"bus", "gen"};
-//				} else {
-//					ordering = new String[] {"bus", "bus", "gen", "gen"};
-//				}
-//				if (jpc.A != null)
-//					jpc = jp_ext2int(jpc, "A", ordering, 2);
-//				if (jpc.N != null)
-//					jpc = jp_ext2int(jpc, "N", ordering, 2);
-//
-//				/* execute userfcn callbacks for 'ext2int' stage */
-//				if (jpc.userfcn != null)
-//					jpc = Djp_run_userfcn.jp_run_userfcn(jpc.userfcn, "ext2int", jpc);
-//			}
+			if (jpc.A != null | jpc.N != null) {
+				if (dc) {
+					ordering = new Ordering[] {Ordering.BUS, Ordering.GEN};
+				} else {
+					ordering = new Ordering[] {Ordering.BUS, Ordering.BUS, Ordering.GEN, Ordering.GEN};
+				}
+				if (jpc.A != null)
+					jpc = e2i_field(jpc, "A", ordering, 1);
+				if (jpc.N != null)
+					jpc = e2i_field(jpc, "N", ordering, 1);
+
+				/* execute userfcn callbacks for 'ext2int' stage */
+				if (jpc.userfcn != null)
+					jpc = run_userfcn(jpc.userfcn, "ext2int", jpc);
+			}
 		}
 		return jpc;
 	}
 
-	public static JPC ext2int(JPC jpc, String field, String ordering) {
-		return ext2int(jpc, field, new String[] {ordering});
-	}
-
-
-	public static JPC ext2int(JPC jpc, String field, String[] ordering) {
-		int dim = 1;
-		return ext2int(jpc, field, ordering, dim);
-	}
-
-	public static JPC ext2int(JPC jpc, String field, String ordering, int dim) {
-		return ext2int(jpc, field, new String[] {ordering}, dim);
-	}
-
-	public static JPC ext2int(JPC jpc, String field, String[] ordering, int dim) {
-		DoubleMatrix1D val1;
-		DoubleMatrix2D val2;
-		Field fld;
-		Class<?> type;
-
-		try {
-			fld = jpc.getClass().getField(field);
-			type = fld.getType();
-			if (type == DoubleMatrix1D.class) {
-				val1 = (DoubleMatrix1D) fld.get(jpc);
-				fld.set(jpc.order.external, val1.copy());
-				fld.set(jpc, ext2int(jpc, val1, ordering, dim));
-			} else if (type == DoubleMatrix2D.class) {
-				val2 = (DoubleMatrix2D) fld.get(jpc);
-				fld.set(jpc.order.external, val2.copy());
-				fld.set(jpc, ext2int(jpc, val2, ordering, dim));
-			} else {
-				throw new UnsupportedOperationException();
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		return jpc;
-	}
-
-	public static JPC ext2int(JPC jpc, String[] field, String ordering) {
-		return ext2int(jpc, field, new String[] {ordering});
-	}
-
-	public static JPC ext2int(JPC jpc, String[] field, String[] ordering) {
-		return ext2int(jpc, field, ordering, 1);
-	}
-
-	public static JPC ext2int(JPC jpc, String[] field, String ordering, int dim) {
-		return ext2int(jpc, field, new String[] {ordering}, 1);
-	}
-
 	/**
-	 *
-	 * @param jpc
-	 * @param field
-	 * @param ordering
-	 * @param dim
-	 * @return
-	 */
-	public static JPC ext2int(JPC jpc, String[] field, String[] ordering, int dim) {
-//		DoubleMatrix1D val1;
-//		DoubleMatrix2D val2;
-//		Field fld;
-//		Class<?> type;
-//
-//		for (String f : field) {
-//			try {
-//				fld = jpc.getClass().getField(f);
-//				type = fld.getType();
-//				if (type == DoubleMatrix1D.class) {
-//					val1 = (DoubleMatrix1D) fld.get(jpc);
-//					fld.set(jpc.order.external, val1.copy());
-//					fld.set(jpc, jp_ext2int(jpc, val1, ordering, dim));
-//				} else if (type == DoubleMatrix2D.class) {
-//					val2 = (DoubleMatrix2D) fld.get(jpc);
-//					fld.set(jpc.order.external, val2.copy());
-//					fld.set(jpc, jp_ext2int(jpc, val2, ordering, dim));
-//				} else {
-//					throw new UnsupportedOperationException();
-//				}
-//			} catch (SecurityException e) {
-//				e.printStackTrace();
-//			} catch (NoSuchFieldException e) {
-//				e.printStackTrace();
-//			} catch (IllegalArgumentException e) {
-//				e.printStackTrace();
-//			} catch (IllegalAccessException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return jpc;
-		throw new UnsupportedOperationException();
-	}
-
-
-	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String ordering) {
-		return ext2int(jpc, val, ordering, 1);
-	}
-
-	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String ordering, int dim) {
-		int[] idx;
-		Order o;
-		DoubleMatrix1D int_val1;
-
-		o = jpc.order;
-
-
-		if (ordering.equals("gen")) {
-			int[] e2i = o.gen.e2i.toArray();
-			idx = IntFactory1D.dense.make(o.gen.status.on).viewSelection(e2i).toArray();
-		} else if (ordering.equals("bus")) {
-			idx = o.bus.status.on;
-		} else if (ordering.equals("branch")) {
-			idx = o.branch.status.on;
-		} else {
-			throw new UnsupportedOperationException();
-		}
-		int_val1 = Djp_get_reorder.get_reorder(val, idx);
-
-		return int_val1;
-	}
-
-	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String[] ordering) {
-		return ext2int(jpc, val, ordering, 1);
-	}
-
-	/**
-	 *
-	 * @param jpc
-	 * @param val
-	 * @param ordering
-	 * @param dim
-	 * @return
-	 */
-	public static DoubleMatrix1D ext2int(JPC jpc, DoubleMatrix1D val, String[] ordering, int dim) {
-		throw new UnsupportedOperationException();
-
-//		int b, n, k;
-//		int[] idx;
-//		String ordr;
-//		Djp_order o;
-//		DoubleMatrix1D int_val1, v1, new_v1;
-//
-//		o = jpc.order;
-//
-//		if (ordering.length == 1) {		// single set
-//			if (ordering[0].equals("gen")) {
-//				int[] e2i = o.gen.e2i.toArray();
-//				idx = IntFactory1D.dense.make(o.gen.status.on).viewSelection(e2i).toArray();
-//			} else if (ordering[0].equals("bus")) {
-//				idx = o.bus.status.on;
-//			} else {					// TODO: enum
-//				idx = o.branch.status.on;
-//			}
-//			int_val1 = Djp_get_reorder.jp_get_reorder(val, idx);
-//		} else {
-//			int_val1 = DoubleFactory1D.dense.make(0);
-//			b = 0;		// base
-//			for (k = 0; k < ordering.length; k++) {
-//				ordr = ordering[k];
-//				if (ordr.equals("gen")) {
-//					n = o.external.gen.size();
-//				} else if (ordr.equals("bus")) {
-//					n = o.external.bus.size();
-//				} else {				// TODO: enum
-//					n= o.external.branch.size();
-//				}
-//				v1 = Djp_get_reorder.jp_get_reorder(val, irange(b, b + n));
-//				new_v1 = jp_ext2int(jpc, v1, ordering[k], dim);
-//				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
-//				b += n;
-//			}
-//			n = (int) val.size();
-//			if (n > b) {				// the rest
-//				new_v1 = Djp_get_reorder.jp_get_reorder(val, irange(b, b + n));
-//				int_val1 = DoubleFactory1D.dense.append(int_val1, new_v1);
-//			}
-//		}
-//		return int_val1;
-	}
-
-
-
-
-	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String ordering) {
-		return ext2int(jpc, val, ordering, 1);
-	}
-
-	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String ordering, int dim) {
-		int[] idx;
-		Order o;
-		DoubleMatrix2D int_val2;
-
-		o = jpc.order;
-
-		if (ordering.equals("gen")) {
-			int[] e2i = o.gen.e2i.toArray();
-			idx = IntFactory1D.dense.make(o.gen.status.on).viewSelection(e2i).toArray();
-		} else if (ordering.equals("bus")) {
-			idx = o.bus.status.on;
-		} else if (ordering.equals("branch")) {
-			idx = o.branch.status.on;
-		} else {
-			throw new UnsupportedOperationException();
-		}
-		int_val2 = Djp_get_reorder.get_reorder(val, idx, dim);
-
-		return int_val2;
-	}
-
-	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String[] ordering) {
-		return ext2int(jpc, val, ordering, 1);
-	}
-
-	/**
-	 *
-	 * @param jpc
-	 * @param val
-	 * @param ordering
-	 * @param dim
-	 * @return
-	 */
-	public static DoubleMatrix2D ext2int(JPC jpc, DoubleMatrix2D val, String[] ordering, int dim) {
-		throw new UnsupportedOperationException();
-
-//		int b, n, k;
-//		int[] idx;
-//		String ordr;
-//		Djp_order o;
-//		DoubleMatrix2D int_val2, v2, new_v2;
-//
-//		o = jpc.order;
-//
-//		if (ordering.length == 1) {		// single set
-//			if (ordering[0].equals("gen")) {
-//				int[] e2i = o.gen.e2i.toArray();
-//				idx = IntFactory1D.dense.make(o.gen.status.on).viewSelection(e2i).toArray();
-//			} else if (ordering[0].equals("bus")) {
-//				idx = o.bus.status.on;
-//			} else {		// TODO: enum
-//				idx = o.branch.status.on;
-//			}
-//			int_val2 = Djp_get_reorder.jp_get_reorder(val, idx, dim);
-//		} else {
-//			if (dim == 1) {
-//				int_val2 = DoubleFactory2D.dense.make(val.rows(), 0);
-//			} else if (dim == 2) {
-//				int_val2 = DoubleFactory2D.dense.make(0, val.columns());
-//			} else {
-//				throw new UnsupportedOperationException();
-//			}
-//			b = 0;		// base
-//			for (k = 0; k < ordering.length; k++) {
-//				ordr = ordering[k];
-//				if (ordr.equals("gen")) {
-//					n = o.external.gen.size();
-//				} else if (ordr.equals("bus")) {
-//					n = o.external.bus.size();
-//				} else {	// TODO: enum
-//					n = o.external.branch.size();
-//				}
-//				v2 = Djp_get_reorder.jp_get_reorder(val, irange(b, b + n), dim);
-//				new_v2 = jp_ext2int(jpc, v2, ordering[k], dim);
-//				if (dim == 1) {
-//					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
-//				} else if (dim == 2) {
-//					int_val2 = DoubleFactory2D.dense.appendColumns(int_val2, new_v2);
-//				} else {
-//					throw new UnsupportedOperationException();
-//				}
-//				b += n;
-//			}
-//			n = (int) val.size();
-//			if (n > b) {				// the rest
-//				new_v2 = Djp_get_reorder.jp_get_reorder(val, irange(b, b+n), dim);
-//				if (dim == 1) {
-//					int_val2 = DoubleFactory2D.dense.appendRows(int_val2, new_v2);
-//				} else if (dim == 2) {
-//					int_val2 = DoubleFactory2D.dense.appendColumns(int_val2, new_v2);
-//				} else {
-//					throw new UnsupportedOperationException();
-//				}
-//			}
-//		}
-//		return int_val2;
-	}
-
-	/**
-	 * old form
-	 *
-	 * @param bus
-	 * @param gen
-	 * @param branch
-	 * @return
-	 */
-	public static Object[] ext2int(Bus bus, Gen gen, Branch branch) {
-		return ext2int(bus, gen, branch, null);
-	}
-
-	/**
-	 * old form
+	 * Old form.
 	 *
 	 * @param bus
 	 * @param gen
@@ -607,6 +263,10 @@ public class Djp_ext2int {
 			areas.price_ref_bus.assign( e2i.viewSelection(areas.price_ref_bus.toArray()) );
 
 		return new Object[] {i2e, bus, gen, branch, areas};
+	}
+
+	public static Object[] ext2int(Bus bus, Gen gen, Branch branch) {
+		return ext2int(bus, gen, branch, null);
 	}
 
 }

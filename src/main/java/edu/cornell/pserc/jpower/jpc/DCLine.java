@@ -105,7 +105,7 @@ public class DCLine {
 	 * @return the number of buses.
 	 */
 	public int size() {
-		return (int) this.f.size();
+		return (int) this.f_bus.size();
 	}
 
 	/**
