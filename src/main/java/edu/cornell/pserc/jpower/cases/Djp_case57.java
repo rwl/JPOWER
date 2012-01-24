@@ -23,7 +23,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 
 /**
@@ -222,7 +222,7 @@ public class Djp_case57 {
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost = GenCost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gencost = Cost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{2,	0,	0,	3,	0.0775795,	20,	0},
 			{2,	0,	0,	3,	0.01,	40,	0},
 			{2,	0,	0,	3,	0.25,	20,	0},

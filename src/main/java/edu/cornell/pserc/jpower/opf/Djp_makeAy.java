@@ -33,7 +33,7 @@ import static cern.colt.util.tdouble.Util.diff;
 import static cern.colt.util.tdouble.Util.nonzero;
 import static cern.colt.util.tdouble.Util.any;
 
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 
 import static edu.cornell.pserc.jpower.jpc.JPC.PW_LINEAR;
 
@@ -72,7 +72,7 @@ public class Djp_makeAy {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static AbstractMatrix[] makeAy(double baseMVA, int ng, GenCost gencost,
+	public static AbstractMatrix[] makeAy(double baseMVA, int ng, Cost gencost,
 			int pgbas, int qgbas, int ybas) {
 		int ny, nnz, k, ns, sidx, j;
 		int[] iycost;

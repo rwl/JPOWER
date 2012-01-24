@@ -28,7 +28,7 @@ import static cern.colt.util.tdouble.Util.ifunc;
 import static cern.colt.util.tdouble.Util.irange;
 import static cern.colt.util.tdouble.Util.nonzero;
 
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 
 import static edu.cornell.pserc.jpower.jpc.JPC.POLYNOMIAL;
 import static edu.cornell.pserc.jpower.jpc.JPC.PW_LINEAR;
@@ -50,7 +50,7 @@ public class Djp_totcost {
 	 * @return
 	 */
 	@SuppressWarnings("static-access")
-	public static DoubleMatrix1D totcost(GenCost gencost, DoubleMatrix1D Pg) {
+	public static DoubleMatrix1D totcost(Cost gencost, DoubleMatrix1D Pg) {
 		int ng, ncost;
 		int[] ipwl, ipol;
 		double p1,  p2, c1, c2, m, b, Pgen;

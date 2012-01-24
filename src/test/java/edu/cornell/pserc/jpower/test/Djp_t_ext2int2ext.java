@@ -29,7 +29,7 @@ import static cern.colt.util.tdouble.Util.icat;
 import static cern.colt.util.tdouble.Util.delete;
 import static cern.colt.util.tdouble.Util.irange;
 
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 
 import static edu.cornell.pserc.jpower.test.Djp_t_begin.t_begin;
@@ -324,11 +324,11 @@ public class Djp_t_ext2int2ext {
 		jpci = loadcase(Djp_t_case_int.t_case_int());
 		jpce.N = null;
 		jpci.N = null;
-		jpce.gencost = GenCost.fromMatrix(DoubleFactory2D.dense.appendRows(
+		jpce.gencost = Cost.fromMatrix(DoubleFactory2D.dense.appendRows(
 				jpce.gencost.toMatrix(),
 				jpce.gencost.toMatrix()
 		));
-		jpci.gencost = GenCost.fromMatrix(DoubleFactory2D.dense.appendRows(
+		jpci.gencost = Cost.fromMatrix(DoubleFactory2D.dense.appendRows(
 				jpci.gencost.toMatrix(),
 				jpci.gencost.toMatrix()
 		));

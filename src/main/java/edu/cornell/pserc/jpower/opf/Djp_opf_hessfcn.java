@@ -54,9 +54,9 @@ import edu.cornell.pserc.jips.HessianEvaluator;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
-import edu.cornell.pserc.jpower.opf.Djp_opf_model.Cost;
+import edu.cornell.pserc.jpower.opf.Djp_opf_model.CostParams;
 import edu.cornell.pserc.jpower.opf.Djp_opf_model.Set;
 
 /**
@@ -108,8 +108,8 @@ public class Djp_opf_hessfcn implements HessianEvaluator {
 		Bus bus;
 		Gen gen;
 		Branch branch;
-		GenCost gencost, pcost, qcost;
-		Cost cp;
+		Cost gencost, pcost, qcost;
+		CostParams cp;
 
 		Map<String, Set> vv;
 

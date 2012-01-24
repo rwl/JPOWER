@@ -59,7 +59,7 @@ public class Djp_opf_model {
 
 	public class NonLinearConstraintSet extends Set {}
 
-	public class Cost extends Set {
+	public class CostParams extends Set {
 		public DoubleMatrix2D N;
 		public DoubleMatrix2D H;
 		public DoubleMatrix1D Cw;
@@ -83,7 +83,7 @@ public class Djp_opf_model {
 		return null;
 	}
 
-	public Cost get_cost_params() {
+	public CostParams get_cost_params() {
 		return null;
 	}
 
@@ -121,7 +121,7 @@ public class Djp_opf_model {
 
 	}
 
-	public void add_costs(String string, Cost user_cost, String[] user_vars) {
+	public void add_costs(String string, CostParams user_cost, String[] user_vars) {
 		// TODO Auto-generated method stub
 
 	}
@@ -140,6 +140,10 @@ public class Djp_opf_model {
 	public int getN(String string) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	public CostParams get_cost_params(String name) {
+		return null;
 	}
 
 	public AbstractMatrix[] linear_constraints() {

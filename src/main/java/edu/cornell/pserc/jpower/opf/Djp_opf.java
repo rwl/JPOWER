@@ -57,9 +57,9 @@ import static edu.cornell.pserc.jpower.pf.Djp_makeBdc.makeBdc;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
-import edu.cornell.pserc.jpower.opf.Djp_opf_model.Cost;
+import edu.cornell.pserc.jpower.opf.Djp_opf_model.CostParams;
 import edu.cornell.pserc.jpower.opf.Djp_opf_model.Set;
 
 /**
@@ -97,8 +97,8 @@ public class Djp_opf {
 		Bus bus;
 		Gen gen;
 		Branch branch;
-		GenCost gencost;
-		GenCost[] pqcost;
+		Cost gencost;
+		Cost[] pqcost;
 
 		DoubleMatrix1D x0, y0, x1, y1, m, b, lbu, ubu, Va, Vm, Pg, Qg,
 				Pmin, Pmax, Qmin, Qmax, Vau, Val, lang, uang, iang, by,
@@ -111,7 +111,7 @@ public class Djp_opf {
 		AbstractMatrix[] Bdc, Alu_vl, Alu_ang;;
 
 		Djp_opf_model om;
-		Cost user_cost;
+		CostParams user_cost;
 
 		Map<String, Set>[] idx;
 		Map<String, Set> vv, ll, nn;
@@ -211,7 +211,7 @@ public class Djp_opf {
 		bus = (Bus) opf_args[1];
 		gen = (Gen) opf_args[2];
 		branch = (Branch) opf_args[3];
-		gencost = (GenCost) opf_args[4];
+		gencost = (Cost) opf_args[4];
 		Au  = (DoubleMatrix2D) opf_args[5];
 		lbu = (DoubleMatrix1D) opf_args[6];
 		ubu = (DoubleMatrix1D) opf_args[7];
@@ -375,7 +375,7 @@ public class Djp_opf {
 		if (nusr > 0)
 			om.add_constraints("usr", jpc.A, lbu, ubu, user_vars);	// nusr
 		if (nw > 0) {
-			user_cost = om.new Cost();
+			user_cost = om.new CostParams();
 			user_cost.N = jpc.N;
 			user_cost.Cw = Cw;
 			if (fparm.size() > 0) {

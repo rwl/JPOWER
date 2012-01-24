@@ -24,7 +24,7 @@ import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 
 /**
@@ -100,7 +100,7 @@ public class Djp_t_case9_opfv2 {
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost = GenCost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gencost = Cost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	0,	0,	4,	0,	0,	100,	2500,	200,	5500,	250,	7250},
 			{1,	0,	0,	4,	0,	0,	100,	2000,	200,	4403.5,	270,	6363.5},
 			{2,	0,	0,	2,	15,	0,	0,	0,	0,	0,	0,	0},

@@ -32,7 +32,7 @@ import static cern.colt.util.tdouble.Util.dblm;
  * @author Richard Lincoln
  *
  */
-public class GenCost {
+public class Cost {
 
 	private static final int MODEL    = 0;
 	private static final int STARTUP  = 1;
@@ -79,7 +79,7 @@ public class GenCost {
 	 *
 	 * @return
 	 */
-	public GenCost copy() {
+	public Cost copy() {
 		return copy(null);
 	}
 
@@ -87,8 +87,8 @@ public class GenCost {
 	 *
 	 * @return a copy of the gencost data.
 	 */
-	public GenCost copy(int[] indexes) {
-		GenCost other = new GenCost();
+	public Cost copy(int[] indexes) {
+		Cost other = new Cost();
 
 		other.model = this.model.viewSelection(indexes).copy();
 		other.startup = this.startup.viewSelection(indexes).copy();
@@ -112,8 +112,8 @@ public class GenCost {
 //		this.cost = other.viewSelection(null, Djp_util.irange(COST, other.columns()));
 //	}
 
-	public static GenCost fromMatrix(DoubleMatrix2D other) {
-		GenCost gencost = new GenCost();
+	public static Cost fromMatrix(DoubleMatrix2D other) {
+		Cost gencost = new Cost();
 
 		gencost.model = intm(other.viewColumn(MODEL));
 		gencost.startup = other.viewColumn(STARTUP);
@@ -124,7 +124,7 @@ public class GenCost {
 		return gencost;
 	}
 
-	public static GenCost fromMatrix(double[][] data) {
+	public static Cost fromMatrix(double[][] data) {
 		return fromMatrix(DoubleFactory2D.dense.make(data));
 	}
 

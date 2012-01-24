@@ -38,7 +38,7 @@ import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 import edu.cornell.pserc.jpower.jpc.Order;
 
@@ -247,11 +247,11 @@ public class Djp_ext2int {
 				jpc.order.external.gencost = jpc.gencost.copy();	// Save with external ordering.
 				if (jpc.gencost.size() == 2*ng0) {
 					String[] ordering = new String[] {"gen", "gen"};  // include Qg cost
-					jpc.gencost = GenCost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					jpc.gencost = Cost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
 
 				} else {
 					String ordering = "gen";  // Pg cost only
-					jpc.gencost = GenCost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
+					jpc.gencost = Cost.fromMatrix( ext2int(jpc, jpc.gencost.toMatrix(), ordering) );
 				}
 			}
 //			if (jpc.A != null | jpc.N != null) {

@@ -17,31 +17,31 @@
  *
  */
 
-package edu.cornell.pserc.jpower.cases;
+package edu.cornell.pserc.jpower.test;
 
-import cern.colt.matrix.tdouble.DoubleFactory2D;
 import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
+import edu.cornell.pserc.jpower.jpc.DCLine;
 import edu.cornell.pserc.jpower.jpc.Gen;
 import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 
 /**
- * Power flow data for 9 bus, 3 generator case.
+ * Same as t_case9_opfv2 with addition of DC line data.
  *
  * @author Ray Zimmerman
  * @author Richard Lincoln
  *
  */
-public class Djp_case9 {
+public class Djp_t_case9_dcline {
 
 	/**
 	 * Based on data from Joe H. Chow's book, p. 70.
 	 *
-	 * @return a 9 bus, 3 generator case.
+	 * @return a 9 bus, 3 generator case, with OPF data.
 	 */
-	public static JPC case9() {
+	public static JPC t_case9_dcline() {
 
 		JPC jpc = new JPC();
 
@@ -55,56 +55,75 @@ public class Djp_case9 {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus = Bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus = Bus.fromMatrix( new double[][] {
 			{1,	3,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{2,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{3,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
+			{30,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{4,	1,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{5,	1,	90,	30,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{6,	1,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{7,	1,	100,	35,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{8,	1,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
-			{9,	1,	125,	50,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9}
-		}) );
+			{9,	1,	125,	50,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
+		});
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen = Gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
-			{1,	0,	0,	300,	-300,	1,	100,	1,	250,	10,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
-			{2,	163,	0,	300,	-300,	1,	100,	1,	300,	10,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
-			{3,	85,	0,	300,	-300,	1,	100,	1,	270,	10,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0}
-		}) );
+		jpc.gen = Gen.fromMatrix( new double[][] {
+			{1,	0,	0,	300,	-300,	1,	100,	1,	250,	90,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+			{2,	163,	0,	300,	-300,	1,	100,	1,	300,	10,	0,	200,	-20,	20,	-10,	10,	0,	0,	0,	0,	0},
+			{30,	85,	0,	300,	-300,	1,	100,	1,	270,	10,	0,	200,	-30,	30,	-15,	15,	0,	0,	0,	0,	0},
+		});
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch = Branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
-			{1,	4,	0,	0.0576,	0,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{4,	5,	0.017,	0.092,	0.158,	250,	250,	250,	0,	0,	1,	-360,	360},
+		jpc.branch = Branch.fromMatrix( new double[][] {
+			{1,	4,	0,	0.0576,	0,	0,	250,	250,	0,	0,	1,	-360,	2.48},
+			{4,	5,	0.017,	0.092,	0.158,	0,	250,	250,	0,	0,	1,	-360,	360},
 			{5,	6,	0.039,	0.17,	0.358,	150,	150,	150,	0,	0,	1,	-360,	360},
-			{3,	6,	0,	0.0586,	0,	300,	300,	300,	0,	0,	1,	-360,	360},
-			{6,	7,	0.0119,	0.1008,	0.209,	150,	150,	150,	0,	0,	1,	-360,	360},
+			{30,	6,	0,	0.0586,	0,	0,	300,	300,	0,	0,	1,	-360,	360},
+			{6,	7,	0.0119,	0.1008,	0.209,	40,	150,	150,	0,	0,	1,	-360,	360},
 			{7,	8,	0.0085,	0.072,	0.149,	250,	250,	250,	0,	0,	1,	-360,	360},
 			{8,	2,	0,	0.0625,	0,	250,	250,	250,	0,	0,	1,	-360,	360},
 			{8,	9,	0.032,	0.161,	0.306,	250,	250,	250,	0,	0,	1,	-360,	360},
-			{9,	4,	0.01,	0.085,	0.176,	250,	250,	250,	0,	0,	1,	-360,	360},
-		}) );
+			{9,	4,	0.01,	0.085,	0.176,	250,	250,	250,	0,	0,	1,	-2,	360},
+		});
 
 		/* -----  OPF Data  ----- */
 
 		/* area data */
 		//	area	refbus
-		jpc.areas = Areas.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.areas = Areas.fromMatrix( new double[][] {
 			{1,	5}
-		}) );
+		});
 
 		/* generator cost data */
 		//	1	startup	shutdow	n	x1	y1	...	xn	yn
 		//	2	startup	shutdow	n	c(n-1)	...	c0
-		jpc.gencost = Cost.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
-			{2,	1500,	0,	3,	0.11,	5,	150},
-			{2,	2000,	0,	3,	0.085,	1.2,	600},
-			{2,	3000,	0,	3,	0.1225,	1,	335}
-		}) );
+		jpc.gencost = Cost.fromMatrix( new double[][] {
+			{1,	0,	0,	4,	0,	0,	100,	2500,	200,	5500,	250,	7250},
+			{1,	0,	0,	4,	0,	0,	100,	2000,	200,	4403.5,	270,	6363.5},
+			{2,	0,	0,	2,	15,	0,	0,	0,	0,	0,	0,	0},
+		});
+
+		/* -----  DC Line Data  ----- */
+		//	fbus	tbus	status	Pf	Pt	Qf	Qt	Vf	Vt	Pmin	Pmax	QminF	QmaxF	QminT	QmaxT	loss0	loss1
+		jpc.dcline = DCLine.fromMatrix( new double[][] {
+			{30,	4,	1,	10,	8.9,	0,	0,	1.01,	1,	1,	10,	-10,	10,	-10,	10,	1,	0.01},
+			{7,	9,	1,	2,	1.96,	0,	0,	1,	1,	2,	10,	0,	0,	0,	0,	0,	0},
+			{5,	8,	0,	0,	0,	0,	0,	1,	1,	1,	10,	-10,	10,	-10,	10,	0,	0},
+			{5,	9,	1,	10,	9.5,	0,	0,	1,	0.98,	0,	10,	-10,	10,	-10,	10,	0,	0.05}
+		});
+
+		/* DC line cost data */
+		// 1	startup	shutdown	n	x1	y1	...	xn	yn
+		// 2	startup	shutdown	n	c(n-1)	...	c0
+		jpc.dclinecost = Cost.fromMatrix( new double[][] {
+			{2,	0,	0,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+			{2,	0,	0,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+			{2,	0,	0,	2,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+			{2,	0,	0,	2,	7.3,	0,	0,	0,	0,	0,	0,	0,	0,	0}
+		});
 
 		return jpc;
 	}

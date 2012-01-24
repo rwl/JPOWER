@@ -6,11 +6,6 @@
   <dependencies>
   	<dependency>
   		<groupId>com.github.rwl</groupId>
-  		<artifactId>parallelcolt</artifactId>
-  		<version>0.9.4-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.github.rwl</groupId>
   		<artifactId>parallelcolt-util</artifactId>
   		<version>0.1.1-SNAPSHOT</version>
   	</dependency>

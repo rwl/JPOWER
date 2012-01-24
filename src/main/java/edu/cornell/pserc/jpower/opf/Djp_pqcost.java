@@ -1,10 +1,10 @@
 package edu.cornell.pserc.jpower.opf;
 
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 
 public class Djp_pqcost {
 
-	public static GenCost[] pqcost(GenCost gencost, int ng) {
+	public static Cost[] pqcost(Cost gencost, int ng) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -33,7 +33,7 @@ import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import static edu.cornell.pserc.jpower.test.Djp_t_ok.t_ok;
 
 /**
@@ -121,7 +121,7 @@ public class Djp_t_is {
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void t_is(GenCost got, GenCost expected, int prec, String msg) {
+	public static void t_is(Cost got, Cost expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}

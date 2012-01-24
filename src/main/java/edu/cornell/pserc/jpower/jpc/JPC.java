@@ -41,7 +41,9 @@ public class JPC {
 	public Gen gen = new Gen();
 	public Branch branch = new Branch();
 	public Areas areas;
-	public GenCost gencost;
+	public Cost gencost;
+	public DCLine dcline;
+	public Cost dclinecost;
 	public DoubleMatrix2D A;
 	public DoubleMatrix2D N;
 	public String userfcn;
@@ -71,6 +73,10 @@ public class JPC {
 			cpy.areas = this.areas.copy();
 		if (this.gencost != null)
 			cpy.gencost = this.gencost.copy();
+		if (this.dcline != null)
+			cpy.dcline = this.dcline.copy();
+		if (this.dclinecost != null)
+			cpy.dclinecost = this.dclinecost.copy();
 		if (this.A != null)
 			cpy.A = this.A.copy();
 		if (this.N != null)

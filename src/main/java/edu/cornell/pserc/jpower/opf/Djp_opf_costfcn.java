@@ -41,9 +41,9 @@ import static edu.cornell.pserc.jpower.opf.Djp_totcost.totcost;
 
 import edu.cornell.pserc.jips.ObjectiveEvaluator;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
-import edu.cornell.pserc.jpower.opf.Djp_opf_model.Cost;
+import edu.cornell.pserc.jpower.opf.Djp_opf_model.CostParams;
 import edu.cornell.pserc.jpower.opf.Djp_opf_model.Set;
 
 /**
@@ -74,8 +74,8 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		int[] ipol, iLT, iEQ, iGT, iND, iL, iQ;
 		double baseMVA, f;
 		JPC jpc;
-		GenCost gencost;
-		Cost cp;
+		Cost gencost;
+		CostParams cp;
 
 		Map<String, Set> vv;
 
@@ -162,8 +162,8 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		double baseMVA, step, tol, df_diff_max;
 		JPC jpc;
 		Gen gen;
-		GenCost gencost;
-		Cost cp;
+		Cost gencost;
+		CostParams cp;
 
 		Map<String, Set> vv;
 
@@ -249,9 +249,9 @@ public class Djp_opf_costfcn implements ObjectiveEvaluator {
 		double baseMVA;
 		JPC jpc;
 		Gen gen;
-		GenCost gencost;
-		GenCost pcost, qcost;
-		Cost cp;
+		Cost gencost;
+		Cost pcost, qcost;
+		CostParams cp;
 
 		Map<String, Set> vv;
 

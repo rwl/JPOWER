@@ -27,7 +27,7 @@ import cern.colt.util.tdouble.Util;
 import static edu.cornell.pserc.jpower.jpc.JPC.PW_LINEAR;
 import static edu.cornell.pserc.jpower.opf.Djp_totcost.totcost;
 
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 
 /**
  * Converts polynomial cost variable to piecewise linear.
@@ -51,10 +51,10 @@ public class Djp_poly2pwl {
 	 * @param npts
 	 * @return
 	 */
-	public static GenCost poly2pwl(GenCost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
+	public static Cost poly2pwl(Cost polycost, DoubleMatrix1D Pmin, DoubleMatrix1D Pmax, int npts) {
 		int i, m;
 		double pmin, pmax, step;
-		GenCost pwlcost;
+		Cost pwlcost;
 		DoubleMatrix1D xx, yy;
 
 		pwlcost = polycost.copy();

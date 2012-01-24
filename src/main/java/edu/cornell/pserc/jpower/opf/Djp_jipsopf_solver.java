@@ -49,7 +49,7 @@ import edu.cornell.pserc.jips.ObjectiveEvaluator;
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Cost;
 import edu.cornell.pserc.jpower.jpc.JPC;
 import edu.cornell.pserc.jpower.opf.Djp_opf_model.Set;
 
@@ -84,7 +84,7 @@ public class Djp_jipsopf_solver {
 		Bus bus;
 		Gen gen;
 		Branch branch;
-		GenCost gencost;
+		Cost gencost;
 
 		Map<String, Set>[] idx;
 		Map<String, Set> vv, ll, nn;
