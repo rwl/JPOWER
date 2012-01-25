@@ -118,8 +118,7 @@ public class Djp_newtonpf {
 
 		/* check tolerance */
 		normF = DenseDoubleAlgebra.DEFAULT.norm(F, Norm.Infinity);
-		if (verbose > 0)
-			System.out.print("(Newton)\n");
+
 		if (verbose > 1) {
 			System.out.printf("\n it    max P & Q mismatch (p.u.)");
 			System.out.printf("\n----  ---------------------------");

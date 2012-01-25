@@ -114,7 +114,7 @@ public class Djp_printpf {
 
 		pw = new PrintWriter(output);
 
-		if (jpopt.get("OUT_ALL").equals(0) || jpopt.get("OUT_RAW").equals(0))
+		if (jpopt.get("OUT_ALL").equals(0))
 			return;
 
 		baseMVA = results.baseMVA;
@@ -159,8 +159,7 @@ public class Djp_printpf {
 			OUT_QG_LIM      = OUT_ALL_LIM;
 		}
 		OUT_ANY			= OUT_ANY || (OUT_ALL_LIM == -1 && (OUT_V_LIM > 0 || OUT_LINE_LIM > 0 || OUT_PG_LIM > 0 || OUT_QG_LIM > 0));
-		OUT_RAW	= jpopt.get("OUT_RAW") == 1;
-		ptol = 1e-6;		// tolerance for displaying shadow prices
+		ptol = 1e-4;		// tolerance for displaying shadow prices
 
 		/* internal bus number */
 		i2e = bus.bus_i.copy();
@@ -544,16 +543,20 @@ public class Djp_printpf {
 			if (isOPF) { pw.printf("  -------  -------"); }
 			for (i = 0; i < nb; i++) {
 				pw.printf("\n%5d%7.3f%9.3f", bus.bus_i.get(i), bus.Vm.get(i), bus.Va.get(i));
-
+				if (bus.bus_type.get(i) == JPC.REF) {
+					pw.printf("*");
+				} else {
+					pw.printf(" ");
+				}
 				_g = gen.gen_bus.copy().assign(ifunc.equals(bus.bus_i.get(i)));
 				g = _g.assign(gen.gen_status, ifunc.and).assign(notload, ifunc.and).toArray();
 				_vg = gen.gen_bus.copy().assign(ifunc.equals(bus.bus_i.get(i)));
 				vg = _vg.assign(gen.gen_status, ifunc.and).assign(isload, ifunc.and).toArray();
 
 				if (g.length > 0) {
-					pw.printf("%10.2f%10.2f", gen.Pg.viewSelection(g).zSum(), gen.Qg.viewSelection(g).zSum());
+					pw.printf("%9.2f%10.2f", gen.Pg.viewSelection(g).zSum(), gen.Qg.viewSelection(g).zSum());
 				} else {
-					pw.printf("       -         -  ");
+					pw.printf("      -         -  ");
 				}
 				if (bus.Pd.get(i) > 0 || bus.Qd.get(i) > 0 || vg.length > 0) {
 					if (vg.length > 0) {

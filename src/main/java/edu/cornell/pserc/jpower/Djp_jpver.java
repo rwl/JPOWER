@@ -33,9 +33,9 @@ public class Djp_jpver {
 	public static Map<String, String> jpver(String all) {
 		Map<String, String> ver = new HashMap<String, String>();
 		ver.put("Name", "JPOWER");
-		ver.put("Version", "4.0.0");
+		ver.put("Version", "4.1.0");
 		ver.put("Release", "");
-		ver.put("Date", "12-Jul-2011");
+		ver.put("Date", "26-Jan-2012");
 		return ver;
 	}
 

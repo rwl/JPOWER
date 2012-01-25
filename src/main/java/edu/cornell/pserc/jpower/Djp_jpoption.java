@@ -76,7 +76,7 @@ import java.util.Map;
  * 	17 - CONSTR_TOL_X, 1e-4     termination tol on x for constr/fmincon
  * 	18 - CONSTR_TOL_F, 1e-4     termination tol on f for constr/fmincon
  * 	19 - CONSTR_MAX_IT, 0       max number of iterations for constr/fmincon
- * 									[       0 => 2*nb + 150                 ]
+ * 									[       0 => default                 ]
  * 	20 - LPC_TOL_GRAD, 3e-3     termination tolerance on gradient, LP-based
  * 								solver
  * 	21 - LPC_TOL_X, 1e-4        termination tolerance on x (min step size),
@@ -107,9 +107,9 @@ import java.util.Map;
  * 	32 - OUT_ALL, -1            controls pretty-printing of results
  * 			[  -1 - individual flags control what prints                    ]
  * 			[   0 - do not print anything                                   ]
- * 			[       (overrides individual flags, except OUT_RAW)            ]
+ * 			[       (overrides individual flags)            ]
  * 			[   1 - print everything                                        ]
- * 			[       (overrides individual flags, except OUT_RAW)            ]
+ * 			[       (overrides individual flags)            ]
  * 	33 - OUT_SYS_SUM, 1         print system summary        [   0 or 1  ]
  * 	34 - OUT_AREA_SUM, 0        print area summaries        [   0 or 1  ]
  * 	35 - OUT_BUS, 1             print bus detail            [   0 or 1  ]
@@ -155,8 +155,6 @@ import java.util.Map;
  * 								used in SC-PDIPM and TRALM
  *
  * 	deprecated options
- * 	43 - OUT_RAW, 0             print raw data for Perl database
- * 								interface code              [   0 or 1  ]
  * 	51 - SPARSE_QP, 1           pass sparse matrices to QP and LP
  * 								solvers if possible         [   0 or 1  ]
  *
@@ -232,9 +230,6 @@ public class Djp_jpoption {
 
 			// OPF options
 			options.put("OPF_ALG", 0.0);
-			options.put("OPF_ALG_POLY", 100.0);		// deprecated
-			options.put("OPF_ALG_PWL", 200.0);		// deprecated
-			options.put("OPF_POLY2PWL_PTS", 10.0);	// deprecated
 			options.put("OPF_NEQ", 0.0);			// not a user option (number of eq constraints, set by program)
 			options.put("OPF_VIOLATION", 5e-6);
 			options.put("CONSTR_TOL_X", 1e-4);
@@ -261,7 +256,6 @@ public class Djp_jpoption {
 			options.put("OUT_LINE_LIM", 1.0);
 			options.put("OUT_PG_LIM", 1.0);
 			options.put("OUT_QG_LIM", 1.0);
-			options.put("OUT_RAW", 0.0);			// deprecated
 
 			// other options
 			options.put("SPARSE_QP", 1.0);			// deprecated

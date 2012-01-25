@@ -37,6 +37,7 @@ import static cern.colt.util.tdouble.Util.polar;
 import static cern.colt.util.tdouble.Util.complex;
 import static cern.colt.util.tdouble.Util.icat;
 import static cern.colt.util.tdouble.Util.intm;
+import static cern.colt.util.tdouble.Util.any;
 
 import static edu.cornell.pserc.jpower.Djp_bustypes.bustypes;
 import static edu.cornell.pserc.jpower.Djp_ext2int.ext2int;
@@ -54,6 +55,7 @@ import static edu.cornell.pserc.jpower.pf.Djp_makeSbus.makeSbus;
 import static edu.cornell.pserc.jpower.pf.Djp_makeYbus.makeYbus;
 import static edu.cornell.pserc.jpower.pf.Djp_newtonpf.newtonpf;
 import static edu.cornell.pserc.jpower.pf.Djp_pfsoln.pfsoln;
+import static edu.cornell.pserc.jpower.pf.Djp_dcpf.dcpf;
 
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
@@ -106,17 +108,19 @@ public class Djp_runpf {
 	@SuppressWarnings("static-access")
 	public static JPC runpf(JPC casedata, Map<String, Double> jpopt,
 			String fname, String solvedcase) {
-		int i, verbose, qlim, ref, refgen, ref0, /*iterations, */k, bi, ref_temp;
-		int[] pv, pq, on, gbus, limited, mx, mn;
+		int i, verbose, qlim, ref0, /*iterations, */k, bi, ref_temp, alg;
+		int[] pv, pq, ref, on, gbus, limited, mx, mn, refgen, temp;
 		long t0;
 		boolean dc, repeat, success;
 		double baseMVA, Varef0;
 		double[] maxloc;
+		String solver;
 		JPC jpc, results;
 		Bus bus;
 		Gen gen;
 		Branch branch;
 		Map<String, String> v;
+		IntMatrix1D ggbus;
 		IntMatrix1D[] bustypes;
 		DoubleMatrix1D Va0, Pbusinj, Pfinj, Pbus, Va, fixedQg;
 		DoubleMatrix2D B, Bf;
@@ -154,14 +158,15 @@ public class Djp_runpf {
 
 		/* get bus index lists of each type of bus */
 		bustypes = bustypes(bus, gen);
-		ref = bustypes[0].get(0);
+		ref = bustypes[0].toArray();
 		pv = bustypes[1].toArray();
 		pq = bustypes[2].toArray();
 
 		/* generator info */
 		on = nonzero(gen.gen_status);  // which generators are on?
 		// what buses are they at?
-		gbus = gen.gen_bus.viewSelection(on).toArray();
+		ggbus = gen.gen_bus.viewSelection(on);
+		gbus = ggbus.toArray();
 
 		/* -----  run the power flow  ----- */
 		t0 = System.currentTimeMillis();
@@ -193,7 +198,7 @@ public class Djp_runpf {
 			Pbus.assign(bus.Gs.copy().assign(dfunc.div(baseMVA)), dfunc.minus);
 
 			/* "run" the power flow */
-			Va = Djp_dcpf.dcpf(B, Pbus, Va0, ref, pv, pq);
+			Va = dcpf(B, Pbus, Va0, ref[0], pv, pq);
 
 			/* update data matrices with solution */
 			branch.Qf.assign(0);
@@ -203,17 +208,34 @@ public class Djp_runpf {
 			bus.Vm.assign(1);
 			bus.Va.assign(Va);
 			bus.Va.assign(dfunc.chain(dfunc.mult(180), dfunc.div(Math.PI)));
-			// update Pg for swing generator (note: other gens at ref bus are accounted for in Pbus)
+			// update Pg for slack generator (1st gen at ref bus)
+			// (note: other gens at ref bus are accounted for in Pbus)
 			//      Pg = Pinj + Pload + Gs
 			//      newPg = oldPg + newPinj - oldPinj
-			refgen = 0;
-			for (int ii : gbus) if (ii == ref) { refgen = ii; break; }
-			gen.Pg.set(on[refgen], gen.Pg.get(on[refgen]) + (B.viewRow(ref).zDotProduct(Va) - Pbus.get(ref)) * baseMVA);
+			refgen = new int[ref.length];
+			for (k = 0; k < ref.length; k++) {
+				temp = nonzero(ggbus.copy().assign(ifunc.equals(ref[k])));
+				refgen[k] = on[temp[0]];
+			}
+			gen.Pg.viewSelection(refgen).assign(B.viewSelection(ref, null).zMult(Va, null).assign(Pbus.viewSelection(ref), dfunc.minus).assign(dfunc.mult(baseMVA)), dfunc.plus);
 
 			success = true;
 		} else {                                  // AC formulation
-			if (verbose > 0)
-				System.out.printf(" -- AC Power Flow ");    // solver name and \n added later
+			alg = jpopt.get("PF_ALG").intValue();
+			if (verbose > 0) {
+				if (alg == 1) {
+					solver = "Newton";
+				} else if (alg == 2) {
+					solver = "fast-decoupled, XB";
+				} else if (alg == 3) {
+					solver = "fast-decoupled, BX";
+				} else if (alg == 4) {
+					solver = "Gauss-Seidel";
+				} else {
+					solver = "unknown";
+				}
+				System.out.printf(" -- AC Power Flow (%s)\n", solver);
+			}
 
 			/* initial state */
 			//DComplexMatrix1D V0 = DComplexFactory1D.dense.make(bus.size(), new double[] {1, 0});	// flat start
@@ -227,8 +249,8 @@ public class Djp_runpf {
 			limited = null;					// list of indices of gens @ Q lims
 			fixedQg = null;
 			if (qlim > 0) {
-				ref0 = ref;							// save index and angle of
-				Varef0 = bus.Va.get(ref0);			//   original reference bus
+				ref0 = ref[0];							// save index and angle of
+				Varef0 = bus.Va.get(ref0);			//   original reference bus(es)
 				fixedQg = DoubleFactory1D.dense.make(gen.size());	// Qg of gens at Q limits
 			}
 			repeat = true;
@@ -241,15 +263,15 @@ public class Djp_runpf {
 				Sbus = makeSbus(baseMVA, bus, gen);
 
 				/* run the power flow */
-				int alg = jpopt.get("PF_ALG").intValue();
+				alg = jpopt.get("PF_ALG").intValue();
 				soln = null;
 				if (alg == 1) {
-					soln = newtonpf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
+					soln = newtonpf(Ybus, Sbus, V0, ref[0], pv, pq, jpopt);
 				} else if (alg == 2 || alg == 3) {
 					BB = makeB(baseMVA, bus, branch, alg);
-					soln = fdpf(Ybus, Sbus, V0, BB[0], BB[1], ref, pv, pq, jpopt);
+					soln = fdpf(Ybus, Sbus, V0, BB[0], BB[1], ref[0], pv, pq, jpopt);
 				} else if (alg == 4) {
-					soln = gausspf(Ybus, Sbus, V0, ref, pv, pq, jpopt);
+					soln = gausspf(Ybus, Sbus, V0, ref[0], pv, pq, jpopt);
 				} else {
 					System.err.println("Only Newton''s method, fast-decoupled, and Gauss-Seidel power flow algorithms currently implemented.");
 					// TODO: throw unsupported algorithm exception.
@@ -317,14 +339,16 @@ public class Djp_runpf {
 							bus.Qd.set(bi, bus.Qd.get(bi) - gen.Qg.get(mx[i]));
 							bus.bus_type.set(gen.gen_bus.get(mx[i]), JPC.PQ);	// & set bus type to PQ
 						}
+						if (ref.length > 1 && any(bus.bus_type.viewSelection(gen.gen_bus.viewSelection(mx).toArray()).copy().assign(ifunc.equals(JPC.REF))))
+				                    throw new UnsupportedOperationException("Sorry, JPOWER cannot enforce Q limits for slack buses in systems with multiple slacks.");
 
 						/* update bus index lists of each type of bus */
-						ref_temp = ref;
+						ref_temp = ref[0];
 						bustypes = bustypes(bus, gen);
-						ref = bustypes[0].get(0);
+						ref = bustypes[0].toArray();
 						pv = bustypes[1].toArray();
 						pq = bustypes[2].toArray();
-						if (verbose > 0 && ref != ref_temp)
+						if (verbose > 0 && ref[0] != ref_temp)
 							System.out.printf("Bus %d is new slack bus\n", ref);
 						limited = icat(limited, mx);
 
@@ -343,7 +367,7 @@ public class Djp_runpf {
 						bus.Qd.set(bi, bus.Qd.get(bi) + gen.Qg.get(limited[i]));
 					}
 					gen.gen_status.viewSelection(limited).assign(1);						// and turn gen back on
-					if (ref != ref0) {
+					if (ref[0] != ref0) {
 						/* adjust voltage angles to make original ref bus correct */
 						bus.Va.assign(dfunc.minus(bus.Va.get(ref0) + Varef0));
 					}

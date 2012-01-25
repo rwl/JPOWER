@@ -110,10 +110,6 @@ public class Djp_fdpf {
 		normP = DenseDoubleAlgebra.DEFAULT.norm(P, Norm.Infinity);
 		normQ = DenseDoubleAlgebra.DEFAULT.norm(Q, Norm.Infinity);
 
-		if (verbose > 0) {
-			alg = jpopt.get("PF_ALG").intValue();
-			System.out.printf("(fast-decoupled, %s)\n", (alg == 2) ? "XB" : "BX");
-		}
 		if (verbose > 1) {
 			System.out.printf("\niteration     max mismatch (p.u.)  ");
 			System.out.printf("\ntype   #        P            Q     ");

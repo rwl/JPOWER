@@ -105,7 +105,7 @@ public class Djp_makeAvl {
 
 
 		if (any(Qg.viewSelection(ivl).copy().assign(Pg.viewSelection(ivl), dfunc.minus).assign(Qlim.copy().assign(Pmin.viewSelection(ivl), dfunc.div), dfunc.mult).assign(dfunc.abs)))
-			System.out.println("makeAvl: %s\n" +
+			System.out.println("makeAvl: %s\n         %s\n" +
 					"For a dispatchable load, PG and QG must be consistent" +
 					"with the power factor defined by PMIN and the Q limits.");
 

@@ -47,8 +47,9 @@ import static edu.cornell.pserc.jpower.Djp_run_userfcn.run_userfcn;
 /**
  * Converts external to internal indexing.
  *
- * This function performs several different tasks, depending on the
- * arguments passed.
+ * This function has two forms, (1) the old form that operates on
+ * and returns individual matrices and (2) the new form that operates
+ * on and returns an entire JPOWER case object.
  *
  * 1.  [I2E, BUS, GEN, BRANCH, AREAS] = EXT2INT(BUS, GEN, BRANCH, AREAS)
  *     [I2E, BUS, GEN, BRANCH] = EXT2INT(BUS, GEN, BRANCH)
@@ -70,11 +71,12 @@ import static edu.cornell.pserc.jpower.Djp_run_userfcn.run_userfcn;
  * buses, off-line generators and branches are removed along with any
  * generators, branches or areas connected to isolated buses. Then the
  * buses are renumbered consecutively, beginning at 1, and the
- * generators are sorted by increasing bus number. All of the related
- * indexing information and the original data matrices are stored in
- * an 'order' field in the struct to be used by INT2EXT to perform
- * the reverse conversions. If the case is already using internal
- * numbering it is returned unchanged.
+ * generators are sorted by increasing bus number. Any 'ext2int'
+ * callback routines registered in the case are also invoked
+ * automatically.All of the related indexing information and the original
+ * data matrices are stored in an 'order' field in the object to be used
+ * by INT2EXT to perform the reverse conversions. If the case is already
+ * using internal numbering it is returned unchanged.
  *
  * Example:
  *     jpc = ext2int(jpc);
