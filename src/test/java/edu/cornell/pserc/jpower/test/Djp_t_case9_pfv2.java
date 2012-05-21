@@ -2,28 +2,24 @@
  * Copyright (C) 1996-2010 Power System Engineering Research Center
  * Copyright (C) 2010-2011 Richard Lincoln
  *
- * JPOWER is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * JPOWER is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package edu.cornell.pserc.jpower.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
-import edu.cornell.pserc.jpower.jpc.Branch;
-import edu.cornell.pserc.jpower.jpc.Bus;
-import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.JPC;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
 
 /**
  * Power flow data for 9 bus, 3 generator case, no OPF data.
@@ -53,7 +49,7 @@ public class Djp_t_case9_pfv2 {
 
 		/* bus data */
 		//	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
-		jpc.bus = Bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.bus.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	3,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{2,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
 			{30,	2,	0,	0,	0,	0,	1,	1,	0,	345,	1,	1.1,	0.9},
@@ -67,7 +63,7 @@ public class Djp_t_case9_pfv2 {
 
 		/* generator data */
 		//	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_ag	ramp_10	ramp_30	ramp_q	apf
-		jpc.gen = Gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.gen.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	0,	0,	300,	-300,	1,	100,	1,	250,	90,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
 			{2,	163,	0,	300,	-300,	1,	100,	1,	300,	10,	0,	200,	-20,	20,	-10,	10,	0,	0,	0,	0,	0},
 			{30,	85,	0,	300,	-300,	1,	100,	1,	270,	10,	0,	200,	-30,	30,	-15,	15,	0,	0,	0,	0,	0},
@@ -75,7 +71,7 @@ public class Djp_t_case9_pfv2 {
 
 		/* branch data */
 		//	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
-		jpc.branch = Branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
+		jpc.branch.fromMatrix( DoubleFactory2D.dense.make(new double[][] {
 			{1,	4,	0,	0.0576,	0,	0,	250,	250,	0,	0,	1,	-360,	2.48},
 			{4,	5,	0.017,	0.092,	0.158,	0,	250,	250,	0,	0,	1,	-360,	360},
 			{5,	6,	0.039,	0.17,	0.358,	150,	150,	150,	0,	0,	1,	-360,	360},

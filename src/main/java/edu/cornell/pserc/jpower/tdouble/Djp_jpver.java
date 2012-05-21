@@ -16,30 +16,26 @@
  *
  */
 
-package edu.cornell.pserc.jpower.test;
+package edu.cornell.pserc.jpower.tdouble;
 
-public class Djp_t_skip {
+import java.util.HashMap;
+import java.util.Map;
 
-	public static void t_skip(int cnt) {
-		t_skip(cnt, "");
-	}
+/**
+ *
+ * @author Ray Zimmerman
+ * @author Richard Lincoln
+ *
+ */
+public class Djp_jpver {
 
-	/**
-	 * Skips a number of tests.
-	 *
-	 * @param cnt
-	 * @param msg
-	 */
-	public static void t_skip(int cnt, String msg) {
-		if (msg.length() > 0)
-			msg = " : " + msg;
-
-		TestGlobals.t_skip_cnt = TestGlobals.t_skip_cnt + cnt;
-		if (!TestGlobals.t_quiet)
-		    System.out.printf("skipped tests %d..%d%s\n",
-		    		TestGlobals.t_counter, TestGlobals.t_counter + cnt-1, msg);
-
-		TestGlobals.t_counter = TestGlobals.t_counter + cnt;
+	public static Map<String, String> jpver(String all) {
+		Map<String, String> ver = new HashMap<String, String>();
+		ver.put("Name", "JPOWER");
+		ver.put("Version", "0.3.2");
+		ver.put("Release", "");
+		ver.put("Date", "21-May-2012");
+		return ver;
 	}
 
 }

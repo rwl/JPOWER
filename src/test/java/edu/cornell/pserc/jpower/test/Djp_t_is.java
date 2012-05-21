@@ -2,18 +2,17 @@
  * Copyright (C) 1996-2010 Power System Engineering Research Center
  * Copyright (C) 2010-2011 Richard Lincoln
  *
- * JPOWER is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * JPOWER is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -25,16 +24,11 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
-import cern.colt.matrix.tint.IntFactory1D;
-import cern.colt.matrix.tint.IntMatrix1D;
-import cern.colt.matrix.tint.algo.IntProperty;
-
-import edu.cornell.pserc.jpower.jpc.Areas;
-import edu.cornell.pserc.jpower.jpc.Branch;
-import edu.cornell.pserc.jpower.jpc.Bus;
-import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.Cost;
-import static edu.cornell.pserc.jpower.test.Djp_t_ok.t_ok;
+import edu.cornell.pserc.jpower.tdouble.jpc.Areas;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
 
 /**
  * Tests if two matrices are identical to some tolerance.
@@ -71,8 +65,8 @@ public class Djp_t_is {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		boolean condition = prop.equals(got, expected);
 
-		t_ok(condition, msg);
-//		if (!condition && !t_quiet) {
+		Djp_t_ok.t_ok(condition, msg);
+//		if (!condition && !Djp_t_begin.t_quiet) {
 //			if (max_diff != 0.0) {
 //				System.out.printf("max diff = %g (allowed tol = %g)\n\n", max_diff, Math.pow(10, -prec));
 //			} else {
@@ -86,59 +80,42 @@ public class Djp_t_is {
 	public static void t_is(DoubleMatrix1D got, double[] expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(expected);
-		t_ok(prop.equals(got, expected_matrix), msg);
-	}
-
-	public static void t_is(DoubleMatrix1D got, DoubleMatrix1D expected, int prec, String msg) {
-		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		t_ok(prop.equals(got, expected), msg);
-	}
-
-	public static void t_is(IntMatrix1D got, IntMatrix1D expected, int prec, String msg) {
-		IntProperty prop = new IntProperty();
-		boolean condition = prop.equals(got, expected);
-
-		t_ok(condition, msg);
-	}
-
-	public static void t_is(IntMatrix1D got, int[] expected, int prec, String msg) {
-		t_is(got, IntFactory1D.dense.make(expected), prec, msg);
+		Djp_t_ok.t_ok(prop.equals(got, expected_matrix), msg);
 	}
 
 	public static void t_is(double got, double expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
 		DoubleMatrix1D expected_matrix = DoubleFactory1D.dense.make(1, expected);
-		t_ok(prop.equals(expected_matrix, got), msg);
+		Djp_t_ok.t_ok(prop.equals(expected_matrix, got), msg);
 	}
 
 	public static void t_is(Bus got, Bus expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Branch got, Branch expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Gen got, Gen expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
-	public static void t_is(Cost got, Cost expected, int prec, String msg) {
+	public static void t_is(GenCost got, GenCost expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(Areas got, Areas expected, int prec, String msg) {
 		DoubleProperty prop = new DoubleProperty(Math.pow(10, -prec));
-		t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
+		Djp_t_ok.t_ok(prop.equals(got.toMatrix(), expected.toMatrix()), msg);
 	}
 
 	public static void t_is(DComplexMatrix2D got, DComplexMatrix2D expected, int prec, String msg) {
 		DComplexProperty cprop = new DComplexProperty(Math.pow(10, -prec));
-		t_ok(cprop.equals(got, expected), msg);
+		Djp_t_ok.t_ok(cprop.equals(got, expected), msg);
 	}
-
 }

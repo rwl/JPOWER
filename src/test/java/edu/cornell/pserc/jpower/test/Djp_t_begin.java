@@ -2,30 +2,21 @@
  * Copyright (C) 1996-2010 Power System Engineering Research Center
  * Copyright (C) 2010-2011 Richard Lincoln
  *
- * JPOWER is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * JPOWER is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
 package edu.cornell.pserc.jpower.test;
-
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_clock;
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_counter;
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_not_ok_cnt;
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_num_of_tests;
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_ok_cnt;
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_quiet;
-import static edu.cornell.pserc.jpower.test.TestGlobals.t_skip_cnt;
 
 /**
  * Begin running tests.
@@ -49,16 +40,15 @@ public class Djp_t_begin {
 	 * @param quiet
 	 */
 	public static void t_begin(int num_of_tests, boolean quiet) {
-		t_quiet = quiet;
-		t_num_of_tests = num_of_tests;
-		t_counter = 1;
-		t_ok_cnt = 0;
-		t_not_ok_cnt = 0;
-		t_skip_cnt = 0;
-		t_clock = System.currentTimeMillis();
+		TestGlobals.t_quiet = quiet;
+		TestGlobals.t_num_of_tests = num_of_tests;
+		TestGlobals.t_counter = 1;
+		TestGlobals.t_ok_cnt = 0;
+		TestGlobals.t_not_ok_cnt = 0;
+		TestGlobals.t_skip_cnt = 0;
+		TestGlobals.t_clock = System.currentTimeMillis();
 
-		if (t_quiet == false)
+		if (TestGlobals.t_quiet == false)
 			System.out.printf("1..%d\n", num_of_tests);
 	}
-
 }

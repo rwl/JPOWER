@@ -2,18 +2,17 @@
  * Copyright (C) 1996-2010 Power System Engineering Research Center
  * Copyright (C) 2010-2011 Richard Lincoln
  *
- * JPOWER is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * JPOWER is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with JPOWER. If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -28,33 +27,23 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
-import cern.jet.math.tdcomplex.DComplexFunctions;
-import cern.jet.math.tdouble.DoubleFunctions;
 
+import static edu.emory.mathcs.utils.Utils.ifunc;
 import static edu.emory.mathcs.utils.Utils.dfunc;
 import static edu.emory.mathcs.utils.Utils.cfunc;
 import static edu.emory.mathcs.utils.Utils.polar;
 
-import edu.cornell.pserc.jpower.jpc.Branch;
-import edu.cornell.pserc.jpower.jpc.Bus;
-import edu.cornell.pserc.jpower.jpc.Gen;
-import edu.cornell.pserc.jpower.jpc.JPC;
-
-import static edu.cornell.pserc.jpower.Djp_ext2int.ext2int;
-import static edu.cornell.pserc.jpower.Djp_jpoption.jpoption;
-import static edu.cornell.pserc.jpower.Djp_loadcase.loadcase;
-import static edu.cornell.pserc.jpower.cases.Djp_case30.case30;
-import static edu.cornell.pserc.jpower.opf.Djp_dAbr_dV.dAbr_dV;
-import static edu.cornell.pserc.jpower.opf.Djp_dIbr_dV.dIbr_dV;
-import static edu.cornell.pserc.jpower.opf.Djp_dSbr_dV.dSbr_dV;
-import static edu.cornell.pserc.jpower.pf.Djp_dSbus_dV.dSbus_dV;
-import static edu.cornell.pserc.jpower.pf.Djp_makeYbus.makeYbus;
-import static edu.cornell.pserc.jpower.pf.Djp_runpf.runpf;
-
-import static edu.cornell.pserc.jpower.test.Djp_t_begin.t_begin;
-import static edu.cornell.pserc.jpower.test.Djp_t_end.t_end;
-import static edu.cornell.pserc.jpower.test.Djp_t_is.t_is;
-import static edu.cornell.pserc.jpower.test.Djp_t_ok.t_ok;
+import edu.cornell.pserc.jpower.tdouble.Djp_ext2int;
+import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
+import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
+import edu.cornell.pserc.jpower.tdouble.cases.Djp_case30;
+import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
+import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
+import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
+import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV;
+import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus;
+import edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf;
 
 public class Djp_t_jacobian {
 
@@ -92,21 +81,21 @@ public class Djp_t_jacobian {
 		int nl, nb;
 		AbstractMatrix[] dSbr_dV, dIbr_dV;
 
-		t_begin(28, quiet);
+		Djp_t_begin.t_begin(28, quiet);
 
 		// run powerflow to get solved case
-		opt = jpoption("VERBOSE", 0.0, "OUT_ALL", 0.0);
-		jpc = loadcase(case30());
-		r = runpf(jpc, opt);
+		opt = Djp_jpoption.jpoption("VERBOSE", 0.0, "OUT_ALL", 0.0);
+		jpc = Djp_loadcase.loadcase(Djp_case30.jp_case30());
+		r = Djp_runpf.runpf(jpc, opt);
 
 		// switch to internal bus numbering and build admittance matrices
-		Object[] internal = ext2int(r.bus, r.gen, r.branch);
+		Object[] internal = Djp_ext2int.ext2int(r.bus, r.gen, r.branch);
 		//int[] i2e = (int[]) internal[0];
 		Bus bus = (Bus) internal[1];
 		//Djp_gen gen = (Djp_gen) internal[2];
 		Branch branch = (Branch) internal[3];
 
-		Y = makeYbus(r.baseMVA, bus, branch);
+		Y = Djp_makeYbus.makeYbus(r.baseMVA, bus, branch);
 		Ybus = Y[0];
 		Yf = Y[1];
 		Yt = Y[2];
@@ -135,7 +124,7 @@ public class Djp_t_jacobian {
 //		dSbus_dVa_full = dSbus_dV[1];
 
 		// sparse matrices
-		dSbus_dV = dSbus_dV(Ybus, V);
+		dSbus_dV = Djp_dSbus_dV.dSbus_dV(Ybus, V);
 		dSbus_dVm = dSbus_dV[0];
 		dSbus_dVa = dSbus_dV[1];
 		dSbus_dVm_sp = DComplexFactory2D.dense.make(dSbus_dVm.toArray());
@@ -169,10 +158,10 @@ public class Djp_t_jacobian {
 		num_dSbus_dVa = arg1.assign(arg3.assign(Vsq, cfunc.mult), cfunc.minus).assign(cfunc.div(pert));
 		/** num_dSbus_dVa = full( (Vap .* conj(Ybus * Vap) - V*ones(1,nb) .* conj(Ybus * V*ones(1,nb))) / pert ); */
 
-		t_is(dSbus_dVm_sp, num_dSbus_dVm, 5, "dSbus_dVm (sparse)");
-		t_is(dSbus_dVa_sp, num_dSbus_dVa, 5, "dSbus_dVa (sparse)");
-//		t_is(dSbus_dVm_full, num_dSbus_dVm, 5, "dSbus_dVm (full)");
-//		t_is(dSbus_dVa_full, num_dSbus_dVa, 5, "dSbus_dVa (full)");
+		Djp_t_is.t_is(dSbus_dVm_sp, num_dSbus_dVm, 5, "dSbus_dVm (sparse)");
+		Djp_t_is.t_is(dSbus_dVa_sp, num_dSbus_dVa, 5, "dSbus_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dSbus_dVm_full, num_dSbus_dVm, 5, "dSbus_dVm (full)");
+//		Djp_t_is.jp_t_is(dSbus_dVa_full, num_dSbus_dVa, 5, "dSbus_dVa (full)");
 
 //		//-----  check dSbr_dV code  -----
 //		// full matrices
@@ -218,14 +207,14 @@ public class Djp_t_jacobian {
 //		num_dSt_dVm = DComplexFactory2D.dense.make( Smpt.copy().assign(St2, cfunc.minus).assign(cfunc.div(pert)).toArray() );
 //		num_dSt_dVa = DComplexFactory2D.dense.make( Sapt.copy().assign(St2, cfunc.minus).assign(cfunc.div(pert)).toArray() );
 //
-//		t_is(dSf_dVm_sp, num_dSf_dVm, 5, "dSf_dVm (sparse)");
-//		t_is(dSf_dVa_sp, num_dSf_dVa, 5, "dSf_dVa (sparse)");
-//		t_is(dSt_dVm_sp, num_dSt_dVm, 5, "dSt_dVm (sparse)");
-//		t_is(dSt_dVa_sp, num_dSt_dVa, 5, "dSt_dVa (sparse)");
-//		t_is(dSf_dVm_full, num_dSf_dVm, 5, "dSf_dVm (full)");
-//		t_is(dSf_dVa_full, num_dSf_dVa, 5, "dSf_dVa (full)");
-//		t_is(dSt_dVm_full, num_dSt_dVm, 5, "dSt_dVm (full)");
-//		t_is(dSt_dVa_full, num_dSt_dVa, 5, "dSt_dVa (full)");
+//		Djp_t_is.jp_t_is(dSf_dVm_sp, num_dSf_dVm, 5, "dSf_dVm (sparse)");
+//		Djp_t_is.jp_t_is(dSf_dVa_sp, num_dSf_dVa, 5, "dSf_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dSt_dVm_sp, num_dSt_dVm, 5, "dSt_dVm (sparse)");
+//		Djp_t_is.jp_t_is(dSt_dVa_sp, num_dSt_dVa, 5, "dSt_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dSf_dVm_full, num_dSf_dVm, 5, "dSf_dVm (full)");
+//		Djp_t_is.jp_t_is(dSf_dVa_full, num_dSf_dVa, 5, "dSf_dVa (full)");
+//		Djp_t_is.jp_t_is(dSt_dVm_full, num_dSt_dVm, 5, "dSt_dVm (full)");
+//		Djp_t_is.jp_t_is(dSt_dVa_full, num_dSt_dVa, 5, "dSt_dVa (full)");
 //
 //		//-----  check dAbr_dV code  -----
 //		// full matrices
@@ -251,14 +240,14 @@ public class Djp_t_jacobian {
 //		num_dAt_dVm = DoubleFactory2D.dense.make( Smpt.assign(cfunc.abs).assign(cfunc.square).assign( St2.assign(cfunc.abs).assign(cfunc.square), cfunc.minus ).assign(cfunc.div(pert)).toArray() );
 //		num_dAt_dVa = DoubleFactory2D.dense.make( Sapt.assign(cfunc.abs).assign(cfunc.square).assign( St2.assign(cfunc.abs).assign(cfunc.square), cfunc.minus ).assign(cfunc.div(pert)).toArray() );
 //
-//		t_is(dAf_dVm_sp, num_dAf_dVm, 4, "dAf_dVm (sparse)");
-//		t_is(dAf_dVa_sp, num_dAf_dVa, 4, "dAf_dVa (sparse)");
-//		t_is(dAt_dVm_sp, num_dAt_dVm, 4, "dAt_dVm (sparse)");
-//		t_is(dAt_dVa_sp, num_dAt_dVa, 4, "dAt_dVa (sparse)");
-//		t_is(dAf_dVm_full, num_dAf_dVm, 4, "dAf_dVm (full)");
-//		t_is(dAf_dVa_full, num_dAf_dVa, 4, "dAf_dVa (full)");
-//		t_is(dAt_dVm_full, num_dAt_dVm, 4, "dAt_dVm (full)");
-//		t_is(dAt_dVa_full, num_dAt_dVa, 4, "dAt_dVa (full)");
+//		Djp_t_is.jp_t_is(dAf_dVm_sp, num_dAf_dVm, 4, "dAf_dVm (sparse)");
+//		Djp_t_is.jp_t_is(dAf_dVa_sp, num_dAf_dVa, 4, "dAf_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dAt_dVm_sp, num_dAt_dVm, 4, "dAt_dVm (sparse)");
+//		Djp_t_is.jp_t_is(dAt_dVa_sp, num_dAt_dVa, 4, "dAt_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dAf_dVm_full, num_dAf_dVm, 4, "dAf_dVm (full)");
+//		Djp_t_is.jp_t_is(dAf_dVa_full, num_dAf_dVa, 4, "dAf_dVa (full)");
+//		Djp_t_is.jp_t_is(dAt_dVm_full, num_dAt_dVm, 4, "dAt_dVm (full)");
+//		Djp_t_is.jp_t_is(dAt_dVa_full, num_dAt_dVa, 4, "dAt_dVa (full)");
 //
 //		//-----  check dIbr_dV code  -----
 //		// full matrices
@@ -289,16 +278,16 @@ public class Djp_t_jacobian {
 //		num_dIt_dVm = DComplexFactory2D.dense.make( Yt.zMult(Vmp, null).assign(Yt.zMult(V2.zMult(nb1c, null), null), cfunc.minus).assign(cfunc.div(pert)).toArray() );
 //		num_dIt_dVa = DComplexFactory2D.dense.make( Yt.zMult(Vap, null).assign(Yt.zMult(V2.zMult(nb1c, null), null), cfunc.minus).assign(cfunc.div(pert)).toArray() );
 //
-//		t_is(dIf_dVm_sp, num_dIf_dVm, 5, "dIf_dVm (sparse)");
-//		t_is(dIf_dVa_sp, num_dIf_dVa, 5, "dIf_dVa (sparse)");
-//		t_is(dIt_dVm_sp, num_dIt_dVm, 5, "dIt_dVm (sparse)");
-//		t_is(dIt_dVa_sp, num_dIt_dVa, 5, "dIt_dVa (sparse)");
-//		t_is(dIf_dVm_full, num_dIf_dVm, 5, "dIf_dVm (full)");
-//		t_is(dIf_dVa_full, num_dIf_dVa, 5, "dIf_dVa (full)");
-//		t_is(dIt_dVm_full, num_dIt_dVm, 5, "dIt_dVm (full)");
-//		t_is(dIt_dVa_full, num_dIt_dVa, 5, "dIt_dVa (full)");
+//		Djp_t_is.jp_t_is(dIf_dVm_sp, num_dIf_dVm, 5, "dIf_dVm (sparse)");
+//		Djp_t_is.jp_t_is(dIf_dVa_sp, num_dIf_dVa, 5, "dIf_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dIt_dVm_sp, num_dIt_dVm, 5, "dIt_dVm (sparse)");
+//		Djp_t_is.jp_t_is(dIt_dVa_sp, num_dIt_dVa, 5, "dIt_dVa (sparse)");
+//		Djp_t_is.jp_t_is(dIf_dVm_full, num_dIf_dVm, 5, "dIf_dVm (full)");
+//		Djp_t_is.jp_t_is(dIf_dVa_full, num_dIf_dVa, 5, "dIf_dVa (full)");
+//		Djp_t_is.jp_t_is(dIt_dVm_full, num_dIt_dVm, 5, "dIt_dVm (full)");
+//		Djp_t_is.jp_t_is(dIt_dVa_full, num_dIt_dVa, 5, "dIt_dVa (full)");
 
-		t_end();
+		Djp_t_end.t_end();
 	}
 
 	public static void main(String[] args) {
