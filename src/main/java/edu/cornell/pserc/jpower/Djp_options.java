@@ -163,7 +163,7 @@ import java.util.Map;
  * @author Richard Lincoln
  *
  */
-public class Djp_jpoption {
+public class Djp_options {
 
 	/**
 	 *

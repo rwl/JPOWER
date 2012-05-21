@@ -49,6 +49,9 @@ import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
 import edu.cornell.pserc.jpower.jpc.JPC;
+import edu.cornell.pserc.jpower.options.Options;
+import edu.cornell.pserc.jpower.options.OutputAll;
+import edu.cornell.pserc.jpower.options.OutputConstraints;
 
 import static edu.cornell.pserc.jpower.Djp_jpoption.jpoption;
 
@@ -66,7 +69,7 @@ public class Djp_printpf {
 	}
 
 	public static void printpf(JPC results, String fname) {
-		printpf(results, fname, jpoption());
+		printpf(results, fname, new Options());
 	}
 
 	public static void printpf(JPC results, String fname, Map<String, Double> jpopt) {
@@ -74,7 +77,7 @@ public class Djp_printpf {
 		try {
 			output = new FileOutputStream(fname);
 
-			printpf(results, output, jpoption());
+			printpf(results, output, new Options());
 
 			output.close();
 		} catch (FileNotFoundException e) {
@@ -85,14 +88,16 @@ public class Djp_printpf {
 	}
 
 	public static void printpf(JPC results, OutputStream output) {
-		printpf(results, output, jpoption());
+		printpf(results, output, new Options());
 	}
 
-	public static void printpf(JPC results, OutputStream output, Map<String, Double> jpopt) {
+	public static void printpf(JPC results, OutputStream output, Options jpopt) {
 		PrintWriter pw;
 
 		int i, k, nb, nl, ng, nout, mini, maxi, a, nxfmr;
-		int OUT_ALL, OUT_ALL_LIM, OUT_V_LIM, OUT_LINE_LIM, OUT_PG_LIM, OUT_QG_LIM;
+		int OUT_ALL_LIM;
+		OutputConstraints OUT_V_LIM, OUT_LINE_LIM, OUT_PG_LIM, OUT_QG_LIM;
+		OutputAll OUT_ALL;
 		int[] ties, xfmr, nzld, s_areas, nzsh, allg, ong, onld, out,
 				ib, ig, igon, ildon, inzld, inzsh, ibrch, in_tie, out_tie, g, vg;
 		boolean success, isOPF, isDC, anyP, anyQ, anyP_ld, anyQ_ld, anyF;
@@ -115,7 +120,7 @@ public class Djp_printpf {
 
 		pw = new PrintWriter(output);
 
-		if (jpopt.get("OUT_ALL").equals(0) || jpopt.get("OUT_RAW").equals(0))
+		if (jpopt.out_all == OutputAll.NONE)
 			return;
 
 		baseMVA = results.baseMVA;
@@ -129,19 +134,19 @@ public class Djp_printpf {
 		isOPF = (f != null);	/* FALSE -> only simple PF data, TRUE -> OPF data */
 
 		/* options */
-		isDC			= jpopt.get("PF_DC") == 1;	// use DC formulation?
-		OUT_ALL			= jpopt.get("OUT_ALL").intValue();
-		OUT_ANY			= OUT_ALL == 1;     // set to true if any pretty output is to be generated
-		OUT_SYS_SUM		= OUT_ALL == 1 || (OUT_ALL == -1 && jpopt.get("OUT_SYS_SUM") == 1);
-		OUT_AREA_SUM	= OUT_ALL == 1 || (OUT_ALL == -1 && jpopt.get("OUT_AREA_SUM") == 1);
-		OUT_BUS			= OUT_ALL == 1 || (OUT_ALL == -1 && jpopt.get("OUT_BUS") == 1);
-		OUT_BRANCH		= OUT_ALL == 1 || (OUT_ALL == -1 && jpopt.get("OUT_BRANCH") == 1);
-		OUT_GEN			= OUT_ALL == 1 || (OUT_ALL == -1 && jpopt.get("OUT_GEN") == 1);
-		OUT_ANY					= OUT_ANY || (OUT_ALL == -1 &&
+		isDC			= jpopt.pf_dc;	// use DC formulation?
+		OUT_ALL			= jpopt.out_all;
+		OUT_ANY			= OUT_ALL == OutputAll.EVERYTHING;     // set to true if any pretty output is to be generated
+		OUT_SYS_SUM		= OUT_ALL == OutputAll.EVERYTHING || (OUT_ALL == OutputAll.DELEGATE && jpopt.out_sys_sum);
+		OUT_AREA_SUM	= OUT_ALL == OutputAll.EVERYTHING || (OUT_ALL == OutputAll.DELEGATE && jpopt.out_area_sum);
+		OUT_BUS			= OUT_ALL == OutputAll.EVERYTHING || (OUT_ALL == OutputAll.DELEGATE && jpopt.out_bus);
+		OUT_BRANCH		= OUT_ALL == OutputAll.EVERYTHING || (OUT_ALL == OutputAll.DELEGATE && jpopt.out_branch);
+		OUT_GEN			= OUT_ALL == OutputAll.EVERYTHING || (OUT_ALL == OutputAll.DELEGATE && jpopt.out_gen);
+		OUT_ANY			= OUT_ANY || (OUT_ALL == OutputAll.DELEGATE &&
 			(OUT_SYS_SUM || OUT_AREA_SUM || OUT_BUS || OUT_BRANCH || OUT_GEN));
-		if (OUT_ALL == -1) {
-			OUT_ALL_LIM = jpopt.get("OUT_ALL_LIM").intValue();
-		} else if (OUT_ALL == 1) {
+		if (OUT_ALL == OutputAll.DELEGATE) {
+			OUT_ALL_LIM = jpopt.out_all_lim;
+		} else if (OUT_ALL == OutputAll.EVERYTHING) {
 			OUT_ALL_LIM = 2;
 		} else {
 			OUT_ALL_LIM = 0;
@@ -149,10 +154,10 @@ public class Djp_printpf {
 		OUT_ANY = OUT_ANY || OUT_ALL_LIM >= 1;
 
 		if (OUT_ALL_LIM == -1) {
-			OUT_V_LIM       = jpopt.get("OUT_V_LIM").intValue();
-			OUT_LINE_LIM    = jpopt.get("OUT_LINE_LIM").intValue();
-			OUT_PG_LIM      = jpopt.get("OUT_PG_LIM").intValue();
-			OUT_QG_LIM      = jpopt.get("OUT_QG_LIM").intValue();
+			OUT_V_LIM       = jpopt.out_v_lim;
+			OUT_LINE_LIM    = jpopt.out_line_lim;
+			OUT_PG_LIM      = jpopt.out_pg_lim;
+			OUT_QG_LIM      = jpopt.out_qg_lim;
 		} else {
 			OUT_V_LIM       = OUT_ALL_LIM;
 			OUT_LINE_LIM    = OUT_ALL_LIM;
@@ -187,7 +192,7 @@ public class Djp_printpf {
 		/* parameters */
 		tiesm = bus.bus_area.viewSelection(e2i.viewSelection(branch.f_bus.toArray()).toArray());
 		tiesm.assign(bus.bus_area.viewSelection(e2i.viewSelection(branch.t_bus.toArray()).toArray()), ifunc.equals);
-		tiesm.assign(ifunc.equals(0)); 
+		tiesm.assign(ifunc.equals(0));
 		ties = tiesm.toArray();	// area inter-ties
 
 		tap = DComplexFactory1D.dense.make(nl).assign(1, 0);	// default tap ratio = 1 for lines
