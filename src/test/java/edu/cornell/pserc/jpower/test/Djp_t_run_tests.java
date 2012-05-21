@@ -11,7 +11,7 @@ import static edu.cornell.pserc.jpower.test.TestGlobals.t_num_of_tests;
 import static edu.cornell.pserc.jpower.test.TestGlobals.t_ok_cnt;
 import static edu.cornell.pserc.jpower.test.TestGlobals.t_skip_cnt;
 
-import static cern.colt.util.tdouble.Util.ifunc;
+import static edu.emory.mathcs.utils.Utils.ifunc;
 
 public class Djp_t_run_tests {
 

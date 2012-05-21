@@ -22,7 +22,10 @@ package edu.cornell.pserc.jpower.opf;
 import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
-import cern.colt.util.tdouble.Util;
+
+import static edu.emory.mathcs.utils.Utils.drange;
+import static edu.emory.mathcs.utils.Utils.dcat;
+import static edu.emory.mathcs.utils.Utils.irange;
 
 import static edu.cornell.pserc.jpower.jpc.JPC.PW_LINEAR;
 import static edu.cornell.pserc.jpower.opf.Djp_totcost.totcost;
@@ -69,21 +72,21 @@ public class Djp_poly2pwl {
 
 			if (pmin == 0) {
 				step = (pmax - pmin) / (npts - 1);
-				xx = DoubleFactory1D.dense.make(Util.drange(pmin, pmax, step));
+				xx = DoubleFactory1D.dense.make(drange(pmin, pmax, step));
 			} else if (pmin > 0) {
 				step = (pmax - pmin) / (npts - 1);
-				double[] x = Util.dcat(new double[] {0}, Util.drange(pmin, pmax, step));
+				double[] x = dcat(new double[] {0}, drange(pmin, pmax, step));
 				xx = DoubleFactory1D.dense.make(x);
 			} else if (pmin < 0 && pmax > 0) {
 				step = (pmax - pmin) / (npts - 1);
-				xx = DoubleFactory1D.dense.make(Util.drange(pmin, pmax, step));
+				xx = DoubleFactory1D.dense.make(drange(pmin, pmax, step));
 			} else {
 				// FIXME Pmin < 0 && Pmax <= 0
 				xx = DoubleFactory1D.dense.make(0);
 			}
 			yy = totcost(polycost.copy(new int[] {i}), xx);
-			pwlcost.cost.viewRow(i).viewSelection(Util.irange(0, 2 * (npts - 1)    , 2)).assign(xx);
-			pwlcost.cost.viewRow(i).viewSelection(Util.irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
+			pwlcost.cost.viewRow(i).viewSelection(irange(0, 2 * (npts - 1)    , 2)).assign(xx);
+			pwlcost.cost.viewRow(i).viewSelection(irange(1, 2 * (npts - 1) + 1, 2)).assign(yy);
 		}
 		return pwlcost;
 	}

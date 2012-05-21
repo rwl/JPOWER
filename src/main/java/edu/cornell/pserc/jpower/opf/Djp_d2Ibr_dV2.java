@@ -23,8 +23,8 @@ import cern.colt.matrix.tdcomplex.DComplexFactory2D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 
-import static cern.colt.util.tdouble.Util.j;
-import static cern.colt.util.tdouble.Util.cfunc;
+import static edu.emory.mathcs.utils.Utils.j;
+import static edu.emory.mathcs.utils.Utils.cfunc;
 
 /**
  * Computes 2nd derivatives of complex branch current w.r.t. voltage.

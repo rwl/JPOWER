@@ -23,9 +23,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Util.intm;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.dblm;
+import static edu.emory.mathcs.utils.Utils.intm;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.dblm;
 
 /**
  *

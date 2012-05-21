@@ -22,7 +22,7 @@ package edu.cornell.pserc.jpower.pf;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.dfunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
 
 import static edu.cornell.pserc.jpower.pf.Djp_makeYbus.makeYbus;
 

@@ -23,11 +23,11 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.any;
-import static cern.colt.util.tdouble.Util.intm;
-import static cern.colt.util.tdouble.Util.nonzero;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.any;
+import static edu.emory.mathcs.utils.Utils.intm;
+import static edu.emory.mathcs.utils.Utils.nonzero;
 
 import edu.cornell.pserc.jpower.jpc.Gen;
 

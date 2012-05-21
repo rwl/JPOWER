@@ -22,8 +22,8 @@ package edu.cornell.pserc.jpower.test;
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.drange;
-import static cern.colt.util.tdouble.Util.irange;
+import static edu.emory.mathcs.utils.Utils.drange;
+import static edu.emory.mathcs.utils.Utils.irange;
 
 import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;

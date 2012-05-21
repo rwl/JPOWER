@@ -32,14 +32,14 @@ import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.all;
-import static cern.colt.util.tdouble.Util.intm;
-import static cern.colt.util.tdouble.Util.nonzero;
-import static cern.colt.util.tdouble.Util.EPS;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.any;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.all;
+import static edu.emory.mathcs.utils.Utils.intm;
+import static edu.emory.mathcs.utils.Utils.nonzero;
+import static edu.emory.mathcs.utils.Utils.EPS;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.any;
 
 /**
  * Java Interior Point Solver.

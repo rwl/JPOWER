@@ -24,11 +24,11 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 import cern.colt.matrix.tint.impl.SparseCCIntMatrix2D;
 
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.max;
-import static cern.colt.util.tdouble.Util.nonzero;
-import static cern.colt.util.tdouble.Util.zeros;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.max;
+import static edu.emory.mathcs.utils.Utils.nonzero;
+import static edu.emory.mathcs.utils.Utils.zeros;
 
 import edu.cornell.pserc.jpower.jpc.Areas;
 import edu.cornell.pserc.jpower.jpc.Branch;

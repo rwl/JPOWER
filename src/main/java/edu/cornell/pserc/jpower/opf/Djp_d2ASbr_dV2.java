@@ -24,8 +24,8 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.cfunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.cfunc;
 
 /**
  * Computes 2nd derivatives of |complex power flow|^2 w.r.t. V.

@@ -24,10 +24,10 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.nonzero;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.nonzero;
 
 import edu.cornell.pserc.jpower.jpc.Cost;
 

@@ -24,9 +24,9 @@ import cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import cern.colt.matrix.tdcomplex.DComplexMatrix2D;
 import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 
-import static cern.colt.util.tdouble.Util.cfunc;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.j;
+import static edu.emory.mathcs.utils.Utils.cfunc;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.j;
 
 import edu.cornell.pserc.jpower.jpc.Branch;
 

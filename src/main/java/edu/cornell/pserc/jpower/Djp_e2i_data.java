@@ -27,7 +27,7 @@ import edu.cornell.pserc.jpower.jpc.Order;
 
 import static edu.cornell.pserc.jpower.Djp_get_reorder.get_reorder;
 
-import static cern.colt.util.tdouble.Util.irange;
+import static edu.emory.mathcs.utils.Utils.irange;
 
 public class Djp_e2i_data {
 

@@ -25,10 +25,10 @@ import cern.colt.matrix.tdcomplex.impl.SparseRCDComplexMatrix2D;
 import edu.cornell.pserc.jpower.jpc.Bus;
 import edu.cornell.pserc.jpower.jpc.Gen;
 
-import static cern.colt.util.tdouble.Util.cfunc;
-import static cern.colt.util.tdouble.Util.nonzero;
-import static cern.colt.util.tdouble.Util.complex;
-import static cern.colt.util.tdouble.Util.irange;
+import static edu.emory.mathcs.utils.Utils.cfunc;
+import static edu.emory.mathcs.utils.Utils.nonzero;
+import static edu.emory.mathcs.utils.Utils.complex;
+import static edu.emory.mathcs.utils.Utils.irange;
 
 /**
  * Builds the vector of complex bus power injections.

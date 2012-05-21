@@ -31,9 +31,9 @@ import cern.colt.matrix.tint.IntMatrix1D;
 import cern.jet.math.tdcomplex.DComplexFunctions;
 import cern.jet.math.tdouble.DoubleFunctions;
 
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.cfunc;
-import static cern.colt.util.tdouble.Util.polar;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.cfunc;
+import static edu.emory.mathcs.utils.Utils.polar;
 
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;

@@ -22,7 +22,7 @@ import cern.colt.matrix.tdouble.DoubleFactory2D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tint.IntMatrix1D;
 
-import static cern.colt.util.tdouble.Util.intm;
+import static edu.emory.mathcs.utils.Utils.intm;
 
 /**
  *

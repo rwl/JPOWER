@@ -34,17 +34,17 @@ import cern.colt.matrix.tint.IntFactory1D;
 import cern.colt.matrix.tint.IntMatrix1D;
 import cern.colt.matrix.tint.algo.IntSorting;
 
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.cfunc;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.nonzero;
-import static cern.colt.util.tdouble.Util.polar;
-import static cern.colt.util.tdouble.Util.intm;
-import static cern.colt.util.tdouble.Util.complex;
-import static cern.colt.util.tdouble.Util.diff;
-import static cern.colt.util.tdouble.Util.icat;
-import static cern.colt.util.tdouble.Util.any;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.cfunc;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.nonzero;
+import static edu.emory.mathcs.utils.Utils.polar;
+import static edu.emory.mathcs.utils.Utils.intm;
+import static edu.emory.mathcs.utils.Utils.complex;
+import static edu.emory.mathcs.utils.Utils.diff;
+import static edu.emory.mathcs.utils.Utils.icat;
+import static edu.emory.mathcs.utils.Utils.any;
 
 import edu.cornell.pserc.jpower.jpc.Branch;
 import edu.cornell.pserc.jpower.jpc.Bus;

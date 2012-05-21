@@ -29,9 +29,9 @@ import static edu.cornell.pserc.jpower.Djp_i2e_field.i2e_field;
 import static edu.cornell.pserc.jpower.Djp_int2ext.int2ext;
 import static edu.cornell.pserc.jpower.Djp_loadcase.loadcase;
 
-import static cern.colt.util.tdouble.Util.icat;
-import static cern.colt.util.tdouble.Util.delete;
-import static cern.colt.util.tdouble.Util.irange;
+import static edu.emory.mathcs.utils.Utils.icat;
+import static edu.emory.mathcs.utils.Utils.delete;
+import static edu.emory.mathcs.utils.Utils.irange;
 
 import edu.cornell.pserc.jpower.Ordering;
 import edu.cornell.pserc.jpower.jpc.Cost;

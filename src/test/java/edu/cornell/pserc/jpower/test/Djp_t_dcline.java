@@ -62,12 +62,12 @@ import static edu.cornell.pserc.jpower.jpc.Branch.MU_ST;
 import static edu.cornell.pserc.jpower.jpc.Branch.MU_ANGMIN;
 import static edu.cornell.pserc.jpower.jpc.Branch.MU_ANGMAX;
 
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.icat;
-import static cern.colt.util.tdouble.Util.scat;
-import static cern.colt.util.tdouble.Util.nonzero;
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.dfunc;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.icat;
+import static edu.emory.mathcs.utils.Utils.scat;
+import static edu.emory.mathcs.utils.Utils.nonzero;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
 
 import java.util.Map;
 

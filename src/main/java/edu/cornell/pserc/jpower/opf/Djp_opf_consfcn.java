@@ -31,12 +31,12 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.cfunc;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.icat;
-import static cern.colt.util.tdouble.Util.polar;
-import static cern.colt.util.tdouble.Util.complex;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.cfunc;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.icat;
+import static edu.emory.mathcs.utils.Utils.polar;
+import static edu.emory.mathcs.utils.Utils.complex;
 
 import edu.cornell.pserc.jips.ConstraintEvaluator;
 import edu.cornell.pserc.jpower.jpc.Branch;

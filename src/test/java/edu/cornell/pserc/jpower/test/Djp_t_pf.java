@@ -43,9 +43,9 @@ import static edu.cornell.pserc.jpower.test.Djp_t_is.t_is;
 import static edu.cornell.pserc.jpower.test.Djp_t_ok.t_ok;
 import static edu.cornell.pserc.jpower.test.Djp_t_case9_pf.t_case9_pf;
 
-import static cern.colt.util.tdouble.MMUtil.readMatrix;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.ifunc;
+import static edu.emory.mathcs.utils.MatrixMarketUtils.readMatrix;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.ifunc;
 
 /**
  * Tests for power flow solvers.

@@ -32,12 +32,12 @@ import cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import cern.colt.matrix.tdouble.algo.SparseDoubleAlgebra;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.cfunc;
-import static cern.colt.util.tdouble.Util.icat;
-import static cern.colt.util.tdouble.Util.complex;
-import static cern.colt.util.tdouble.Util.polar;
-import static cern.colt.util.tdouble.Util.irange;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.cfunc;
+import static edu.emory.mathcs.utils.Utils.icat;
+import static edu.emory.mathcs.utils.Utils.complex;
+import static edu.emory.mathcs.utils.Utils.polar;
+import static edu.emory.mathcs.utils.Utils.irange;
 
 import static edu.cornell.pserc.jpower.Djp_jpoption.jpoption;
 import static edu.cornell.pserc.jpower.pf.Djp_dSbus_dV.dSbus_dV;

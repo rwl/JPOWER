@@ -27,13 +27,13 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.SparseRCDoubleMatrix2D;
 
-import static cern.colt.util.tdouble.Util.ifunc;
-import static cern.colt.util.tdouble.Util.dfunc;
-import static cern.colt.util.tdouble.Util.ones;
-import static cern.colt.util.tdouble.Util.irange;
-import static cern.colt.util.tdouble.Util.nonzero;
-import static cern.colt.util.tdouble.Util.intm;
-import static cern.colt.util.tdouble.Util.icat;
+import static edu.emory.mathcs.utils.Utils.ifunc;
+import static edu.emory.mathcs.utils.Utils.dfunc;
+import static edu.emory.mathcs.utils.Utils.ones;
+import static edu.emory.mathcs.utils.Utils.irange;
+import static edu.emory.mathcs.utils.Utils.nonzero;
+import static edu.emory.mathcs.utils.Utils.intm;
+import static edu.emory.mathcs.utils.Utils.icat;
 
 import static edu.cornell.pserc.jpower.jpc.JPC.POLYNOMIAL;
 import static edu.cornell.pserc.jpower.opf.Djp_polycost.polycost;
