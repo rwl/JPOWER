@@ -28,14 +28,14 @@ import cern.colt.matrix.tdouble.DoubleMatrix2D;
 
 import static edu.emory.mathcs.utils.MatrixMarketUtils.readMatrix;
 
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
-import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_rundcpf;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf;
+import edu.cornell.pserc.jpower.Djp_jpoption;
+import edu.cornell.pserc.jpower.Djp_loadcase;
+import edu.cornell.pserc.jpower.jpc.Branch;
+import edu.cornell.pserc.jpower.jpc.Bus;
+import edu.cornell.pserc.jpower.jpc.Gen;
+import edu.cornell.pserc.jpower.jpc.JPC;
+import edu.cornell.pserc.jpower.pf.Djp_rundcpf;
+import edu.cornell.pserc.jpower.pf.Djp_runpf;
 
 /**
  * Tests for power flow solvers.

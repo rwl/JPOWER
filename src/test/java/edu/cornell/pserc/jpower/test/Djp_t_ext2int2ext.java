@@ -20,11 +20,11 @@ package edu.cornell.pserc.jpower.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
 import edu.emory.mathcs.utils.Utils;
-import edu.cornell.pserc.jpower.tdouble.Djp_ext2int;
-import edu.cornell.pserc.jpower.tdouble.Djp_int2ext;
-import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
-import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.Djp_ext2int;
+import edu.cornell.pserc.jpower.Djp_int2ext;
+import edu.cornell.pserc.jpower.Djp_loadcase;
+import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.JPC;
 
 public class Djp_t_ext2int2ext {
 

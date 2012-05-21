@@ -33,17 +33,17 @@ import static edu.emory.mathcs.utils.Utils.dfunc;
 import static edu.emory.mathcs.utils.Utils.cfunc;
 import static edu.emory.mathcs.utils.Utils.polar;
 
-import edu.cornell.pserc.jpower.tdouble.Djp_ext2int;
-import edu.cornell.pserc.jpower.tdouble.Djp_jpoption;
-import edu.cornell.pserc.jpower.tdouble.Djp_loadcase;
-import edu.cornell.pserc.jpower.tdouble.cases.Djp_case30;
-import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_dSbus_dV;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_makeYbus;
-import edu.cornell.pserc.jpower.tdouble.pf.Djp_runpf;
+import edu.cornell.pserc.jpower.Djp_ext2int;
+import edu.cornell.pserc.jpower.Djp_jpoption;
+import edu.cornell.pserc.jpower.Djp_loadcase;
+import edu.cornell.pserc.jpower.cases.Djp_case30;
+import edu.cornell.pserc.jpower.jpc.Branch;
+import edu.cornell.pserc.jpower.jpc.Bus;
+import edu.cornell.pserc.jpower.jpc.Gen;
+import edu.cornell.pserc.jpower.jpc.JPC;
+import edu.cornell.pserc.jpower.pf.Djp_dSbus_dV;
+import edu.cornell.pserc.jpower.pf.Djp_makeYbus;
+import edu.cornell.pserc.jpower.pf.Djp_runpf;
 
 public class Djp_t_jacobian {
 

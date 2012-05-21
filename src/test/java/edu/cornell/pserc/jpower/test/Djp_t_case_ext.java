@@ -19,12 +19,12 @@
 package edu.cornell.pserc.jpower.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
-import edu.cornell.pserc.jpower.tdouble.jpc.Areas;
-import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.jpc.Areas;
+import edu.cornell.pserc.jpower.jpc.Branch;
+import edu.cornell.pserc.jpower.jpc.Bus;
+import edu.cornell.pserc.jpower.jpc.Gen;
+import edu.cornell.pserc.jpower.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.JPC;
 
 public class Djp_t_case_ext {
 

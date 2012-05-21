@@ -19,7 +19,7 @@
 package edu.cornell.pserc.jpower.test;
 
 import cern.colt.matrix.tdouble.DoubleFactory2D;
-import edu.cornell.pserc.jpower.tdouble.jpc.JPC;
+import edu.cornell.pserc.jpower.jpc.JPC;
 
 /**
  * Power flow data for 9 bus, 3 generator case, with OPF data.

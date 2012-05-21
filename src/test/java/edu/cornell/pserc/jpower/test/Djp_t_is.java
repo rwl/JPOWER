@@ -24,11 +24,11 @@ import cern.colt.matrix.tdouble.DoubleFactory1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.algo.DoubleProperty;
-import edu.cornell.pserc.jpower.tdouble.jpc.Areas;
-import edu.cornell.pserc.jpower.tdouble.jpc.Branch;
-import edu.cornell.pserc.jpower.tdouble.jpc.Bus;
-import edu.cornell.pserc.jpower.tdouble.jpc.Gen;
-import edu.cornell.pserc.jpower.tdouble.jpc.GenCost;
+import edu.cornell.pserc.jpower.jpc.Areas;
+import edu.cornell.pserc.jpower.jpc.Branch;
+import edu.cornell.pserc.jpower.jpc.Bus;
+import edu.cornell.pserc.jpower.jpc.Gen;
+import edu.cornell.pserc.jpower.jpc.GenCost;
 
 /**
  * Tests if two matrices are identical to some tolerance.
