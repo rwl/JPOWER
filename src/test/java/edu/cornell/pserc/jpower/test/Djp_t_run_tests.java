@@ -1,5 +1,25 @@
+/*
+ * Copyright (C) 1996-2010 Power System Engineering Research Center
+ * Copyright (C) 2010-2011 Richard Lincoln
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package edu.cornell.pserc.jpower.test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import cern.colt.matrix.tint.IntFactory1D;
@@ -45,7 +65,7 @@ public class Djp_t_run_tests {
 		        for (int m = 0; m < pad; m++)
 		        	System.out.print(".");
 			}
-		    //feval( test_names{k}, ~verbose );
+			run_test(test_names.get(k), verbose);
 
 		    num_of_tests    = num_of_tests  + TestGlobals.t_num_of_tests;
 		    counter         = counter       + TestGlobals.t_counter;
@@ -71,6 +91,37 @@ public class Djp_t_run_tests {
 		    	System.out.printf(", %d skipped", skip_cnt);
 		}
 		System.out.printf("\nElapsed time %.2f seconds.\n", ((System.currentTimeMillis() - t0) / 1000F));
+	}
+
+	private static void run_test(String name, boolean verbose) {
+		ClassLoader classLoader = Djp_t_run_tests.class.getClassLoader();
+
+		try {
+			Class<?> testClass = classLoader.loadClass("edu.cornell.pserc.jpower.test.Djp_" + name);
+
+			try {
+				Method func = testClass.getMethod(name, Boolean.TYPE);
+				func.invoke(testClass, !verbose);
+			} catch (SecurityException e) {
+				System.out.println("Failed to get test function: " + name);
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				System.out.println("Failed to get test function: " + name);
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				System.out.println("Failed to invoke test function: " + name);
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				System.out.println("Failed to invoke test function: " + name);
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				System.out.println("Failed to invoke test function: " + name);
+				e.printStackTrace();
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("Failed to load test: " + name);
+			e.printStackTrace();
+		}
 	}
 
 }
